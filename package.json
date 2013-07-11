@@ -9,7 +9,7 @@
     "dependencies": {
         "windshaft": "git+https://github.com/azavea/Windshaft#master",
         "underscore": "~1.3"
-        "semver": "~1.1.0" // Windshaft lists semver as a dev dependency yet needs it to run...
+        "semver": "~1.1.0"
     },
     "devDependencies": {
         "mocha": "~1.2.1"
