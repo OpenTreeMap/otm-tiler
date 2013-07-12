@@ -33,8 +33,8 @@ var config = {
     }
 };
 
-// Initialize tile server on port 4000
 var ws = new Windshaft.Server(config);
-ws.listen(4000);
+var port = process.env.PORT || 4000;
+ws.listen(port);
 
-console.log("map tiles are now being served out of: http://localhost:4000" + config.base_url + '/:z/:x/:y');
+console.log("map tiles are now being served out of: http://localhost:" + port + config.base_url + '/:z/:x/:y');
