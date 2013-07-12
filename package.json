@@ -14,6 +14,7 @@
     "devDependencies": {
         "mocha": "~1.2.1"
     },
+    "main": "./server.js",
     "scripts": {
         "test": "mocha test/*.js"
     },
