@@ -26,9 +26,9 @@ var config = {
         callback(null,req);
     },
     afterTileRender: function(req, res, tile, headers, callback) {
-        headers['Cache-Control'] = 'max-age=2592000'
-        console.log("HEADERS:")
-        console.log(headers)
+        headers['Cache-Control'] = 'max-age=2592000';
+        console.log("HEADERS:");
+        console.log(headers);
         callback(null, tile, headers);
     }
 };
