@@ -1,10 +1,10 @@
 {
-    "name": "opentreemap-tiler",
+    "name": "otm2-tiler",
     "version": "0.0.1-SNAPSHOT",
-    "description": "Wraps windshaft to provide tiles for OTM",
+    "description": "Wraps Windshaft to provide map tiles for OpenTreeMap 2",
     "repository": {
         "type": "git",
-        "url": "https://github.com/azavea/OpenTreeMap-tiler.git"
+        "url": "https://github.com/azavea/OTM2-tiler"
     },
     "dependencies": {
         "windshaft": "git+https://github.com/azavea/Windshaft#master",
