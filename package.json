@@ -9,10 +9,12 @@
     "dependencies": {
         "windshaft": "git+https://github.com/azavea/Windshaft#master",
         "underscore": "~1.3",
-        "semver": "~1.1.0"
+        "semver": "~1.1.0",
+        "moment": "~2.1.0"
     },
     "devDependencies": {
-        "mocha": "~1.2.1"
+        "mocha": "~1.2.1",
+        "docco": "~0.6.2"
     },
     "main": "./server.js",
     "scripts": {
