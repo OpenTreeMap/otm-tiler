@@ -22,7 +22,9 @@ var moment = require('moment');
 // string.
 
 exports = module.exports = function (s) {
-    if (!s) { return ''; }
+    if (!s) {
+        throw new Error('A null, undefined, or empty filter string cannot be converted to SQL');
+    }
     return filterToSql(JSON.parse(s));
 };
 
@@ -224,6 +226,9 @@ function fieldNameAndPredicateToSql(fieldName, predicate) {
 // `objectToSql` converts a filter object to a valid SQL WHERE clause.
 function objectToSql(o) {
     var statements = [];
+    if (Object.keys(o).length === 0) {
+        throw new Error("An empty object cannot be converted to SQL");
+    }
     _.each(o, function (valueOrPredicate, fieldName) {
         var predicate;
         if (!_.isObject(valueOrPredicate)) {
