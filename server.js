@@ -32,12 +32,10 @@ var windshaftConfig = {
     enable_cors: true,
     postgres: { password: 'otm', user: 'otm' },
     req2params: function(req, callback){
-
-        if (req.query[config.filterQueryArgumentName]) {
+        var filterString = req.query[config.filterQueryArgumentName];
+        if (filterString) {
             try {
-                req.query.sql = filterStringToGrainstoreSqlQuery(
-                    req.query[config.filterQueryArgumentName]
-                );
+                req.query.sql = filterStringToGrainstoreSqlQuery(filterString);
             } catch (err) {
                 callback(err, null);
             }
