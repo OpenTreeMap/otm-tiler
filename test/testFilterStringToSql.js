@@ -11,15 +11,21 @@ describe('filterStringToSql', function() {
     // NULL AND EMPTY HANDLING
 
     it('returns an empty string when passed undefined', function() {
-        assertSql(undefined, '');
+        assert.throws(function() {
+            filterStringToSql(undefined);
+        }, Error);
     });
 
     it('returns an empty string when passed null', function() {
-        assertSql(null, '');
+        assert.throws(function() {
+            filterStringToSql(null);
+        }, Error);
     });
 
     it('returns an empty string when passed an empty string', function() {
-        assertSql('', '');
+        assert.throws(function() {
+            filterStringToSql('');
+        }, Error);
     });
 
     // INVALID JSON HANDLING
