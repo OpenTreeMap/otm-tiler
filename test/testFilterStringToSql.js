@@ -50,6 +50,18 @@ describe('filterStringToSql', function() {
         }, Error);
     });
 
+    it('accepts species as a valid model', function() {
+        assertSql('{"species.id": {"IS": 1}}', '("treemap_species"."id" = 1)');
+    });
+
+    it('accepts tree as a valid model', function() {
+        assertSql('{"tree.id": {"IS": 1}}', '("treemap_tree"."id" = 1)');
+    });
+
+    it('accepts plot as a valid model', function() {
+        assertSql('{"plot.id": {"IS": 1}}', '("treemap_plot"."id" = 1)');
+    });
+
     // INVALID PREDICATE HANDLING
 
     it('raises an error with an invalid predicate', function() {
