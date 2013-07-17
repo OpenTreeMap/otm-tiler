@@ -1,6 +1,24 @@
 var Windshaft = require('windshaft');
-var _         = require('underscore');
-var config = {
+var _ = require('underscore');
+var filterStringToSql = require('./filterStringToSql');
+var config = require('./config.json');
+
+var grainstoreSqlQueryTemplate = _.template(
+    '( <%= selectAllFieldsSql %> WHERE <%= filterSql %> ) otmfiltersql '
+);
+
+// Create a SQL query from a JSON string in the OTM2 filter syntax.
+// Grainstore expects this to be a subquery that it can
+// plugged into another statement. Postgres requires subqueries to
+// be named.
+function filterStringToGrainstoreSqlQuery(filterString) {
+    return grainstoreSqlQueryTemplate({
+        selectAllFieldsSql: config.selectAllFieldsSql,
+        filterSql: filterStringToSql(filterString)
+    });
+}
+
+var windshaftConfig = {
     base_url: '/:cache_key/database/:dbname/table/:table',
     base_url_notable: '/:cache_key/database/:dbname/table',
     grainstore: {
@@ -14,6 +32,16 @@ var config = {
     enable_cors: true,
     postgres: { password: 'otm', user: 'otm' },
     req2params: function(req, callback){
+
+        if (req.query[config.filterQueryArgumentName]) {
+            try {
+                req.query.sql = filterStringToGrainstoreSqlQuery(
+                    req.query[config.filterQueryArgumentName]
+                );
+            } catch (err) {
+                callback(err, null);
+            }
+        }
 
         // no default interactivity. to enable specify the database column you'd like to interact with
         req.params.interactivity = null;
@@ -33,7 +61,7 @@ var config = {
     }
 };
 
-var ws = new Windshaft.Server(config);
+var ws = new Windshaft.Server(windshaftConfig);
 var port = process.env.PORT || 4000;
 ws.listen(port);
 
