@@ -102,6 +102,16 @@ describe('filterStringToSql', function() {
         }, Error);
     });
 
+    // IN_BOUNDARY matches
+
+    if ('returns a ST_Contains function', function() {
+        assertSql('{"plot.geom": {"IN_BOUNDARY": 6}}',
+                  "(ST_Contains(" +
+                    "(SELECT the_geom_webmercator " +
+                    "FROM treemap_boundary WHERE id=6), " +
+                  "treemap_plot.the_geom_webmercator))");
+    });
+
     // MIN AND MAX MATCHES
 
     it('return a less or equal to clause', function () {
