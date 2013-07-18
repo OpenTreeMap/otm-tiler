@@ -102,7 +102,7 @@ describe('filterStringToSql', function() {
         }, Error);
     });
 
-    // IN_BOUNDARY matches
+    // IN_BOUNDARY MATCHES
 
     if ('returns a ST_Contains function', function() {
         assertSql('{"plot.geom": {"IN_BOUNDARY": 6}}',
@@ -255,8 +255,6 @@ describe('filterStringToSql', function() {
         assertSql('{"tree.height": {"IS": "1; SELECT 1; DROP TABLE treemap_tree;"}}',
                   '(\"treemap_tree\".\"height\" = \'1\')');
     });
-
-    // GEOMETRY HANDLING
 
     it('converts "geom" columns to "the_geom_webmercator"', function() {
         assertSql('{"plot.geom": {"IS": 1}}', '(\"treemap_plot\".\"the_geom_webmercator\" = 1)');

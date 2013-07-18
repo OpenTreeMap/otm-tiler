@@ -5,7 +5,7 @@
 //
 //     literal        = json literal | GMT date string in 'YYYY-MM-DD HH:mm:ss'
 //     model          = 'plot' | 'tree'
-//     value-property = 'MIN' | 'MAX' | 'EXCLUSIVE' | 'IN' | 'IS' | 'LIKE'
+//     value-property = 'MIN' | 'MAX' | 'EXCLUSIVE' | 'IN' | 'IS' | 'LIKE' | 'WITHIN_RADIUS' | 'IN_BOUNDARY'
 //     combinator     = 'AND' | 'OR'
 //     predicate      = { model.field: literal }
 //                    | { model.field: { (value-property: literal)* }}
@@ -79,9 +79,8 @@ var PREDICATE_TYPES = {
     }
 };
 
-// Transform a predicate that contains a single value representing
-// a boundary. In particular, this is used with the IN_BOUNDARY
-// predicate.
+// `transformBoundaryPredicate` transform a predicate that contains a single value
+// representing a boundary. In particular, this is used with the IN_BOUNDARY
 function transformBoundaryPredicate(boundaryid) {
     var select = "SELECT the_geom_webmercator " +
             "FROM treemap_boundary WHERE id=" +
@@ -90,6 +89,9 @@ function transformBoundaryPredicate(boundaryid) {
     return 'ST_Contains((' + select + '), <%= column %>)';
 }
 
+// `transformWithinRadiusPredicate` takes an object containing point and radius
+// data. It returns an underscore template that is used to produce an SQL where
+// clause.
 function transformWithinRadiusPredicate(predicateValue) {
     var point = predicateValue.POINT,
         radius = predicateValue.RADIUS,
