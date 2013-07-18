@@ -68,8 +68,24 @@ var PREDICATE_TYPES = {
         matcher: '<=',
         exclusiveMatcher: '<',
         valueConverter: convertValueToEscapedSqlLiteral
+    },
+    IN_BOUNDARY: {
+        combinesWith: [],
+        predicateTransform: transformBoundaryPredicate
     }
 };
+
+// Transform a predicate that contains a single value representing
+// a boundary. In particular, this is used with the IN_BOUNDARY
+// predicate.
+function transformBoundaryPredicate(boundaryid) {
+    var select = "SELECT the_geom_webmercator " +
+            "FROM treemap_boundary WHERE id=" +
+            boundaryid;
+
+    return 'ST_Contains((' + select + '), <%= column %>)';
+}
+
 
 // The `DATETIME_FORMATS` dictionary contains constant strings used to validate
 // and format date and datetime strings.
@@ -104,7 +120,9 @@ function fieldNameToColumnName(fieldName) {
     model = MODEL_MAPPING[modelAndColumn[0]]; // model is not sanitized because there is a whitelist
     column =  sanitizeSqlString(modelAndColumn[1]);
     customColumnName = config.customDbFieldNames[column];
+
     column = customColumnName || column;
+
     if (!MODEL_MAPPING[modelAndColumn[0]]) {
         throw new Error('The model name must be one of the following: ' + Object.keys(MODEL_MAPPING).join(', ') + '. Not ' + modelAndColumn[0]);
     }
@@ -195,21 +213,30 @@ function predicateValueAndTypeToFilterObject(predicateValue, predicateType) {
     var value;
     var t = PREDICATE_TYPES[predicateType];
 
-    // _.isObject can be truthy for arrays
-    if (_.isObject(predicateValue) && !_.isArray(predicateValue)) {
-        matcher = predicateValue.EXCLUSIVE ? t.exclusiveMatcher : t.matcher;
-        value = predicateValue.value;
+    // Predicate transforms override matchers and can return
+    // literal SQL
+    if (t.predicateTransform) {
+        return { sql_template: t.predicateTransform(predicateValue) };
     } else {
-        matcher = t.matcher;
-        value = predicateValue;
-    }
+        // _.isObject can be truthy for arrays
+        if (_.isObject(predicateValue) && !_.isArray(predicateValue)) {
+            matcher = predicateValue.EXCLUSIVE ? t.exclusiveMatcher : t.matcher;
+            value = predicateValue.value;
+        } else {
+            matcher = t.matcher;
+            value = predicateValue;
+        }
 
-    return { matcher: matcher, value: t.valueConverter(value) };
+        return { matcher: matcher, value: t.valueConverter(value) };
+    }
 }
 
 // `predicateToFilterObjects` converts the specified `predicate` object into
 // an array of filter objects. Each element in the returned array will
 // be an object with two keys, `matcher` and `value` e.g. {matcher: "=", value: 4}
+// or an object with a single key called `sql_template` that contains an
+// underscore template that accepts a `column` parameter. If `sql_template` is
+// provided, the template is evaluated and the result is used as the SQL.
 function predicateToFilterObjects(predicate) {
     validatePredicate(predicate);
     return _.map(predicate, predicateValueAndTypeToFilterObject);
@@ -221,7 +248,14 @@ function fieldNameAndPredicateToSql(fieldName, predicate) {
     var columnName = fieldNameToColumnName(fieldName);
     var filters = predicateToFilterObjects(predicate);
     var filterStatements = _.map(filters, function(f) {
-        return columnName + ' ' + f.matcher + ' ' + f.value;
+        // If a literal value is found it probably needs the column
+        // name somewhere besides the LHS so we provide it via
+        // an underscore template
+        if (f.sql_template) {
+            return _.template(f.sql_template, { 'column': columnName });
+        } else {
+            return columnName + ' ' + f.matcher + ' ' + f.value;
+        }
     });
     return '(' + filterStatements.join(' AND ') + ')' ;
 }
