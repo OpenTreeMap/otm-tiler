@@ -19,8 +19,13 @@
           <div id="jump_page">
             
               
-              <a class="source" href="filterStringToSql.html">
-                filterStringToSql.js
+              <a class="source" href="filterStringToSelect.html">
+                filterStringToSelect.js
+              </a>
+            
+              
+              <a class="source" href="filterStringToWhere.html">
+                filterStringToWhere.js
               </a>
             
               
@@ -52,8 +57,40 @@
             </div>
             
             <div class="content"><div class='highlight'><pre><span class="keyword">var</span> Windshaft = require(<span class="string">'windshaft'</span>);
-<span class="keyword">var</span> _         = require(<span class="string">'underscore'</span>);
-<span class="keyword">var</span> config = {
+<span class="keyword">var</span> _ = require(<span class="string">'underscore'</span>);
+
+<span class="keyword">var</span> filterStringToWhere = require(<span class="string">'./filterStringToWhere'</span>);
+<span class="keyword">var</span> filterStringToSelect = require(<span class="string">'./filterStringToSelect'</span>);
+<span class="keyword">var</span> config = require(<span class="string">'./config.json'</span>);
+
+<span class="keyword">var</span> grainstoreSqlQueryTemplate = _.template(
+    <span class="string">'( &lt;%= selectAllFieldsSql %&gt; WHERE &lt;%= filterSql %&gt; ) otmfiltersql '</span>
+);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p>Create a SQL query from a JSON string in the OTM2 filter syntax.
+Grainstore expects this to be a subquery that it can
+plugged into another statement. Postgres requires subqueries to
+be named.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="function"><span class="keyword">function</span> <span class="title">filterStringToGrainstoreSqlQuery</span><span class="params">(filterString)</span> {</span>
+    <span class="keyword">return</span>  grainstoreSqlQueryTemplate({
+        selectAllFieldsSql: filterStringToSelect(filterString),
+        filterSql: filterStringToWhere(filterString)
+    });
+}
+
+<span class="keyword">var</span> windshaftConfig = {
     base_url: <span class="string">'/:cache_key/database/:dbname/table/:table'</span>,
     base_url_notable: <span class="string">'/:cache_key/database/:dbname/table'</span>,
     grainstore: {
@@ -66,16 +103,24 @@
     redis: {host: <span class="string">'127.0.0.1'</span>, port: <span class="number">6379</span>},
     enable_cors: <span class="literal">true</span>,
     postgres: { password: <span class="string">'otm'</span>, user: <span class="string">'otm'</span> },
-    req2params: <span class="keyword">function</span>(req, callback){</pre></div></div>
+    req2params: <span class="keyword">function</span>(req, callback){
+        <span class="keyword">var</span> filterString = req.query[config.filterQueryArgumentName];
+        <span class="keyword">if</span> (filterString) {
+            <span class="keyword">try</span> {
+                req.query.sql = filterStringToGrainstoreSqlQuery(filterString);
+            } <span class="keyword">catch</span> (err) {
+                callback(err, <span class="literal">null</span>);
+            }
+        }</pre></div></div>
             
         </li>
         
         
-        <li id="section-2">
+        <li id="section-3">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-2">&#182;</a>
+                <a class="pilcrow" href="#section-3">&#182;</a>
               </div>
               <p>no default interactivity. to enable specify the database column you&#39;d like to interact with</p>
 
@@ -86,11 +131,11 @@
         </li>
         
         
-        <li id="section-3">
+        <li id="section-4">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-3">&#182;</a>
+                <a class="pilcrow" href="#section-4">&#182;</a>
               </div>
               <p>this is in case you want to test sql parameters eg ...png?sql=select * from my_table limit 10</p>
 
@@ -102,11 +147,11 @@
         </li>
         
         
-        <li id="section-4">
+        <li id="section-5">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-4">&#182;</a>
+                <a class="pilcrow" href="#section-5">&#182;</a>
               </div>
               <p>send the finished req object on</p>
 
@@ -122,11 +167,11 @@
     }
 };
 
-<span class="keyword">var</span> ws = <span class="keyword">new</span> Windshaft.Server(config);
+<span class="keyword">var</span> ws = <span class="keyword">new</span> Windshaft.Server(windshaftConfig);
 <span class="keyword">var</span> port = process.env.PORT || <span class="number">4000</span>;
 ws.listen(port);
 
-console.log(<span class="string">"map tiles are now being served out of: http://localhost:"</span> + port + config.base_url + <span class="string">'/:z/:x/:y'</span>);</pre></div></div>
+console.log(<span class="string">"map tiles are now being served out of: http://localhost:"</span> + port + windshaftConfig.base_url + <span class="string">'/:z/:x/:y'</span>);</pre></div></div>
             
         </li>
         
