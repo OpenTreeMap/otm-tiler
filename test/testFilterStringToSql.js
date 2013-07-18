@@ -112,6 +112,20 @@ describe('filterStringToSql', function() {
                   "treemap_plot.the_geom_webmercator))");
     });
 
+    // WITHIN_RADIUS MATCHES
+
+    it('returns a ST_DWithin function', function() {
+        var jsonQuery = ['{"plot.geom": {"WITHIN_RADIUS":',
+                         '{"POINT": {"x": 0, "y": 0}, "RADIUS": 10}}}'
+                        ].join(""),
+
+            sqlQuery = ["(ST_DWithin(\"treemap_plot\".\"the_geom_webmercator\", ",
+                        "ST_GeomFromEWKT('SRID=3587;POINT(0 0)'), 10))"
+                       ].join("");
+
+        assertSql(jsonQuery, sqlQuery);
+    });
+
     // MIN AND MAX MATCHES
 
     it('return a less or equal to clause', function () {

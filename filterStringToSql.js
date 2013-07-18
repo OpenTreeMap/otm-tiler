@@ -70,8 +70,12 @@ var PREDICATE_TYPES = {
         valueConverter: convertValueToEscapedSqlLiteral
     },
     IN_BOUNDARY: {
-        combinesWith: [],
+        combinesWith: ['WITHIN_RADIUS'],
         predicateTransform: transformBoundaryPredicate
+    },
+    WITHIN_RADIUS: {
+        combinesWith: ['IN_BOUNDARY'],
+        predicateTransform: transformWithinRadiusPredicate
     }
 };
 
@@ -86,6 +90,15 @@ function transformBoundaryPredicate(boundaryid) {
     return 'ST_Contains((' + select + '), <%= column %>)';
 }
 
+function transformWithinRadiusPredicate(predicateValue) {
+    var point = predicateValue.POINT,
+        radius = predicateValue.RADIUS,
+
+        template = "ST_DWithin(<%= column %>, ST_GeomFromEWKT('SRID=3587;POINT(" +
+            point.x + " " + point.y + ")'), " + radius + ")";
+
+    return template;
+}
 
 // The `DATETIME_FORMATS` dictionary contains constant strings used to validate
 // and format date and datetime strings.
