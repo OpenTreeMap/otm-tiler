@@ -2,7 +2,7 @@
 
 <html>
 <head>
-  <title>filterStringToSql.js</title>
+  <title>filterStringToWhere.js</title>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
   <link rel="stylesheet" media="all" href="docco.css" />
@@ -19,8 +19,13 @@
           <div id="jump_page">
             
               
-              <a class="source" href="filterStringToSql.html">
-                filterStringToSql.js
+              <a class="source" href="filterStringToSelect.html">
+                filterStringToSelect.js
+              </a>
+            
+              
+              <a class="source" href="filterStringToWhere.html">
+                filterStringToWhere.js
               </a>
             
               
@@ -36,7 +41,7 @@
         
           <li id="title">
               <div class="annotation">
-                  <h1>filterStringToSql.js</h1>
+                  <h1>filterStringToWhere.js</h1>
               </div>
           </li>
         
@@ -48,12 +53,26 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-1">&#182;</a>
               </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="string">"use strict"</span>;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
               <p>Convert an OpenTreeMap 2 filter string to a Postgres/PostGIS-compatible
 SQL WHERE clause.</p>
 <p>A filter string must be valid JSON and conform to the following grammar:</p>
 <pre><code>literal        = json literal | GMT date string in &#39;YYYY-MM-DD HH:mm:ss&#39;
 model          = &#39;plot&#39; | &#39;tree&#39;
-value-property = &#39;MIN&#39; | &#39;MAX&#39; | &#39;EXCLUIVE&#39; | &#39;IN&#39; | &#39;IS&#39; | &#39;LIKE&#39;
+value-property = &#39;MIN&#39; | &#39;MAX&#39; | &#39;EXCLUSIVE&#39; | &#39;IN&#39; | &#39;IS&#39; | &#39;LIKE&#39; | &#39;WITHIN_RADIUS&#39; | &#39;IN_BOUNDARY&#39;
 combinator     = &#39;AND&#39; | &#39;OR&#39;
 predicate      = { model.field: literal }
                | { model.field: { (value-property: literal)* }}
@@ -63,16 +82,17 @@ filter         = predicate
             </div>
             
             <div class="content"><div class='highlight'><pre><span class="keyword">var</span> _ = require(<span class="string">'underscore'</span>);
-<span class="keyword">var</span> moment = require(<span class="string">'moment'</span>);</pre></div></div>
+<span class="keyword">var</span> moment = require(<span class="string">'moment'</span>);
+<span class="keyword">var</span> config = require(<span class="string">'./config.json'</span>);</pre></div></div>
             
         </li>
         
         
-        <li id="section-2">
+        <li id="section-3">
             <div class="annotation">
               
               <div class="pilwrap for-h2">
-                <a class="pilcrow" href="#section-2">&#182;</a>
+                <a class="pilcrow" href="#section-3">&#182;</a>
               </div>
               <h2>Exports</h2>
 
@@ -81,11 +101,11 @@ filter         = predicate
         </li>
         
         
-        <li id="section-3">
+        <li id="section-4">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-3">&#182;</a>
+                <a class="pilcrow" href="#section-4">&#182;</a>
               </div>
               <p>This module exports a single conversion function that takes a JSON format
 string.</p>
@@ -93,22 +113,11 @@ string.</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>exports = module.exports = <span class="function"><span class="keyword">function</span> <span class="params">(s)</span> {</span>
-    <span class="keyword">if</span> (!s) { <span class="keyword">return</span> <span class="string">''</span>; }
+    <span class="keyword">if</span> (!s) {
+        <span class="keyword">throw</span> <span class="keyword">new</span> Error(<span class="string">'A null, undefined, or empty filter string cannot be converted to SQL'</span>);
+    }
     <span class="keyword">return</span> filterToSql(JSON.parse(s));
 };</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-4">
-            <div class="annotation">
-              
-              <div class="pilwrap for-h2">
-                <a class="pilcrow" href="#section-4">&#182;</a>
-              </div>
-              <h2>Constants</h2>
-
-            </div>
             
         </li>
         
@@ -116,18 +125,12 @@ string.</p>
         <li id="section-5">
             <div class="annotation">
               
-              <div class="pilwrap ">
+              <div class="pilwrap for-h2">
                 <a class="pilcrow" href="#section-5">&#182;</a>
               </div>
-              <p>The <code>MODEL_MAPPING</code> dictionary is used to convert a short model name to a
-physical table name.</p>
+              <h2>Constants</h2>
 
             </div>
-            
-            <div class="content"><div class='highlight'><pre><span class="keyword">var</span> MODEL_MAPPING = {
-    plot: <span class="string">'treemap_plot'</span>,
-    tree: <span class="string">'treemap_tree'</span>
-};</pre></div></div>
             
         </li>
         
@@ -137,6 +140,26 @@ physical table name.</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <p>The <code>MODEL_MAPPING</code> dictionary is used to convert a short model name to a
+physical table name.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="keyword">var</span> MODEL_MAPPING = {
+    plot: <span class="string">'treemap_plot'</span>,
+    tree: <span class="string">'treemap_tree'</span>,
+    species: <span class="string">'treemap_species'</span>
+};</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
               </div>
               <p>The <code>PREDICATE_TYPES</code> dictionary is used for validating predicates and
 providing values and methods used to convert predicates into SQL strings.</p>
@@ -170,17 +193,72 @@ providing values and methods used to convert predicates into SQL strings.</p>
         matcher: <span class="string">'&lt;='</span>,
         exclusiveMatcher: <span class="string">'&lt;'</span>,
         valueConverter: convertValueToEscapedSqlLiteral
+    },
+    IN_BOUNDARY: {
+        combinesWith: [<span class="string">'WITHIN_RADIUS'</span>],
+        predicateTransform: transformBoundaryPredicate
+    },
+    WITHIN_RADIUS: {
+        combinesWith: [<span class="string">'IN_BOUNDARY'</span>],
+        predicateTransform: transformWithinRadiusPredicate
     }
 };</pre></div></div>
             
         </li>
         
         
-        <li id="section-7">
+        <li id="section-8">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-7">&#182;</a>
+                <a class="pilcrow" href="#section-8">&#182;</a>
+              </div>
+              <p><code>transformBoundaryPredicate</code> transform a predicate that contains a single value
+representing a boundary. In particular, this is used with the IN_BOUNDARY</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="function"><span class="keyword">function</span> <span class="title">transformBoundaryPredicate</span><span class="params">(boundaryid)</span> {</span>
+    <span class="keyword">var</span> select = <span class="string">"SELECT the_geom_webmercator "</span> +
+            <span class="string">"FROM treemap_boundary WHERE id="</span> +
+            boundaryid;
+
+    <span class="keyword">return</span> <span class="string">'ST_Contains(('</span> + select + <span class="string">'), &lt;%= column %&gt;)'</span>;
+}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-9">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-9">&#182;</a>
+              </div>
+              <p><code>transformWithinRadiusPredicate</code> takes an object containing point and radius
+data. It returns an underscore template that is used to produce an SQL where
+clause.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="function"><span class="keyword">function</span> <span class="title">transformWithinRadiusPredicate</span><span class="params">(predicateValue)</span> {</span>
+    <span class="keyword">var</span> point = predicateValue.POINT,
+        radius = predicateValue.RADIUS,
+
+        template = <span class="string">"ST_DWithin(&lt;%= column %&gt;, ST_GeomFromEWKT('SRID=3587;POINT("</span> +
+            point.x + <span class="string">" "</span> + point.y + <span class="string">")'), "</span> + radius + <span class="string">")"</span>;
+
+    <span class="keyword">return</span> template;
+}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-10">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-10">&#182;</a>
               </div>
               <p>The <code>DATETIME_FORMATS</code> dictionary contains constant strings used to validate
 and format date and datetime strings.</p>
@@ -196,11 +274,11 @@ and format date and datetime strings.</p>
         </li>
         
         
-        <li id="section-8">
+        <li id="section-11">
             <div class="annotation">
               
               <div class="pilwrap for-h2">
-                <a class="pilcrow" href="#section-8">&#182;</a>
+                <a class="pilcrow" href="#section-11">&#182;</a>
               </div>
               <h2>Internal Methods</h2>
 
@@ -209,11 +287,11 @@ and format date and datetime strings.</p>
         </li>
         
         
-        <li id="section-9">
+        <li id="section-12">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-9">&#182;</a>
+                <a class="pilcrow" href="#section-12">&#182;</a>
               </div>
               <p>The tiler is built on top of Windshaft, which uses sql strings for filtering
 rather than a more complex (but safer) parameterized query system. As a result
@@ -226,11 +304,11 @@ we need this &#39;sanitizeSqlString&#39; method to remove malicous SQL injection
         </li>
         
         
-        <li id="section-10">
+        <li id="section-13">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-10">&#182;</a>
+                <a class="pilcrow" href="#section-13">&#182;</a>
               </div>
               <p>Strip off a trailing statement to prevent &quot;value = 4; DROP TABLE FOO;&quot;</p>
 
@@ -242,11 +320,11 @@ we need this &#39;sanitizeSqlString&#39; method to remove malicous SQL injection
         </li>
         
         
-        <li id="section-11">
+        <li id="section-14">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-11">&#182;</a>
+                <a class="pilcrow" href="#section-14">&#182;</a>
               </div>
               <p><code>fieldNameToColumnName</code> converts a string of the format model.column
 to &quot;physicalTableName&quot;.&quot;column&quot;</p>
@@ -255,7 +333,7 @@ to &quot;physicalTableName&quot;.&quot;column&quot;</p>
             
             <div class="content"><div class='highlight'><pre><span class="function"><span class="keyword">function</span> <span class="title">fieldNameToColumnName</span><span class="params">(fieldName)</span> {</span>
     <span class="keyword">var</span> modelAndColumn = fieldName.split(<span class="string">'.'</span>);
-    <span class="keyword">var</span> model, column;
+    <span class="keyword">var</span> model, column, customColumnName;
     <span class="keyword">if</span> (modelAndColumn.length != <span class="number">2</span>) {
         <span class="keyword">throw</span> <span class="keyword">new</span> Error(<span class="string">'Field names in predicate objects should be of the form "model.field", not "'</span> + fieldName + <span class="string">'"'</span>);
     }
@@ -264,6 +342,10 @@ to &quot;physicalTableName&quot;.&quot;column&quot;</p>
     }
     model = MODEL_MAPPING[modelAndColumn[<span class="number">0</span>]]; <span class="comment">// model is not sanitized because there is a whitelist</span>
     column =  sanitizeSqlString(modelAndColumn[<span class="number">1</span>]);
+    customColumnName = config.customDbFieldNames[column];
+
+    column = customColumnName || column;
+
     <span class="keyword">if</span> (!MODEL_MAPPING[modelAndColumn[<span class="number">0</span>]]) {
         <span class="keyword">throw</span> <span class="keyword">new</span> Error(<span class="string">'The model name must be one of the following: '</span> + Object.keys(MODEL_MAPPING).join(<span class="string">', '</span>) + <span class="string">'. Not '</span> + modelAndColumn[<span class="number">0</span>]);
     }
@@ -273,11 +355,11 @@ to &quot;physicalTableName&quot;.&quot;column&quot;</p>
         </li>
         
         
-        <li id="section-12">
+        <li id="section-15">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-12">&#182;</a>
+                <a class="pilcrow" href="#section-15">&#182;</a>
               </div>
               <p><code>isDateString</code> returns a boolean indicating whether or not the string value
 should be treated as datetime.</p>
@@ -291,11 +373,11 @@ should be treated as datetime.</p>
         </li>
         
         
-        <li id="section-13">
+        <li id="section-16">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-13">&#182;</a>
+                <a class="pilcrow" href="#section-16">&#182;</a>
               </div>
               <p><code>dateTimeStringToSqlValue</code> converts a datetime string into a Postgres
 compatible literal date and time value.</p>
@@ -311,11 +393,11 @@ compatible literal date and time value.</p>
         </li>
         
         
-        <li id="section-14">
+        <li id="section-17">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-14">&#182;</a>
+                <a class="pilcrow" href="#section-17">&#182;</a>
               </div>
               <p><code>convertValueToEscapedSqlLiteral</code> converts a string or number literal
 to be used as SQL query values by wrapping non-numeric values in single quotes,
@@ -338,13 +420,13 @@ into the correct Postgres literal.</p>
         </li>
         
         
-        <li id="section-15">
+        <li id="section-18">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-15">&#182;</a>
+                <a class="pilcrow" href="#section-18">&#182;</a>
               </div>
-              <p><code>convertValueToEscapedSqlLiteral</code> converts an array of string or number
+              <p><code>convertArrayValueToEscapedSqlLiteral</code> converts an array of string or number
 literals to be used as a SQL query values by wrapping each non-numeric value
 in single quotes, escaping single quotes within individual string
 literals by converting them into a pair of single quotes, and converting
@@ -365,11 +447,11 @@ a CSV string wrapped with (), suitable for use in a SQL IN clause.</p>
         </li>
         
         
-        <li id="section-16">
+        <li id="section-19">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-16">&#182;</a>
+                <a class="pilcrow" href="#section-19">&#182;</a>
               </div>
               <p><code>convertValuesToEscapedSqlLiterals</code> converts an array of string or number literals
 to be used as SQL query values by wrapping non-numeric values in single quotes,
@@ -386,11 +468,11 @@ into the correct Postgres literal.</p>
         </li>
         
         
-        <li id="section-17">
+        <li id="section-20">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-17">&#182;</a>
+                <a class="pilcrow" href="#section-20">&#182;</a>
               </div>
               <p><code>validatePredicate</code> throws an error if the specified <code>predicate</code> object
 is not valid.</p>
@@ -423,11 +505,11 @@ is not valid.</p>
         </li>
         
         
-        <li id="section-18">
+        <li id="section-21">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-18">&#182;</a>
+                <a class="pilcrow" href="#section-21">&#182;</a>
               </div>
               <p><code>predicateValueAndTypeToFilterObject</code> converts a value and type to</p>
 
@@ -441,39 +523,61 @@ is not valid.</p>
         </li>
         
         
-        <li id="section-19">
+        <li id="section-22">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-19">&#182;</a>
+                <a class="pilcrow" href="#section-22">&#182;</a>
+              </div>
+              <p>Predicate transforms override matchers and can return
+literal SQL</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="keyword">if</span> (t.predicateTransform) {
+        <span class="keyword">return</span> { sql_template: t.predicateTransform(predicateValue) };
+    } <span class="keyword">else</span> {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-23">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-23">&#182;</a>
               </div>
               <p>_.isObject can be truthy for arrays</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    <span class="keyword">if</span> (_.isObject(predicateValue) &amp;&amp; !_.isArray(predicateValue)) {
-        matcher = predicateValue.EXCLUSIVE ? t.exclusiveMatcher : t.matcher;
-        value = predicateValue.value;
-    } <span class="keyword">else</span> {
-        matcher = t.matcher;
-        value = predicateValue;
-    }
+            <div class="content"><div class='highlight'><pre>        <span class="keyword">if</span> (_.isObject(predicateValue) &amp;&amp; !_.isArray(predicateValue)) {
+            matcher = predicateValue.EXCLUSIVE ? t.exclusiveMatcher : t.matcher;
+            value = predicateValue.value;
+        } <span class="keyword">else</span> {
+            matcher = t.matcher;
+            value = predicateValue;
+        }
 
-    <span class="keyword">return</span> { matcher: matcher, value: t.valueConverter(value) };
+        <span class="keyword">return</span> { matcher: matcher, value: t.valueConverter(value) };
+    }
 }</pre></div></div>
             
         </li>
         
         
-        <li id="section-20">
+        <li id="section-24">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-20">&#182;</a>
+                <a class="pilcrow" href="#section-24">&#182;</a>
               </div>
               <p><code>predicateToFilterObjects</code> converts the specified <code>predicate</code> object into
 an array of filter objects. Each element in the returned array will
-be an object with two keys, <code>matcher</code> and <code>value</code> e.g. {matcher: &quot;=&quot;, value: 4}</p>
+be an object with two keys, <code>matcher</code> and <code>value</code> e.g. {matcher: &quot;=&quot;, value: 4}
+or an object with a single key called <code>sql_template</code> that contains an
+underscore template that accepts a <code>column</code> parameter. If <code>sql_template</code> is
+provided, the template is evaluated and the result is used as the SQL.</p>
 
             </div>
             
@@ -485,11 +589,11 @@ be an object with two keys, <code>matcher</code> and <code>value</code> e.g. {ma
         </li>
         
         
-        <li id="section-21">
+        <li id="section-25">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-21">&#182;</a>
+                <a class="pilcrow" href="#section-25">&#182;</a>
               </div>
               <p><code>fieldNameAndPredicateToSql</code> converts the specified <code>fieldName</code> and <code>predicate</code>
 object into a valid SQL WHERE clause.</p>
@@ -499,8 +603,28 @@ object into a valid SQL WHERE clause.</p>
             <div class="content"><div class='highlight'><pre><span class="function"><span class="keyword">function</span> <span class="title">fieldNameAndPredicateToSql</span><span class="params">(fieldName, predicate)</span> {</span>
     <span class="keyword">var</span> columnName = fieldNameToColumnName(fieldName);
     <span class="keyword">var</span> filters = predicateToFilterObjects(predicate);
-    <span class="keyword">var</span> filterStatements = _.map(filters, <span class="keyword">function</span>(f) {
-        <span class="keyword">return</span> columnName + <span class="string">' '</span> + f.matcher + <span class="string">' '</span> + f.value;
+    <span class="keyword">var</span> filterStatements = _.map(filters, <span class="keyword">function</span>(f) {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-26">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-26">&#182;</a>
+              </div>
+              <p>If a literal value is found it probably needs the column
+name somewhere besides the LHS so we provide it via
+an underscore template</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="keyword">if</span> (f.sql_template) {
+            <span class="keyword">return</span> _.template(f.sql_template, { <span class="string">'column'</span>: columnName });
+        } <span class="keyword">else</span> {
+            <span class="keyword">return</span> columnName + <span class="string">' '</span> + f.matcher + <span class="string">' '</span> + f.value;
+        }
     });
     <span class="keyword">return</span> <span class="string">'('</span> + filterStatements.join(<span class="string">' AND '</span>) + <span class="string">')'</span> ;
 }</pre></div></div>
@@ -508,11 +632,11 @@ object into a valid SQL WHERE clause.</p>
         </li>
         
         
-        <li id="section-22">
+        <li id="section-27">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-22">&#182;</a>
+                <a class="pilcrow" href="#section-27">&#182;</a>
               </div>
               <p><code>objectToSql</code> converts a filter object to a valid SQL WHERE clause.</p>
 
@@ -520,6 +644,9 @@ object into a valid SQL WHERE clause.</p>
             
             <div class="content"><div class='highlight'><pre><span class="function"><span class="keyword">function</span> <span class="title">objectToSql</span><span class="params">(o)</span> {</span>
     <span class="keyword">var</span> statements = [];
+    <span class="keyword">if</span> (Object.keys(o).length === <span class="number">0</span>) {
+        <span class="keyword">throw</span> <span class="keyword">new</span> Error(<span class="string">"An empty object cannot be converted to SQL"</span>);
+    }
     _.each(o, <span class="function"><span class="keyword">function</span> <span class="params">(valueOrPredicate, fieldName)</span> {</span>
         <span class="keyword">var</span> predicate;
         <span class="keyword">if</span> (!_.isObject(valueOrPredicate)) {
@@ -535,11 +662,11 @@ object into a valid SQL WHERE clause.</p>
         </li>
         
         
-        <li id="section-23">
+        <li id="section-28">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-23">&#182;</a>
+                <a class="pilcrow" href="#section-28">&#182;</a>
               </div>
               <p><code>arrayToSql</code> converts a combinator array into a valid SQL WHERE clause.</p>
 
@@ -564,11 +691,11 @@ object into a valid SQL WHERE clause.</p>
         </li>
         
         
-        <li id="section-24">
+        <li id="section-29">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-24">&#182;</a>
+                <a class="pilcrow" href="#section-29">&#182;</a>
               </div>
               <p><code>filterToSql</code> converts any filter object or combinator array into a valid SQL WHERE clause.</p>
 
