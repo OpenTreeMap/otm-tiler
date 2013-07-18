@@ -63,4 +63,4 @@ var ws = new Windshaft.Server(windshaftConfig);
 var port = process.env.PORT || 4000;
 ws.listen(port);
 
-console.log("map tiles are now being served out of: http://localhost:" + port + config.base_url + '/:z/:x/:y');
+console.log("map tiles are now being served out of: http://localhost:" + port + windshaftConfig.base_url + '/:z/:x/:y');
