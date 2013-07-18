@@ -14,6 +14,7 @@
 
 var _ = require('underscore');
 var moment = require('moment');
+var config = require('./config.json');
 
 // Exports
 //---------------------------
@@ -91,7 +92,7 @@ function sanitizeSqlString(value) {
 // to "physicalTableName"."column"
 function fieldNameToColumnName(fieldName) {
     var modelAndColumn = fieldName.split('.');
-    var model, column;
+    var model, column, customColumnName;
     if (modelAndColumn.length != 2) {
         throw new Error('Field names in predicate objects should be of the form "model.field", not "' + fieldName + '"');
     }
@@ -100,6 +101,8 @@ function fieldNameToColumnName(fieldName) {
     }
     model = MODEL_MAPPING[modelAndColumn[0]]; // model is not sanitized because there is a whitelist
     column =  sanitizeSqlString(modelAndColumn[1]);
+    customColumnName = config.customDbFieldNames[column];
+    column = customColumnName || column;
     if (!MODEL_MAPPING[modelAndColumn[0]]) {
         throw new Error('The model name must be one of the following: ' + Object.keys(MODEL_MAPPING).join(', ') + '. Not ' + modelAndColumn[0]);
     }
