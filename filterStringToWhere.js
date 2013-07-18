@@ -1,3 +1,4 @@
+"use strict";
 // Convert an OpenTreeMap 2 filter string to a Postgres/PostGIS-compatible
 // SQL WHERE clause.
 

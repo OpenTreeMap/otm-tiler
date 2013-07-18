@@ -1,6 +1,8 @@
 var Windshaft = require('windshaft');
 var _ = require('underscore');
-var filterStringToSql = require('./filterStringToSql');
+
+var filterStringToWhere = require('./filterStringToWhere');
+var filterStringToSelect = require('./filterStringToSelect');
 var config = require('./config.json');
 
 var grainstoreSqlQueryTemplate = _.template(
@@ -12,9 +14,9 @@ var grainstoreSqlQueryTemplate = _.template(
 // plugged into another statement. Postgres requires subqueries to
 // be named.
 function filterStringToGrainstoreSqlQuery(filterString) {
-    return grainstoreSqlQueryTemplate({
-        selectAllFieldsSql: config.selectAllFieldsSql,
-        filterSql: filterStringToSql(filterString)
+    return  grainstoreSqlQueryTemplate({
+        selectAllFieldsSql: filterStringToSelect(filterString),
+        filterSql: filterStringToWhere(filterString)
     });
 }
 
