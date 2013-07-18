@@ -138,7 +138,7 @@ function convertValueToEscapedSqlLiteral(value) {
     }
 }
 
-// `convertValueToEscapedSqlLiteral` converts an array of string or number
+// `convertArrayValueToEscapedSqlLiteral` converts an array of string or number
 // literals to be used as a SQL query values by wrapping each non-numeric value
 // in single quotes, escaping single quotes within individual string
 // literals by converting them into a pair of single quotes, and converting
