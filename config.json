@@ -1,4 +1,7 @@
 {
     "filterQueryArgumentName": "q",
-    "selectAllFieldsSql": "SELECT * FROM treemap_plot LEFT JOIN treemap_tree ON treemap_plot.id = treemap_tree.plot_id LEFT JOIN treemap_species ON treemap_tree.species_id = treemap_species.id"
+    "selectAllFieldsSql": "SELECT * FROM treemap_plot LEFT JOIN treemap_tree ON treemap_plot.id = treemap_tree.plot_id LEFT JOIN treemap_species ON treemap_tree.species_id = treemap_species.id",
+    "customDbFieldNames": {
+        "geom": "the_geom_webmercator"
+    }
 }
