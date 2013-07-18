@@ -18,4 +18,9 @@ describe('filterStringToSelect', function() {
         var sql = filterStringToSelect('{"plot.id":{"IS":"1"}}');
         assert.equal(sql, config.selectAllFieldsSql.plot);
     });
+
+    it('returns returns tree select when tree is nested in the filter string', function() {
+        var sql = filterStringToSelect('["AND", {"plot.id":{"IS":"1"}, {"tree.id":{"IN":[1,2,3]}}}]');
+        assert.equal(sql, config.selectAllFieldsSql.tree);
+    });
 });
