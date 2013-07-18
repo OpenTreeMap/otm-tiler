@@ -1,30 +1,30 @@
 var assert = require("assert");
-var filterStringToSql = require("../filterStringToSql");
+var filterStringToWhere = require("../filterStringToWhere");
 
 var assertSql = function(objectString, expectedSql) {
-    var result = filterStringToSql(objectString);
+    var result = filterStringToWhere(objectString);
     assert.equal(result, expectedSql);
 };
 
-describe('filterStringToSql', function() {
+describe('filterStringToWhere', function() {
 
     // NULL AND EMPTY HANDLING
 
     it('returns an empty string when passed undefined', function() {
         assert.throws(function() {
-            filterStringToSql(undefined);
+            filterStringToWhere(undefined);
         }, Error);
     });
 
     it('returns an empty string when passed null', function() {
         assert.throws(function() {
-            filterStringToSql(null);
+            filterStringToWhere(null);
         }, Error);
     });
 
     it('returns an empty string when passed an empty string', function() {
         assert.throws(function() {
-            filterStringToSql('');
+            filterStringToWhere('');
         }, Error);
     });
 
@@ -32,7 +32,7 @@ describe('filterStringToSql', function() {
 
     it('raises an error if the specified value is not JSON', function() {
         assert.throws(function() {
-            filterStringToSql('height=1');
+            filterStringToWhere('height=1');
         }, Error);
     });
 
@@ -40,13 +40,13 @@ describe('filterStringToSql', function() {
 
     it('raises an error if the field is not prefixed with a model', function() {
         assert.throws(function() {
-            filterStringToSql('{"height": 1}');
+            filterStringToWhere('{"height": 1}');
         }, Error);
     });
 
     it('raises an error if the field is not prefixed with a valid model', function() {
         assert.throws(function() {
-            filterStringToSql('{"foo.height": 1}');
+            filterStringToWhere('{"foo.height": 1}');
         }, Error);
     });
 
@@ -66,7 +66,7 @@ describe('filterStringToSql', function() {
 
     it('raises an error with an invalid predicate', function() {
         assert.throws(function() {
-            filterStringToSql('{"tree.height": {"WILLBE": 1}}');
+            filterStringToWhere('{"tree.height": {"WILLBE": 1}}');
         }, Error);
     });
 
@@ -110,7 +110,7 @@ describe('filterStringToSql', function() {
 
     it('raises an error when IN is mixed with IS', function() {
         assert.throws(function() {
-            filterStringToSql('{"plot.type": {"IN": [1,2], "IS": "Array"}}');
+            filterStringToWhere('{"plot.type": {"IN": [1,2], "IS": "Array"}}');
         }, Error);
     });
 
@@ -170,37 +170,37 @@ describe('filterStringToSql', function() {
 
     it('raises an error when MIN is mixed with IN', function() {
         assert.throws(function() {
-            filterStringToSql('{"tree.height": {"MIN": 1, "IN": [1]}}');
+            filterStringToWhere('{"tree.height": {"MIN": 1, "IN": [1]}}');
         }, Error);
     });
 
     it('raises an error when MAX is mixed with IN', function() {
         assert.throws(function() {
-            filterStringToSql('{"tree.height": {"MAX": 1, "IN": [1]}}');
+            filterStringToWhere('{"tree.height": {"MAX": 1, "IN": [1]}}');
         }, Error);
     });
 
     it('raises an error when MIN is mixed with IS', function() {
         assert.throws(function() {
-            filterStringToSql('{"tree.height": {"MIN": 1, "IS": 1}}');
+            filterStringToWhere('{"tree.height": {"MIN": 1, "IS": 1}}');
         }, Error);
     });
 
     it('raises an error when MAX is mixed with IN', function() {
         assert.throws(function() {
-            filterStringToSql('{"tree.height": {"MAX": 1, "IS": 1}}');
+            filterStringToWhere('{"tree.height": {"MAX": 1, "IS": 1}}');
         }, Error);
     });
 
     it('raises an error when MIN is mixed with LIKE', function() {
         assert.throws(function() {
-            filterStringToSql('{"tree.height": {"MIN": 1, "LIKE": "%market%"}}');
+            filterStringToWhere('{"tree.height": {"MIN": 1, "LIKE": "%market%"}}');
         }, Error);
     });
 
     it('raises an error when MAX is mixed with LIKE', function() {
         assert.throws(function() {
-            filterStringToSql('{"tree.height": {"MAX": 1, "LIKE": "%market%"}}');
+            filterStringToWhere('{"tree.height": {"MAX": 1, "LIKE": "%market%"}}');
         }, Error);
     });
 
@@ -231,7 +231,7 @@ describe('filterStringToSql', function() {
 
     it('raises an error when a combinator is empty', function() {
         assert.throws(function() {
-            filterStringToSql('[]');
+            filterStringToWhere('[]');
         }, Error);
     });
 
