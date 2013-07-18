@@ -1,3 +1,4 @@
+"use strict";
 // Convert an OpenTreeMap 2 filter string to a Postgres/PostGIS-compatible
 // SQL WHERE clause.
 
@@ -36,7 +37,8 @@ exports = module.exports = function (s) {
 // physical table name.
 var MODEL_MAPPING = {
     plot: 'treemap_plot',
-    tree: 'treemap_tree'
+    tree: 'treemap_tree',
+    species: 'treemap_species'
 };
 
 // The `PREDICATE_TYPES` dictionary is used for validating predicates and
