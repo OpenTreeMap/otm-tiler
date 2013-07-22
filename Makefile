@@ -8,3 +8,6 @@ check:
 	npm test
 
 test: check
+
+docs:
+	docco ./*.js
