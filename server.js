@@ -9,16 +9,53 @@ var grainstoreSqlQueryTemplate = _.template(
     '( <%= selectAllFieldsSql %> WHERE <%= filterSql %> ) otmfiltersql '
 );
 
+var boundarySqlTemplate = _.template(config.boundarySql);
+
 // Create a SQL query from a JSON string in the OTM2 filter syntax.
 // Grainstore expects this to be a subquery that it can
 // plugged into another statement. Postgres requires subqueries to
 // be named.
-function filterStringToGrainstoreSqlQuery(filterString) {
-    return  grainstoreSqlQueryTemplate({
-        selectAllFieldsSql: filterStringToSelect(filterString),
-        filterSql: filterStringToWhere(filterString)
+//
+// Assumes that instanceid is an integer, ready to be plugged
+// directly into SQL
+function plotFilterStringToGrainstoreSqlQuery(filterString, instanceid) {
+    var queryString = '',
+        selectString = '';
+    if (filterString) {
+        queryString = filterStringToWhere(filterString);
+        selectString = filterStringToSelect(filterString);
+
+        if (instanceid) {
+                queryString = '(' + queryString + ') AND ';
+        }
+    } else {
+        selectString = config.defaultSelectSql;
+    }
+
+    if (instanceid) {
+        queryString += 'treemap_plot.instance_id = ' + instanceid;
+    }
+
+    return grainstoreSqlQueryTemplate({
+        selectAllFieldsSql: selectString,
+        filterSql: queryString
     });
 }
+
+
+// Create a SQL query from a JSON string in the OTM2 filter syntax.
+// Grainstore expects this to be a subquery that it can
+// plugged into another statement. Postgres requires subqueries to
+// be named.
+//
+// Assumes that instanceid is an integer, ready to be plugged
+// directly into SQL
+function instanceToBoundaryGrainstoreSqlQuery(instanceid) {
+    return boundarySqlTemplate({
+        instanceid: instanceid
+    });
+}
+
 
 var windshaftConfig = {
     base_url: '/:cache_key/database/:dbname/table/:table',
@@ -34,13 +71,20 @@ var windshaftConfig = {
     enable_cors: true,
     postgres: { password: 'otm', user: 'otm' },
     req2params: function(req, callback){
-        var filterString = req.query[config.filterQueryArgumentName];
-        if (filterString) {
-            try {
-                req.query.sql = filterStringToGrainstoreSqlQuery(filterString);
-            } catch (err) {
-                callback(err, null);
+        var instanceid = parseInt(req.query['instance_id']),
+            table = req.params.table;
+
+        try {
+            if (table === 'treemap_plot') {
+                var filterString = req.query[config.filterQueryArgumentName];
+                req.query.sql = plotFilterStringToGrainstoreSqlQuery(
+                    filterString, instanceid);
+            } else if (table === 'treemap_boundary' && instanceid) {
+                req.query.sql = instanceToBoundaryGrainstoreSqlQuery(
+                    instanceid);
             }
+        } catch (err) {
+            callback(err, null);
         }
 
         // no default interactivity. to enable specify the database column you'd like to interact with
