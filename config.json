@@ -18,5 +18,10 @@
     "customDbFieldNames": {
         "geom": "the_geom_webmercator"
     },
-    "interactivityForUtfGridRequests": "species_id,the_plot_id"
+    "interactivityForUtfGridRequests": "species_id,the_plot_id",
+    "modelMapping": {
+        "plot": "treemap_plot",
+        "tree": "treemap_tree",
+        "species": "treemap_species"
+    }
 }

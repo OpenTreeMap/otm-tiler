@@ -33,14 +33,6 @@ exports = module.exports = function (s) {
 // Constants
 //---------------------------
 
-// The `MODEL_MAPPING` dictionary is used to convert a short model name to a
-// physical table name.
-var MODEL_MAPPING = {
-    plot: 'treemap_plot',
-    tree: 'treemap_tree',
-    species: 'treemap_species'
-};
-
 // The `PREDICATE_TYPES` dictionary is used for validating predicates and
 // providing values and methods used to convert predicates into SQL strings.
 var PREDICATE_TYPES = {
@@ -131,17 +123,19 @@ function fieldNameToColumnName(fieldName) {
     if (modelAndColumn.length != 2) {
         throw new Error('Field names in predicate objects should be of the form "model.field", not "' + fieldName + '"');
     }
-    if (!MODEL_MAPPING[modelAndColumn[0]]) {
-        throw new Error('The model name must be one of the following: ' + Object.keys(MODEL_MAPPING).join(', ') + '. Not ' + modelAndColumn[0]);
+    // The `modelMapping` dictionary is used to convert a short model name to a
+    // physical table name.
+    if (!config.modelMapping[modelAndColumn[0]]) {
+        throw new Error('The model name must be one of the following: ' + Object.keys(config.modelMapping).join(', ') + '. Not ' + modelAndColumn[0]);
     }
-    model = MODEL_MAPPING[modelAndColumn[0]]; // model is not sanitized because there is a whitelist
+    model = config.modelMapping[modelAndColumn[0]]; // model is not sanitized because there is a whitelist
     column =  sanitizeSqlString(modelAndColumn[1]);
     customColumnName = config.customDbFieldNames[column];
 
     column = customColumnName || column;
 
-    if (!MODEL_MAPPING[modelAndColumn[0]]) {
-        throw new Error('The model name must be one of the following: ' + Object.keys(MODEL_MAPPING).join(', ') + '. Not ' + modelAndColumn[0]);
+    if (!config.modelMapping[modelAndColumn[0]]) {
+        throw new Error('The model name must be one of the following: ' + Object.keys(config.modelMapping).join(', ') + '. Not ' + modelAndColumn[0]);
     }
     return '"' + model + '"."' + column + '"';
 }
