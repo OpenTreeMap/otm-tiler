@@ -23,7 +23,7 @@ function makeSqlForPlots(filterString, instanceid, isUtfGridRequest) {
         tables = config.sqlForPlots.tables.base;
     }
 
-    var where,
+    var where = '',
         filterClause = (filterString ? filterStringToWhere(filterString) : null),
         instanceClause = (instanceid ? _.template(config.sqlForPlots.where.instance)({instanceid: instanceid}) : null);
     if (filterString && instanceid) {
