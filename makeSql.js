@@ -50,7 +50,7 @@ function makeSqlForPlots(filterString, instanceid, isUtfGridRequest) {
 // Assumes that instanceid is an integer, ready to be plugged
 // directly into SQL
 function makeSqlForBoundaries(instanceid) {
-    return _.template(config.boundarySql) ({instanceid: instanceid});
+    return _.template(config.boundaryGrainstoreSql) ({instanceid: instanceid});
 }
 
 exports = module.exports = {
