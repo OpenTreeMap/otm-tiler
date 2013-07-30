@@ -1,12 +1,22 @@
 {
     "filterQueryArgumentName": "q",
-    "defaultSelectSql": "SELECT * FROM treemap_plot",
-    "selectAllFieldsSql": {
-        "plot": "SELECT * FROM treemap_plot LEFT JOIN treemap_tree ON treemap_plot.id = treemap_tree.plot_id LEFT JOIN treemap_species ON treemap_tree.species_id = treemap_species.id",
-        "tree": "SELECT * FROM treemap_plot JOIN treemap_tree ON treemap_plot.id = treemap_tree.plot_id JOIN treemap_species ON treemap_tree.species_id = treemap_species.id"
+    "sqlForPlots": {
+        "fields": {
+            "base": "the_geom_webmercator",
+            "utfGrid": "the_geom_webmercator, species_id, treemap_plot.id AS the_plot_id"
+            },
+        "tables": {
+            "base": "treemap_plot",
+            "plot": "treemap_plot LEFT JOIN treemap_tree ON treemap_plot.id = treemap_tree.plot_id LEFT JOIN treemap_species ON treemap_tree.species_id = treemap_species.id",
+            "tree": "treemap_plot      JOIN treemap_tree ON treemap_plot.id = treemap_tree.plot_id LEFT JOIN treemap_species ON treemap_tree.species_id = treemap_species.id"
+            },
+        "where": {
+            "instance" : "treemap_plot.instance_id = <%= instanceid %>"
+        }
     },
     "boundarySql": "(SELECT the_geom_webmercator FROM treemap_boundary JOIN treemap_instance_boundaries ON treemap_instance_boundaries.boundary_id = treemap_boundary.id WHERE treemap_instance_boundaries.instance_id=<%= instanceid %>) otmfiltersql",
     "customDbFieldNames": {
         "geom": "the_geom_webmercator"
-    }
+    },
+    "interactivityForUtfGridRequests": "species_id,the_plot_id"
 }
