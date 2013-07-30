@@ -15,6 +15,7 @@
         }
     },
     "boundaryGrainstoreSql": "(SELECT the_geom_webmercator FROM treemap_boundary JOIN treemap_instance_boundaries ON treemap_instance_boundaries.boundary_id = treemap_boundary.id WHERE treemap_instance_boundaries.instance_id=<%= instanceid %>) otmfiltersql",
+    "getBoundarySql" : "SELECT the_geom_webmercator FROM treemap_boundary WHERE id=<% boundaryId %>",
     "customDbFieldNames": {
         "geom": "the_geom_webmercator"
     },

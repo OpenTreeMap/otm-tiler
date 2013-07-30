@@ -75,12 +75,11 @@ var PREDICATE_TYPES = {
 
 // `transformBoundaryPredicate` transform a predicate that contains a single value
 // representing a boundary. In particular, this is used with the IN_BOUNDARY
-function transformBoundaryPredicate(boundaryid) {
-    var select = "SELECT the_geom_webmercator " +
-            "FROM treemap_boundary WHERE id=" +
-            boundaryid;
+function transformBoundaryPredicate(boundaryId) {
+    var selectTemplate = _.template(config.getBoundarySql),
+        selectStatement = selectTemplate({boundaryId: boundaryId});
 
-    return 'ST_Contains((' + select + '), <%= column %>)';
+    return 'ST_Contains((' + selectStatement + '), <%= column %>)';
 }
 
 // `transformWithinRadiusPredicate` takes an object containing point and radius
