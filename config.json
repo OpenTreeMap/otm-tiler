@@ -14,9 +14,15 @@
             "instance" : "treemap_plot.instance_id = <%= instanceid %>"
         }
     },
-    "boundarySql": "(SELECT the_geom_webmercator FROM treemap_boundary JOIN treemap_instance_boundaries ON treemap_instance_boundaries.boundary_id = treemap_boundary.id WHERE treemap_instance_boundaries.instance_id=<%= instanceid %>) otmfiltersql",
+    "boundaryGrainstoreSql": "(SELECT the_geom_webmercator FROM treemap_boundary JOIN treemap_instance_boundaries ON treemap_instance_boundaries.boundary_id = treemap_boundary.id WHERE treemap_instance_boundaries.instance_id=<%= instanceid %>) otmfiltersql",
+    "getBoundarySql" : "SELECT the_geom_webmercator FROM treemap_boundary WHERE id=<% boundaryId %>",
     "customDbFieldNames": {
         "geom": "the_geom_webmercator"
     },
-    "interactivityForUtfGridRequests": "species_id,the_plot_id"
+    "interactivityForUtfGridRequests": "species_id,the_plot_id",
+    "modelMapping": {
+        "plot": "treemap_plot",
+        "tree": "treemap_tree",
+        "species": "treemap_species"
+    }
 }
