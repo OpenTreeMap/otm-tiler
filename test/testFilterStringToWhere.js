@@ -97,6 +97,13 @@ describe('filterStringToWhere', function() {
                   "(\"treemap_plot\".\"address\" ILIKE '%Market St%')");
     });
 
+    // UDF MATCHES
+    it('processes udf values', function() {
+        assertSql('{"plot.udf:Clever Name": {"LIKE": "%Market St%"}}',
+                  "(\"treemap_plot\".\"udf_scalar_values\"->'Clever Name' " +
+                  "ILIKE '%Market St%')");
+    });
+
     // LIST MATCHES
 
     it('returns an IN clause for a numeric list', function () {
