@@ -6,10 +6,17 @@
 //
 //     literal        = json literal | GMT date string in 'YYYY-MM-DD HH:mm:ss'
 //     model          = 'plot' | 'tree'
-//     value-property = 'MIN' | 'MAX' | 'EXCLUSIVE' | 'IN' | 'IS' | 'LIKE' | 'WITHIN_RADIUS' | 'IN_BOUNDARY'
+//     value-property = 'MIN'
+//                    | 'MAX'
+//                    | 'EXCLUSIVE'
+//                    | 'IN'
+//                    | 'IS'
+//                    | 'LIKE'
+//                    | 'WITHIN_RADIUS'
+//                    | 'IN_BOUNDARY'
 //     combinator     = 'AND' | 'OR'
-//     predicate      = { model.field: literal }
-//                    | { model.field: { (value-property: literal)* }}
+//     predicate      = { model.[udf:]field: literal }
+//                    | { model.[udf:]field: { (value-property: literal)* }}
 //     filter         = predicate
 //                    | [combinator, filter*]
 
@@ -128,15 +135,26 @@ function fieldNameToColumnName(fieldName) {
         throw new Error('The model name must be one of the following: ' + Object.keys(config.modelMapping).join(', ') + '. Not ' + modelAndColumn[0]);
     }
     model = config.modelMapping[modelAndColumn[0]]; // model is not sanitized because there is a whitelist
-    column =  sanitizeSqlString(modelAndColumn[1]);
-    customColumnName = config.customDbFieldNames[column];
-
-    column = customColumnName || column;
 
     if (!config.modelMapping[modelAndColumn[0]]) {
         throw new Error('The model name must be one of the following: ' + Object.keys(config.modelMapping).join(', ') + '. Not ' + modelAndColumn[0]);
     }
-    return '"' + model + '"."' + column + '"';
+
+    column = modelAndColumn[1]
+
+    // udf colums need are prefixed by 'udf:'
+    if (column.indexOf('udf:') === 0) {
+        column = '"' + config.scalar_udf_field + "\"->'" +
+            column.substring(4).replace("'","''") + "'"
+    } else {
+        column =  sanitizeSqlString(modelAndColumn[1]);
+        customColumnName = config.customDbFieldNames[column];
+
+        column = customColumnName || column;
+        column = '"' + column + '"'
+    }
+
+    return '"' + model + '".' + column;
 }
 
 // `isDateString` returns a boolean indicating whether or not the string value
