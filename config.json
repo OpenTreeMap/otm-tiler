@@ -1,5 +1,6 @@
 {
     "filterQueryArgumentName": "q",
+    "scalar_udf_field": "udf_scalar_values",
     "sqlForPlots": {
         "fields": {
             "base": "the_geom_webmercator",
