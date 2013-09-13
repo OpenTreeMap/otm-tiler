@@ -2,6 +2,10 @@ var Windshaft = require('windshaft');
 var _ = require('underscore');
 var makeSql = require('./makeSql.js');
 var config = require('./config.json');
+var cluster = require('cluster');
+var workerCount = process.env.WORKERS || require('os').cpus().length;
+var port = process.env.PORT || 4000;
+var ws;
 
 // Configure the Windshaft tile server to handle OTM's HTTP requests, which retrieve 
 // e.g. a map tile or UTF grid with map features like tree plots or boundaries. 
@@ -25,16 +29,17 @@ var windshaftConfig = {
     base_url_notable: '/:cache_key/database/:dbname/table',
 
     // Tell server how to handle HTTP request 'req' (by specifying properties in req.params).
-    req2params: function(req, callback){
+    req2params: function(req, callback) {
+        var instanceid, isUtfGridRequest, table, filterString;
         // Specify SQL subquery to extract desired features from desired DB layer.
         // (This will be wrapped in an outer query, in many cases extracting geometry
         // using the magic column name "the_geom_webmercator".)
         try {
-            var instanceid = parseInt(req.query['instance_id']),
-                table = req.params.table;
+            instanceid = parseInt(req.query['instance_id'], 10);
+            table = req.params.table;
             if (table === 'treemap_plot') {
-                var filterString = req.query[config.filterQueryArgumentName],
-                    isUtfGridRequest = (req.params.format === 'grid.json');
+                filterString = req.query[config.filterQueryArgumentName];
+                isUtfGridRequest = (req.params.format === 'grid.json');
                 req.query.sql = makeSql.makeSqlForPlots(filterString, instanceid, isUtfGridRequest);
             } else if (table === 'treemap_boundary' && instanceid) {
                 req.query.sql = makeSql.makeSqlForBoundaries(instanceid);
@@ -65,8 +70,24 @@ var windshaftConfig = {
     }
 };
 
-var ws = new Windshaft.Server(windshaftConfig);
-var port = process.env.PORT || 4000;
-ws.listen(port);
-
-console.log("map tiles are now being served out of: http://localhost:" + port + windshaftConfig.base_url + '/:z/:x/:y');
+if (cluster.isMaster) {
+    console.log("Map tiles will be served from http://localhost:" + port + windshaftConfig.base_url + '/:z/:x/:y');
+  
+    console.log('Creating ' + workerCount + ' workers.');
+  
+    cluster.on('online', function(worker) {
+        console.log('Worker process ' + worker.process.pid + ' started.');
+    });
+  
+    for (var i = 0; i < workerCount; i++) {
+        cluster.fork();
+    }
+  
+    cluster.on('exit', function(worker, code, signal) {
+        console.log('Worker process ' + worker.process.pid + ' has died. Starting another to replace it.');
+        cluster.fork();
+    });
+} else {
+    ws = new Windshaft.Server(windshaftConfig);
+    ws.listen(port);
+}
