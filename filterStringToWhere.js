@@ -177,7 +177,7 @@ function dateTimeStringToSqlValue(dtString) {
 // a pair of single quotes, and converting YYYY-MM-DD HH:mm:ss datetime strings
 // into the correct Postgres literal.
 function convertValueToEscapedSqlLiteral(value) {
-    if (_.isNumber(value)) {
+    if (_.isNumber(value) || value === null) {
         return value;
     } else if (isDateTimeString(value)) {
         return dateTimeStringToSqlValue(value);
