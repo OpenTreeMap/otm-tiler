@@ -2,13 +2,14 @@ var Windshaft = require('windshaft');
 var _ = require('underscore');
 var makeSql = require('./makeSql.js');
 var config = require('./config.json');
+var settings = require('./settings.json');
 var cluster = require('cluster');
 var workerCount = process.env.WORKERS || require('os').cpus().length;
 var port = process.env.PORT || 4000;
 var ws;
 
-// Configure the Windshaft tile server to handle OTM's HTTP requests, which retrieve 
-// e.g. a map tile or UTF grid with map features like tree plots or boundaries. 
+// Configure the Windshaft tile server to handle OTM's HTTP requests, which retrieve
+// e.g. a map tile or UTF grid with map features like tree plots or boundaries.
 
 var windshaftConfig = {
     enable_cors: true,
@@ -18,10 +19,10 @@ var windshaftConfig = {
     postgres: { password: 'otm', user: 'otm' },
     grainstore: {
         datasource: {
-            user:'otm',
-            password:'otm',
-            host: 'localhost',
-            port: 5432 }
+            user: settings.username || 'otm',
+            password: settings.password || 'otm',
+            host: settings.host || 'localhost',
+            port: settings.port || 5432 }
     }, // See grainstore npm for other options
 
     // Parse params from the request URL
@@ -72,17 +73,17 @@ var windshaftConfig = {
 
 if (cluster.isMaster) {
     console.log("Map tiles will be served from http://localhost:" + port + windshaftConfig.base_url + '/:z/:x/:y');
-  
+
     console.log('Creating ' + workerCount + ' workers.');
-  
+
     cluster.on('online', function(worker) {
         console.log('Worker process ' + worker.process.pid + ' started.');
     });
-  
+
     for (var i = 0; i < workerCount; i++) {
         cluster.fork();
     }
-  
+
     cluster.on('exit', function(worker, code, signal) {
         console.log('Worker process ' + worker.process.pid + ' has died. Starting another to replace it.');
         cluster.fork();
