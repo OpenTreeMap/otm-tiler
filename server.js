@@ -13,7 +13,7 @@ var ws;
 
 var windshaftConfig = {
     enable_cors: true,
-    redis: {host: '127.0.0.1', port: 6379},
+    redis: {host: settings.redishost || '127.0.0.1', port: 6379},
 
     // How to access the database
     postgres: { password: 'otm', user: 'otm' },
