@@ -59,7 +59,7 @@ describe('filterStringToWhere', function() {
     });
 
     it('accepts plot as a valid model', function() {
-        assertSql('{"plot.id": {"IS": 1}}', '("treemap_plot"."id" = 1)');
+        assertSql('{"plot.id": {"IS": 1}}', '("treemap_mapfeature"."id" = 1)');
     });
 
     // INVALID PREDICATE HANDLING
@@ -82,37 +82,37 @@ describe('filterStringToWhere', function() {
 
     it('returns a single string property match with IS syntax', function() {
         assertSql('{"plot.address": {"IS": "1234 Market St"}}',
-                  "(\"treemap_plot\".\"address\" = '1234 Market St')");
+                  "(\"treemap_mapfeature\".\"address\" = '1234 Market St')");
     });
 
     it('returns a single string property match with short syntax', function() {
         assertSql('{"plot.address": "1234 Market St"}',
-                  "(\"treemap_plot\".\"address\" = '1234 Market St')");
+                  "(\"treemap_mapfeature\".\"address\" = '1234 Market St')");
     });
 
     // LIKE MATCHES
 
     it('returns a LIKE statement', function() {
         assertSql('{"plot.address": {"LIKE": "%Market St%"}}',
-                  "(\"treemap_plot\".\"address\" ILIKE '%Market St%')");
+                  "(\"treemap_mapfeature\".\"address\" ILIKE '%Market St%')");
     });
 
     // UDF MATCHES
     it('processes udf values', function() {
         assertSql('{"plot.udf:Clever Name": {"LIKE": "%Market St%"}}',
-                  "(\"treemap_plot\".\"udf_scalar_values\"->'Clever Name' " +
+                  "(\"treemap_mapfeature\".\"udf_scalar_values\"->'Clever Name' " +
                   "ILIKE '%Market St%')");
     });
 
     // LIST MATCHES
 
     it('returns an IN clause for a numeric list', function () {
-        assertSql('{"plot.type": {"IN": [1,2]}}', "(\"treemap_plot\".\"type\" IN (1,2))");
+        assertSql('{"plot.type": {"IN": [1,2]}}', "(\"treemap_mapfeature\".\"type\" IN (1,2))");
     });
 
     it('returns an IN clause for a string list', function () {
         assertSql('{"plot.address": {"IN": ["1234 Market St", "123 Market St"]}}',
-                  "(\"treemap_plot\".\"address\" IN ('1234 Market St','123 Market St'))");
+                  "(\"treemap_mapfeature\".\"address\" IN ('1234 Market St','123 Market St'))");
     });
 
     it('raises an error when IN is mixed with IS', function() {
@@ -128,7 +128,7 @@ describe('filterStringToWhere', function() {
                   "(ST_Contains(" +
                     "(SELECT the_geom_webmercator " +
                     "FROM treemap_boundary WHERE id=6), " +
-                  "treemap_plot.the_geom_webmercator))");
+                  "treemap_mapfeature.the_geom_webmercator))");
     });
 
     // WITHIN_RADIUS MATCHES
@@ -138,7 +138,7 @@ describe('filterStringToWhere', function() {
                          '{"POINT": {"x": 0, "y": 0}, "RADIUS": 10}}}'
                         ].join(""),
 
-            sqlQuery = ["(ST_DWithin(\"treemap_plot\".\"the_geom_webmercator\", ",
+            sqlQuery = ["(ST_DWithin(\"treemap_mapfeature\".\"the_geom_webmercator\", ",
                         "ST_GeomFromEWKT('SRID=3587;POINT(0 0)'), 10))"
                        ].join("");
 
@@ -216,19 +216,19 @@ describe('filterStringToWhere', function() {
     it('supports ANDing multiple fields', function () {
         assertSql('{"tree.height": {"MIN": 1, "MAX": 2}, "plot.type": {"IN": [1,2]}}',
                   "(\"treemap_tree\".\"height\" >= 1 AND \"treemap_tree\".\"height\" <= 2) " +
-                      "AND (\"treemap_plot\".\"type\" IN (1,2))");
+                      "AND (\"treemap_mapfeature\".\"type\" IN (1,2))");
     });
 
     // COMBINATORS
 
     it('supports OR with a combinator', function () {
         assertSql('["OR", {"tree.height": {"MIN": 1}}, {"plot.type": {"IN": [1,2]}}]',
-                  "((\"treemap_tree\".\"height\" >= 1) OR (\"treemap_plot\".\"type\" IN (1,2)))");
+                  "((\"treemap_tree\".\"height\" >= 1) OR (\"treemap_mapfeature\".\"type\" IN (1,2)))");
     });
 
     it('supports nested combinators', function () {
         assertSql('["AND", {"tree.height": {"MIN": 1}}, ["OR", {"plot.type": {"IN": [1,2]}}, {"tree.dbh": {"MIN": 3}}]]',
-                  "((\"treemap_tree\".\"height\" >= 1) AND ((\"treemap_plot\".\"type\" IN (1,2)) OR (\"treemap_tree\".\"dbh\" >= 3)))");
+                  "((\"treemap_tree\".\"height\" >= 1) AND ((\"treemap_mapfeature\".\"type\" IN (1,2)) OR (\"treemap_tree\".\"dbh\" >= 3)))");
     });
 
     it('generates working SQL from a one element combinator', function () {
@@ -276,7 +276,7 @@ describe('filterStringToWhere', function() {
     });
 
     it('converts "geom" columns to "the_geom_webmercator"', function() {
-        assertSql('{"plot.geom": {"IS": 1}}', '(\"treemap_plot\".\"the_geom_webmercator\" = 1)');
+        assertSql('{"plot.geom": {"IS": 1}}', '(\"treemap_mapfeature\".\"the_geom_webmercator\" = 1)');
     });
 
 });

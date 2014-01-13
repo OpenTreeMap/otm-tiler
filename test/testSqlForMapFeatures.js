@@ -2,7 +2,7 @@ var assert = require("assert");
 var makeSql = require("../makeSql");
 var config = require("../config.json");
 
-describe('testSqlForPlots', function() {
+describe('testSqlForMapFeatures', function() {
 
     var filterString = '{"tree.id":{"IS":"1"}}';
 
@@ -15,7 +15,7 @@ describe('testSqlForPlots', function() {
     }
 
     function testSql(options) {
-        var sql = makeSql.makeSqlForPlots(options.filter, options.instanceId, options.isUtfGridRequest);
+        var sql = makeSql.makeSqlForMapFeatures(options.filter, options.instanceId, options.isUtfGridRequest);
         return sql.indexOf(options.expected);
     }
 
@@ -23,14 +23,14 @@ describe('testSqlForPlots', function() {
 
     it('has base fields for plain request', function() {
         assertSqlContains({
-            expected: config.sqlForPlots.fields.base
+            expected: config.sqlForMapFeatures.fields.base
         });
     });
 
     it('has extra fields for UTF grid request', function() {
         assertSqlContains({
             isUtfGridRequest: true,
-            expected: config.sqlForPlots.fields.utfGrid
+            expected: config.sqlForMapFeatures.fields.utfGrid
         });
     });
 
@@ -38,21 +38,21 @@ describe('testSqlForPlots', function() {
 
     it('has base tables for plain request', function() {
         assertSqlContains({
-            expected: config.sqlForPlots.tables.base
+            expected: config.sqlForMapFeatures.tables.base
         });
     });
 
     it('has tree tables when filtering trees', function() {
         assertSqlContains({
             filter: filterString,
-            expected: config.sqlForPlots.tables.tree
+            expected: config.sqlForMapFeatures.tables.tree
         });
     });
        
     it('has plot tables for UTF grid without filter', function() {
         assertSqlContains({
             isUtfGridRequest: true,
-            expected: config.sqlForPlots.tables.plot
+            expected: config.sqlForMapFeatures.tables.plot
         });
     });
 

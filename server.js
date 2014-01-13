@@ -41,7 +41,7 @@ var windshaftConfig = {
             if (table === 'treemap_plot') {
                 filterString = req.query[config.filterQueryArgumentName];
                 isUtfGridRequest = (req.params.format === 'grid.json');
-                req.query.sql = makeSql.makeSqlForPlots(filterString, instanceid, isUtfGridRequest);
+                req.query.sql = makeSql.makeSqlForMapFeatures(filterString, instanceid, isUtfGridRequest);
             } else if (table === 'treemap_boundary' && instanceid) {
                 req.query.sql = makeSql.makeSqlForBoundaries(instanceid);
             }
