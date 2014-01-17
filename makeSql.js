@@ -8,24 +8,24 @@ var filterStringToWhere = require('./filterStringToWhere');
 var filterStringToTables = require('./filterStringToTables');
 var config = require('./config.json');
 
-// Create a SQL query to return info about plots.
+// Create a SQL query to return info about map features.
 // Assumes that instanceid is an integer, ready to be plugged
 // directly into SQL
-function makeSqlForPlots(filterString, instanceid, isUtfGridRequest) {
-    var fields = (isUtfGridRequest ? config.sqlForPlots.fields.utfGrid : config.sqlForPlots.fields.base);
+function makeSqlForMapFeatures(filterString, instanceid, isUtfGridRequest) {
+    var fields = (isUtfGridRequest ? config.sqlForMapFeatures.fields.utfGrid : config.sqlForMapFeatures.fields.base);
 
     var tables;
     if (filterString) {
         tables = filterStringToTables(filterString);
     } else if (isUtfGridRequest) {
-        tables = config.sqlForPlots.tables.plot;
+        tables = config.sqlForMapFeatures.tables.plot;
     } else {
-        tables = config.sqlForPlots.tables.base;
+        tables = config.sqlForMapFeatures.tables.base;
     }
 
     var where = '',
         filterClause = (filterString ? filterStringToWhere(filterString) : null),
-        instanceClause = (instanceid ? _.template(config.sqlForPlots.where.instance)({instanceid: instanceid}) : null);
+        instanceClause = (instanceid ? _.template(config.sqlForMapFeatures.where.instance)({instanceid: instanceid}) : null);
     if (filterString && instanceid) {
         where = '(' + filterClause + ') AND ' + instanceClause;
     } else if (filterString) {
@@ -54,6 +54,6 @@ function makeSqlForBoundaries(instanceid) {
 }
 
 exports = module.exports = {
-    makeSqlForPlots: makeSqlForPlots,
+    makeSqlForMapFeatures: makeSqlForMapFeatures,
     makeSqlForBoundaries: makeSqlForBoundaries
 };

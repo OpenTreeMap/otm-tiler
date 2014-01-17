@@ -6,8 +6,8 @@ exports = module.exports = function (s) {
     }
 
     if (s.match(/(tree\.|species\.)/)) {
-        return config.sqlForPlots.tables.tree;
+        return config.sqlForMapFeatures.tables.tree;
     } else {
-        return config.sqlForPlots.tables.plot;
+        return config.sqlForMapFeatures.tables.plot;
     }
 };
