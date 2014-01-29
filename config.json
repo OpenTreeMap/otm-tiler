@@ -4,13 +4,13 @@
     "sqlForMapFeatures": {
         "fields": {
             "base": "the_geom_webmercator",
-            "utfGrid": "the_geom_webmercator, species_id, treemap_mapfeature.id AS the_plot_id"
-            },
+            "utfGrid": "the_geom_webmercator, treemap_mapfeature.id AS id"
+        },
         "tables": {
             "base": "treemap_mapfeature",
-            "plot": "treemap_mapfeature LEFT JOIN treemap_tree ON treemap_mapfeature.id = treemap_tree.plot_id LEFT JOIN treemap_species ON treemap_tree.species_id = treemap_species.id",
+            "mapfeature": "treemap_mapfeature LEFT JOIN treemap_tree ON treemap_mapfeature.id = treemap_tree.plot_id LEFT JOIN treemap_species ON treemap_tree.species_id = treemap_species.id",
             "tree": "treemap_mapfeature      JOIN treemap_tree ON treemap_mapfeature.id = treemap_tree.plot_id LEFT JOIN treemap_species ON treemap_tree.species_id = treemap_species.id"
-            },
+        },
         "where": {
             "instance" : "treemap_mapfeature.instance_id = <%= instanceid %>"
         }
@@ -20,9 +20,9 @@
     "customDbFieldNames": {
         "geom": "the_geom_webmercator"
     },
-    "interactivityForUtfGridRequests": "species_id,the_plot_id",
+    "interactivityForUtfGridRequests": "id",
     "modelMapping": {
-        "plot": "treemap_mapfeature",
+        "mapfeature": "treemap_mapfeature",
         "tree": "treemap_tree",
         "species": "treemap_species"
     }

@@ -14,13 +14,13 @@ describe('filterStringToTables', function() {
         assert.equal(sql, config.sqlForMapFeatures.tables.tree);
     });
 
-    it('returns "plot" tables when "plot" is in the filter string', function() {
-        var sql = filterStringToTables('{"plot.id":{"IS":"1"}}');
-        assert.equal(sql, config.sqlForMapFeatures.tables.plot);
+    it('returns "mapfeature" tables when "mapfeature" is in the filter string', function() {
+        var sql = filterStringToTables('{"mapfeature.id":{"IS":"1"}}');
+        assert.equal(sql, config.sqlForMapFeatures.tables.mapfeature);
     });
 
     it('returns "tree" tables when "tree" is nested in the filter string', function() {
-        var sql = filterStringToTables('["AND", {"plot.id":{"IS":"1"}, {"tree.id":{"IN":[1,2,3]}}}]');
+        var sql = filterStringToTables('["AND", {"mapfeature.id":{"IS":"1"}, {"tree.id":{"IN":[1,2,3]}}}]');
         assert.equal(sql, config.sqlForMapFeatures.tables.tree);
     });
 });

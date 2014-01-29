@@ -48,11 +48,11 @@ describe('testSqlForMapFeatures', function() {
             expected: config.sqlForMapFeatures.tables.tree
         });
     });
-       
-    it('has plot tables for UTF grid without filter', function() {
+
+    it('has mapfeatures tables for UTF grid without filter', function() {
         assertSqlContains({
             isUtfGridRequest: true,
-            expected: config.sqlForMapFeatures.tables.plot
+            expected: config.sqlForMapFeatures.tables.mapfeature
         });
     });
 

@@ -18,7 +18,7 @@ function makeSqlForMapFeatures(filterString, instanceid, isUtfGridRequest) {
     if (filterString) {
         tables = filterStringToTables(filterString);
     } else if (isUtfGridRequest) {
-        tables = config.sqlForMapFeatures.tables.plot;
+        tables = config.sqlForMapFeatures.tables.mapfeature;
     } else {
         tables = config.sqlForMapFeatures.tables.base;
     }

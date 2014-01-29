@@ -19,13 +19,18 @@
           <div id="jump_page">
             
               
-              <a class="source" href="filterStringToSelect.html">
-                filterStringToSelect.js
+              <a class="source" href="filterStringToTables.html">
+                filterStringToTables.js
               </a>
             
               
               <a class="source" href="filterStringToWhere.html">
                 filterStringToWhere.js
+              </a>
+            
+              
+              <a class="source" href="makeSql.html">
+                makeSql.js
               </a>
             
               
@@ -56,16 +61,17 @@
               
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="keyword">var</span> Windshaft = require(<span class="string">'windshaft'</span>);
+            <div class="content"><div class='highlight'><pre><span class="string">"use strict"</span>;
+
+<span class="keyword">var</span> Windshaft = require(<span class="string">'windshaft'</span>);
 <span class="keyword">var</span> _ = require(<span class="string">'underscore'</span>);
-
-<span class="keyword">var</span> filterStringToWhere = require(<span class="string">'./filterStringToWhere'</span>);
-<span class="keyword">var</span> filterStringToSelect = require(<span class="string">'./filterStringToSelect'</span>);
+<span class="keyword">var</span> makeSql = require(<span class="string">'./makeSql.js'</span>);
 <span class="keyword">var</span> config = require(<span class="string">'./config.json'</span>);
-
-<span class="keyword">var</span> grainstoreSqlQueryTemplate = _.template(
-    <span class="string">'( &lt;%= selectAllFieldsSql %&gt; WHERE &lt;%= filterSql %&gt; ) otmfiltersql '</span>
-);</pre></div></div>
+<span class="keyword">var</span> settings = require(<span class="string">'./settings.json'</span>);
+<span class="keyword">var</span> cluster = require(<span class="string">'cluster'</span>);
+<span class="keyword">var</span> workerCount = process.env.WORKERS || require(<span class="string">'os'</span>).cpus().length;
+<span class="keyword">var</span> port = process.env.PORT || <span class="number">4000</span>;
+<span class="keyword">var</span> ws;</pre></div></div>
             
         </li>
         
@@ -76,42 +82,14 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-2">&#182;</a>
               </div>
-              <p>Create a SQL query from a JSON string in the OTM2 filter syntax.
-Grainstore expects this to be a subquery that it can
-plugged into another statement. Postgres requires subqueries to
-be named.</p>
+              <p>Configure the Windshaft tile server to handle OTM&#39;s HTTP requests, which retrieve
+e.g. a map tile or UTF grid with map features like tree plots or boundaries.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="function"><span class="keyword">function</span> <span class="title">filterStringToGrainstoreSqlQuery</span><span class="params">(filterString)</span> {</span>
-    <span class="keyword">return</span>  grainstoreSqlQueryTemplate({
-        selectAllFieldsSql: filterStringToSelect(filterString),
-        filterSql: filterStringToWhere(filterString)
-    });
-}
-
-<span class="keyword">var</span> windshaftConfig = {
-    base_url: <span class="string">'/:cache_key/database/:dbname/table/:table'</span>,
-    base_url_notable: <span class="string">'/:cache_key/database/:dbname/table'</span>,
-    grainstore: {
-        datasource: {
-            user:<span class="string">'otm'</span>,
-            password:<span class="string">'otm'</span>,
-            host: <span class="string">'localhost'</span>,
-            port: <span class="number">5432</span> }
-    }, <span class="comment">//see grainstore npm for other options</span>
-    redis: {host: <span class="string">'127.0.0.1'</span>, port: <span class="number">6379</span>},
+            <div class="content"><div class='highlight'><pre><span class="keyword">var</span> windshaftConfig = {
     enable_cors: <span class="literal">true</span>,
-    postgres: { password: <span class="string">'otm'</span>, user: <span class="string">'otm'</span> },
-    req2params: <span class="keyword">function</span>(req, callback){
-        <span class="keyword">var</span> filterString = req.query[config.filterQueryArgumentName];
-        <span class="keyword">if</span> (filterString) {
-            <span class="keyword">try</span> {
-                req.query.sql = filterStringToGrainstoreSqlQuery(filterString);
-            } <span class="keyword">catch</span> (err) {
-                callback(err, <span class="literal">null</span>);
-            }
-        }</pre></div></div>
+    redis: {host: settings.redishost || <span class="string">'127.0.0.1'</span>, port: <span class="number">6379</span>},</pre></div></div>
             
         </li>
         
@@ -122,11 +100,19 @@ be named.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-3">&#182;</a>
               </div>
-              <p>no default interactivity. to enable specify the database column you&#39;d like to interact with</p>
+              <p>How to access the database</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        req.params.interactivity = <span class="literal">null</span>;</pre></div></div>
+            <div class="content"><div class='highlight'><pre>    postgres: { password: <span class="string">'otm'</span>, user: <span class="string">'otm'</span> },
+    grainstore: {
+        datasource: {
+            user: settings.username || <span class="string">'otm'</span>,
+            password: settings.password || <span class="string">'otm'</span>,
+            host: settings.host || <span class="string">'localhost'</span>,
+            port: settings.port || <span class="number">5432</span>
+        }
+    }, <span class="comment">// See grainstore npm for other options</span></pre></div></div>
             
         </li>
         
@@ -137,12 +123,12 @@ be named.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-4">&#182;</a>
               </div>
-              <p>this is in case you want to test sql parameters eg ...png?sql=select * from my_table limit 10</p>
+              <p>Parse params from the request URL</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        req.params =  _.extend({}, req.params);
-        _.extend(req.params, req.query);</pre></div></div>
+            <div class="content"><div class='highlight'><pre>    base_url: <span class="string">'/:cache_buster/database/:dbname/table/:table'</span>,
+    base_url_notable: <span class="string">'/:cache_buster/database/:dbname/table'</span>,</pre></div></div>
             
         </li>
         
@@ -153,12 +139,92 @@ be named.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-5">&#182;</a>
               </div>
-              <p>send the finished req object on</p>
+              <p>Tell server how to handle HTTP request &#39;req&#39; (by specifying properties in req.params).</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        callback(<span class="literal">null</span>,req);
+            <div class="content"><div class='highlight'><pre>    req2params: <span class="keyword">function</span>(req, callback) {
+        <span class="keyword">var</span> instanceid, isUtfGridRequest, table, filterString;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <p>Specify SQL subquery to extract desired features from desired DB layer.
+(This will be wrapped in an outer query, in many cases extracting geometry
+using the magic column name &quot;the_geom_webmercator&quot;.)</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="keyword">try</span> {
+            instanceid = parseInt(req.query[<span class="string">'instance_id'</span>], <span class="number">10</span>);
+            table = req.params.table;
+            <span class="keyword">if</span> (table === <span class="string">'treemap_mapfeature'</span>) {
+                filterString = req.query[config.filterQueryArgumentName];
+                isUtfGridRequest = (req.params.format === <span class="string">'grid.json'</span>);
+                req.query.sql = makeSql.makeSqlForMapFeatures(filterString, instanceid, isUtfGridRequest);
+            } <span class="keyword">else</span> <span class="keyword">if</span> (table === <span class="string">'treemap_boundary'</span> &amp;&amp; instanceid) {
+                req.query.sql = makeSql.makeSqlForBoundaries(instanceid);
+            }
+        } <span class="keyword">catch</span> (err) {
+            callback(err, <span class="literal">null</span>);
+        }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
+              </div>
+              <p>A UTF grid request returns map feature data for each pixel in a tile,
+streamlining client actions like clicking on or hovering over a feature.
+&quot;interactivity&quot; specifies which fields from our SQL query should be returned for each feature.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        req.params.interactivity = (isUtfGridRequest ? config.interactivityForUtfGridRequests : <span class="literal">null</span>);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-8">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-8">&#182;</a>
+              </div>
+              <p>Override request params with query params
+(allows for example testing different SQL, e.g. ...png?sql=select * from my_table limit 10)</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        req.params =  _.extend({}, req.params);
+        _.extend(req.params, req.query);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-9">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-9">&#182;</a>
+              </div>
+              <p>Send the finished req object on</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        callback(<span class="literal">null</span>, req);
     },
+
     afterTileRender: <span class="keyword">function</span>(req, res, tile, headers, callback) {
         headers[<span class="string">'Cache-Control'</span>] = <span class="string">'max-age=2592000'</span>;
         console.log(<span class="string">"HEADERS:"</span>);
@@ -167,11 +233,27 @@ be named.</p>
     }
 };
 
-<span class="keyword">var</span> ws = <span class="keyword">new</span> Windshaft.Server(windshaftConfig);
-<span class="keyword">var</span> port = process.env.PORT || <span class="number">4000</span>;
-ws.listen(port);
+<span class="keyword">if</span> (cluster.isMaster) {
+    console.log(<span class="string">"Map tiles will be served from http://localhost:"</span> + port + windshaftConfig.base_url + <span class="string">'/:z/:x/:y'</span>);
 
-console.log(<span class="string">"map tiles are now being served out of: http://localhost:"</span> + port + windshaftConfig.base_url + <span class="string">'/:z/:x/:y'</span>);</pre></div></div>
+    console.log(<span class="string">'Creating '</span> + workerCount + <span class="string">' workers.'</span>);
+
+    cluster.on(<span class="string">'online'</span>, <span class="keyword">function</span>(worker) {
+        console.log(<span class="string">'Worker process '</span> + worker.process.pid + <span class="string">' started.'</span>);
+    });
+
+    <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; workerCount; i++) {
+        cluster.fork();
+    }
+
+    cluster.on(<span class="string">'exit'</span>, <span class="keyword">function</span>(worker, code, signal) {
+        console.log(<span class="string">'Worker process '</span> + worker.process.pid + <span class="string">' has died. Starting another to replace it.'</span>);
+        cluster.fork();
+    });
+} <span class="keyword">else</span> {
+    ws = <span class="keyword">new</span> Windshaft.Server(windshaftConfig);
+    ws.listen(port);
+}</pre></div></div>
             
         </li>
         
