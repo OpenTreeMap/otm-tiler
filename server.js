@@ -22,7 +22,8 @@ var windshaftConfig = {
             user: settings.username || 'otm',
             password: settings.password || 'otm',
             host: settings.host || 'localhost',
-            port: settings.port || 5432 }
+            port: settings.port || 5432
+        }
     }, // See grainstore npm for other options
 
     // Parse params from the request URL
