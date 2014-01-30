@@ -2,7 +2,7 @@
 
 <html>
 <head>
-  <title>filterStringToSelect.js</title>
+  <title>filterStringToTables.js</title>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
   <link rel="stylesheet" media="all" href="docco.css" />
@@ -19,13 +19,18 @@
           <div id="jump_page">
             
               
-              <a class="source" href="filterStringToSelect.html">
-                filterStringToSelect.js
+              <a class="source" href="filterStringToTables.html">
+                filterStringToTables.js
               </a>
             
               
               <a class="source" href="filterStringToWhere.html">
                 filterStringToWhere.js
+              </a>
+            
+              
+              <a class="source" href="makeSql.html">
+                makeSql.js
               </a>
             
               
@@ -41,7 +46,7 @@
         
           <li id="title">
               <div class="annotation">
-                  <h1>filterStringToSelect.js</h1>
+                  <h1>filterStringToTables.js</h1>
               </div>
           </li>
         
@@ -64,9 +69,9 @@ exports = module.exports = <span class="function"><span class="keyword">function
     }
 
     <span class="keyword">if</span> (s.match(<span class="regexp">/(tree\.|species\.)/</span>)) {
-        <span class="keyword">return</span> config.selectAllFieldsSql.tree;
+        <span class="keyword">return</span> config.sqlForMapFeatures.tables.tree;
     } <span class="keyword">else</span> {
-        <span class="keyword">return</span> config.selectAllFieldsSql.plot;
+        <span class="keyword">return</span> config.sqlForMapFeatures.tables.mapfeature;
     }
 };</pre></div></div>
             

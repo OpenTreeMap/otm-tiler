@@ -22,7 +22,8 @@ var windshaftConfig = {
             user: settings.username || 'otm',
             password: settings.password || 'otm',
             host: settings.host || 'localhost',
-            port: settings.port || 5432 }
+            port: settings.port || 5432
+        }
     }, // See grainstore npm for other options
 
     // Parse params from the request URL
@@ -38,7 +39,7 @@ var windshaftConfig = {
         try {
             instanceid = parseInt(req.query['instance_id'], 10);
             table = req.params.table;
-            if (table === 'treemap_plot') {
+            if (table === 'treemap_mapfeature') {
                 filterString = req.query[config.filterQueryArgumentName];
                 isUtfGridRequest = (req.params.format === 'grid.json');
                 req.query.sql = makeSql.makeSqlForMapFeatures(filterString, instanceid, isUtfGridRequest);

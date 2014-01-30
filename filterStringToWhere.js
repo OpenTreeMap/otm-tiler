@@ -1,11 +1,12 @@
 "use strict";
+
 // Convert an OpenTreeMap 2 filter string to a Postgres/PostGIS-compatible
 // SQL WHERE clause.
 
 // A filter string must be valid JSON and conform to the following grammar:
 //
 //     literal        = json literal | GMT date string in 'YYYY-MM-DD HH:mm:ss'
-//     model          = 'plot' | 'tree'
+//     model          = 'mapfeature' | 'tree'
 //     value-property = 'MIN'
 //                    | 'MAX'
 //                    | 'EXCLUSIVE'
@@ -140,18 +141,18 @@ function fieldNameToColumnName(fieldName) {
         throw new Error('The model name must be one of the following: ' + Object.keys(config.modelMapping).join(', ') + '. Not ' + modelAndColumn[0]);
     }
 
-    column = modelAndColumn[1]
+    column = modelAndColumn[1];
 
-    // udf colums need are prefixed by 'udf:'
+    // udf columns need are prefixed by 'udf:'
     if (column.indexOf('udf:') === 0) {
         column = '"' + config.scalar_udf_field + "\"->'" +
-            column.substring(4).replace("'","''") + "'"
+            column.substring(4).replace("'","''") + "'";
     } else {
         column =  sanitizeSqlString(modelAndColumn[1]);
         customColumnName = config.customDbFieldNames[column];
 
         column = customColumnName || column;
-        column = '"' + column + '"'
+        column = '"' + column + '"';
     }
 
     return '"' + model + '".' + column;

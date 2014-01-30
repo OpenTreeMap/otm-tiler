@@ -58,8 +58,8 @@ describe('filterStringToWhere', function() {
         assertSql('{"tree.id": {"IS": 1}}', '("treemap_tree"."id" = 1)');
     });
 
-    it('accepts plot as a valid model', function() {
-        assertSql('{"plot.id": {"IS": 1}}', '("treemap_mapfeature"."id" = 1)');
+    it('accepts mapfeature as a valid model', function() {
+        assertSql('{"mapfeature.id": {"IS": 1}}', '("treemap_mapfeature"."id" = 1)');
     });
 
     // INVALID PREDICATE HANDLING
@@ -81,25 +81,25 @@ describe('filterStringToWhere', function() {
     });
 
     it('returns a single string property match with IS syntax', function() {
-        assertSql('{"plot.address": {"IS": "1234 Market St"}}',
+        assertSql('{"mapfeature.address": {"IS": "1234 Market St"}}',
                   "(\"treemap_mapfeature\".\"address\" = '1234 Market St')");
     });
 
     it('returns a single string property match with short syntax', function() {
-        assertSql('{"plot.address": "1234 Market St"}',
+        assertSql('{"mapfeature.address": "1234 Market St"}',
                   "(\"treemap_mapfeature\".\"address\" = '1234 Market St')");
     });
 
     // LIKE MATCHES
 
     it('returns a LIKE statement', function() {
-        assertSql('{"plot.address": {"LIKE": "%Market St%"}}',
+        assertSql('{"mapfeature.address": {"LIKE": "%Market St%"}}',
                   "(\"treemap_mapfeature\".\"address\" ILIKE '%Market St%')");
     });
 
     // UDF MATCHES
     it('processes udf values', function() {
-        assertSql('{"plot.udf:Clever Name": {"LIKE": "%Market St%"}}',
+        assertSql('{"mapfeature.udf:Clever Name": {"LIKE": "%Market St%"}}',
                   "(\"treemap_mapfeature\".\"udf_scalar_values\"->'Clever Name' " +
                   "ILIKE '%Market St%')");
     });
@@ -107,24 +107,24 @@ describe('filterStringToWhere', function() {
     // LIST MATCHES
 
     it('returns an IN clause for a numeric list', function () {
-        assertSql('{"plot.type": {"IN": [1,2]}}', "(\"treemap_mapfeature\".\"type\" IN (1,2))");
+        assertSql('{"mapfeature.type": {"IN": [1,2]}}', "(\"treemap_mapfeature\".\"type\" IN (1,2))");
     });
 
     it('returns an IN clause for a string list', function () {
-        assertSql('{"plot.address": {"IN": ["1234 Market St", "123 Market St"]}}',
+        assertSql('{"mapfeature.address": {"IN": ["1234 Market St", "123 Market St"]}}',
                   "(\"treemap_mapfeature\".\"address\" IN ('1234 Market St','123 Market St'))");
     });
 
     it('raises an error when IN is mixed with IS', function() {
         assert.throws(function() {
-            filterStringToWhere('{"plot.type": {"IN": [1,2], "IS": "Array"}}');
+            filterStringToWhere('{"mapfeature.type": {"IN": [1,2], "IS": "Array"}}');
         }, Error);
     });
 
     // IN_BOUNDARY MATCHES
 
     if ('returns a ST_Contains function', function() {
-        assertSql('{"plot.geom": {"IN_BOUNDARY": 6}}',
+        assertSql('{"mapfeature.geom": {"IN_BOUNDARY": 6}}',
                   "(ST_Contains(" +
                     "(SELECT the_geom_webmercator " +
                     "FROM treemap_boundary WHERE id=6), " +
@@ -134,7 +134,7 @@ describe('filterStringToWhere', function() {
     // WITHIN_RADIUS MATCHES
 
     it('returns a ST_DWithin function', function() {
-        var jsonQuery = ['{"plot.geom": {"WITHIN_RADIUS":',
+        var jsonQuery = ['{"mapfeature.geom": {"WITHIN_RADIUS":',
                          '{"POINT": {"x": 0, "y": 0}, "RADIUS": 10}}}'
                         ].join(""),
 
@@ -214,7 +214,7 @@ describe('filterStringToWhere', function() {
     // MULTIPLE FIELDS
 
     it('supports ANDing multiple fields', function () {
-        assertSql('{"tree.height": {"MIN": 1, "MAX": 2}, "plot.type": {"IN": [1,2]}}',
+        assertSql('{"tree.height": {"MIN": 1, "MAX": 2}, "mapfeature.type": {"IN": [1,2]}}',
                   "(\"treemap_tree\".\"height\" >= 1 AND \"treemap_tree\".\"height\" <= 2) " +
                       "AND (\"treemap_mapfeature\".\"type\" IN (1,2))");
     });
@@ -222,12 +222,12 @@ describe('filterStringToWhere', function() {
     // COMBINATORS
 
     it('supports OR with a combinator', function () {
-        assertSql('["OR", {"tree.height": {"MIN": 1}}, {"plot.type": {"IN": [1,2]}}]',
+        assertSql('["OR", {"tree.height": {"MIN": 1}}, {"mapfeature.type": {"IN": [1,2]}}]',
                   "((\"treemap_tree\".\"height\" >= 1) OR (\"treemap_mapfeature\".\"type\" IN (1,2)))");
     });
 
     it('supports nested combinators', function () {
-        assertSql('["AND", {"tree.height": {"MIN": 1}}, ["OR", {"plot.type": {"IN": [1,2]}}, {"tree.dbh": {"MIN": 3}}]]',
+        assertSql('["AND", {"tree.height": {"MIN": 1}}, ["OR", {"mapfeature.type": {"IN": [1,2]}}, {"tree.dbh": {"MIN": 3}}]]',
                   "((\"treemap_tree\".\"height\" >= 1) AND ((\"treemap_mapfeature\".\"type\" IN (1,2)) OR (\"treemap_tree\".\"dbh\" >= 3)))");
     });
 
@@ -276,7 +276,7 @@ describe('filterStringToWhere', function() {
     });
 
     it('converts "geom" columns to "the_geom_webmercator"', function() {
-        assertSql('{"plot.geom": {"IS": 1}}', '(\"treemap_mapfeature\".\"the_geom_webmercator\" = 1)');
+        assertSql('{"mapfeature.geom": {"IS": 1}}', '(\"treemap_mapfeature\".\"the_geom_webmercator\" = 1)');
     });
 
 });
