@@ -3,8 +3,8 @@
     "scalar_udf_field": "udf_scalar_values",
     "sqlForMapFeatures": {
         "fields": {
-            "base": "the_geom_webmercator, feature_type",
-            "utfGrid": "the_geom_webmercator, feature_type, treemap_mapfeature.id AS id"
+            "base": "feature_type",
+            "utfGrid": "feature_type, treemap_mapfeature.id AS id"
         },
         "tables": {
             "base": "treemap_mapfeature",

@@ -12,6 +12,7 @@ var ws;
 // e.g. a map tile or UTF grid with map features like tree plots or boundaries.
 
 var windshaftConfig = {
+    useProfiler: false,  // if true, returns X-Tiler-Profiler header with rendering times
     enable_cors: true,
     redis: {host: settings.redishost || '127.0.0.1', port: 6379},
 
@@ -32,17 +33,18 @@ var windshaftConfig = {
 
     // Tell server how to handle HTTP request 'req' (by specifying properties in req.params).
     req2params: function(req, callback) {
-        var instanceid, isUtfGridRequest, table, filterString;
+        var instanceid, isUtfGridRequest, table, zoom, filterString;
         // Specify SQL subquery to extract desired features from desired DB layer.
         // (This will be wrapped in an outer query, in many cases extracting geometry
         // using the magic column name "the_geom_webmercator".)
         try {
             instanceid = parseInt(req.query['instance_id'], 10);
             table = req.params.table;
+            zoom = req.params.z;
             if (table === 'treemap_mapfeature') {
                 filterString = req.query[config.filterQueryArgumentName];
                 isUtfGridRequest = (req.params.format === 'grid.json');
-                req.query.sql = makeSql.makeSqlForMapFeatures(filterString, instanceid, isUtfGridRequest);
+                req.query.sql = makeSql.makeSqlForMapFeatures(filterString, instanceid, zoom, isUtfGridRequest);
             } else if (table === 'treemap_boundary' && instanceid) {
                 req.query.sql = makeSql.makeSqlForBoundaries(instanceid);
             }
@@ -73,7 +75,7 @@ var windshaftConfig = {
 };
 
 if (cluster.isMaster) {
-    console.log("Map tiles will be served from http://localhost:" + port + windshaftConfig.base_url + '/:z/:x/:y');
+    console.log("Map tiles will be served from http://localhost:" + port + windshaftConfig.base_url + '/:zoom/:x/:y');
 
     console.log('Creating ' + workerCount + ' workers.');
 

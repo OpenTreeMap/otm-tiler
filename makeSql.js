@@ -11,8 +11,10 @@ var config = require('./config.json');
 // Create a SQL query to return info about map features.
 // Assumes that instanceid is an integer, ready to be plugged
 // directly into SQL
-function makeSqlForMapFeatures(filterString, instanceid, isUtfGridRequest) {
-    var fields = (isUtfGridRequest ? config.sqlForMapFeatures.fields.utfGrid : config.sqlForMapFeatures.fields.base);
+function makeSqlForMapFeatures(filterString, instanceid, zoom, isUtfGridRequest) {
+    var geom_field = makeGeomFieldSql(zoom),
+        otherFields = (isUtfGridRequest ? config.sqlForMapFeatures.fields.utfGrid : config.sqlForMapFeatures.fields.base),
+        fields = geom_field + ', ' + otherFields;
 
     var tables;
     if (filterString) {
@@ -44,6 +46,16 @@ function makeSqlForMapFeatures(filterString, instanceid, isUtfGridRequest) {
         tables: tables,
         where: where
     });
+}
+
+function makeGeomFieldSql(zoom) {
+    // Performance can suffer when zoomed out with many features per pixel,
+    // so compute the pixel size and only select one feature per pixel.
+    var worldWidth = 40075016.6856,
+        tileSize = 256,
+        unitsPerPixel = worldWidth / (tileSize * Math.pow(2, zoom)),
+        sql = 'DISTINCT ON (the_geom_webmercator) ST_SnapToGrid(the_geom_webmercator, ' + unitsPerPixel + ') AS the_geom_webmercator';
+    return sql;
 }
 
 // Create a SQL query to return info about boundaries.
