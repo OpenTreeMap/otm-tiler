@@ -121,6 +121,15 @@ describe('filterStringToWhere', function() {
         }, Error);
     });
 
+    // ISNULL MATCHES
+    it('returns IS NULL for true', function() {
+        assertSql('{"species.id": {"ISNULL": true}}', '("treemap_species"."id" IS NULL)');
+    });
+
+    it('returns IS NOT NULL for false', function() {
+        assertSql('{"species.id": {"ISNULL": false}}', '("treemap_species"."id" IS NOT NULL)');
+    });
+
     // IN_BOUNDARY MATCHES
 
     if ('returns a ST_Contains function', function() {
