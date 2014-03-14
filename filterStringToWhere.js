@@ -12,6 +12,7 @@
 //                    | 'EXCLUSIVE'
 //                    | 'IN'
 //                    | 'IS'
+//                    | 'ISNULL'
 //                    | 'LIKE'
 //                    | 'WITHIN_RADIUS'
 //                    | 'IN_BOUNDARY'
@@ -48,6 +49,11 @@ var PREDICATE_TYPES = {
         combinesWith: [],
         matcher: '=',
         valueConverter: convertValueToEscapedSqlLiteral
+    },
+    ISNULL: {
+        combinesWith: [],
+        matcher: 'IS',
+        valueConverter: convertValueForIsNull,
     },
     IN: {
         combinesWith: [],
@@ -209,6 +215,12 @@ function convertArrayValueToEscapedSqlLiteral(arrayValue) {
 // into the correct Postgres literal.
 function convertValuesToEscapedSqlLiterals(values) {
     return _.map(values, convertValueToEscapedSqlLiteral);
+}
+
+// `convertValueForIsNull` converts a literal to "NULL" or "NOT NULL" based on its
+// truthiness.  Truthy values -> "NULL", falsey values -> "NOT NULL"
+function convertValueForIsNull(value) {
+    return !!value ? "NULL" : "NOT NULL";
 }
 
 // `validatePredicate` throws an error if the specified `predicate` object
