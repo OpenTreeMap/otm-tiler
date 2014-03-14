@@ -43,13 +43,6 @@ describe('testSqlForMapFeatures', function() {
         });
     });
 
-    it('has tree tables when filtering trees', function() {
-        assertSqlContains({
-            filter: filterString,
-            expected: config.sqlForMapFeatures.tables.tree
-        });
-    });
-
     it('has mapfeatures tables for UTF grid without filter', function() {
         assertSqlContains({
             isUtfGridRequest: true,
