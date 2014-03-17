@@ -29,6 +29,11 @@
               </a>
             
               
+              <a class="source" href="filterStringUtils.html">
+                filterStringUtils.js
+              </a>
+            
+              
               <a class="source" href="makeSql.html">
                 makeSql.js
               </a>
@@ -96,7 +101,8 @@ filter         = predicate
             
             <div class="content"><div class='highlight'><pre><span class="keyword">var</span> _ = require(<span class="string">'underscore'</span>);
 <span class="keyword">var</span> moment = require(<span class="string">'moment'</span>);
-<span class="keyword">var</span> config = require(<span class="string">'./config.json'</span>);</pre></div></div>
+<span class="keyword">var</span> config = require(<span class="string">'./config.json'</span>);
+<span class="keyword">var</span> utils = require(<span class="string">'./filterStringUtils'</span>);</pre></div></div>
             
         </li>
         
@@ -125,11 +131,11 @@ string.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>exports = module.exports = <span class="function"><span class="keyword">function</span> <span class="params">(s)</span> {</span>
-    <span class="keyword">if</span> (!s) {
-        <span class="keyword">throw</span> <span class="keyword">new</span> Error(<span class="string">'A null, undefined, or empty filter string cannot be converted to SQL'</span>);
+            <div class="content"><div class='highlight'><pre>exports = module.exports = <span class="function"><span class="keyword">function</span> <span class="params">(object)</span> {</span>
+    <span class="keyword">if</span> (_.isUndefined(object) || _.isNull(object)) {
+        <span class="keyword">throw</span> <span class="keyword">new</span> Error(<span class="string">'A null or undefined filter object cannot be converted to SQL'</span>);
     }
-    <span class="keyword">return</span> filterToSql(JSON.parse(s));
+    <span class="keyword">return</span> filterToSql(object);
 };</pre></div></div>
             
         </li>
@@ -699,10 +705,7 @@ an underscore template</p>
             
             <div class="content"><div class='highlight'><pre><span class="function"><span class="keyword">function</span> <span class="title">objectToSql</span><span class="params">(o)</span> {</span>
     <span class="keyword">var</span> statements = [];
-    <span class="keyword">if</span> (Object.keys(o).length === <span class="number">0</span>) {
-        <span class="keyword">throw</span> <span class="keyword">new</span> Error(<span class="string">"An empty object cannot be converted to SQL"</span>);
-    }
-    _.each(o, <span class="function"><span class="keyword">function</span> <span class="params">(valueOrPredicate, fieldName)</span> {</span>
+    utils.traverseObject(o, <span class="function"><span class="keyword">function</span> <span class="params">(valueOrPredicate, fieldName)</span> {</span>
         <span class="keyword">var</span> predicate;
         <span class="keyword">if</span> (!_.isObject(valueOrPredicate)) {
             predicate = {<span class="string">"IS"</span>: valueOrPredicate};
@@ -729,16 +732,8 @@ an underscore template</p>
             
             <div class="content"><div class='highlight'><pre><span class="function"><span class="keyword">function</span> <span class="title">arrayToSql</span><span class="params">(a)</span> {</span>
     <span class="keyword">var</span> statements = [];
-    <span class="keyword">if</span> (a.length === <span class="number">0</span>) {
-        <span class="keyword">throw</span> <span class="keyword">new</span> Error(<span class="string">"An empty array is not a valid combinator"</span>);
-    }
-    <span class="keyword">if</span> (a[<span class="number">0</span>] !== <span class="string">"AND"</span> &amp;&amp; a[<span class="number">0</span>] !== <span class="string">"OR"</span>) {
-        <span class="keyword">throw</span> <span class="keyword">new</span> Error(<span class="string">'The first element of a combinator array must be "AND" or "OR", not '</span> + a[<span class="number">0</span>]);
-    }
-    _.each(a, <span class="keyword">function</span>(filter, index) {
-        <span class="keyword">if</span> (index &gt; <span class="number">0</span>) {
-            statements.push(filterToSql(filter));
-        }
+    utils.traverseCombinator(a, <span class="keyword">function</span>(filter, index) {
+        statements.push(filterToSql(filter));
     });
     <span class="keyword">return</span> <span class="string">'('</span> + statements.join(<span class="string">' '</span> + a[<span class="number">0</span>] + <span class="string">' '</span>) + <span class="string">')'</span>;
 }</pre></div></div>

@@ -29,6 +29,11 @@
               </a>
             
               
+              <a class="source" href="filterStringUtils.html">
+                filterStringUtils.js
+              </a>
+            
+              
               <a class="source" href="makeSql.html">
                 makeSql.js
               </a>
@@ -61,14 +66,60 @@
               
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="keyword">var</span> config = require(<span class="string">'./config.json'</span>);
+            <div class="content"><div class='highlight'><pre><span class="string">"use strict"</span>;
 
-exports = module.exports = <span class="function"><span class="keyword">function</span> <span class="params">(s)</span> {</span>
-    <span class="keyword">if</span> (!s) {
-        <span class="keyword">throw</span> <span class="keyword">new</span> Error(<span class="string">'A null, undefined, or empty filter string cannot be converted to SQL'</span>);
+<span class="keyword">var</span> _ = require(<span class="string">'underscore'</span>);
+<span class="keyword">var</span> config = require(<span class="string">'./config.json'</span>);
+<span class="keyword">var</span> utils = require(<span class="string">"./filterStringUtils"</span>);
+
+exports = module.exports = <span class="function"><span class="keyword">function</span> <span class="params">(object)</span> {</span>
+    <span class="keyword">if</span> (_.isUndefined(object) || _.isNull(object)) {
+        <span class="keyword">throw</span> <span class="keyword">new</span> Error(<span class="string">'A null or undefined filter object cannot be converted to SQL'</span>);
     }
-    <span class="keyword">return</span> config.sqlForMapFeatures.tables.mapfeature;
-};</pre></div></div>
+    <span class="keyword">var</span> models = getModelsForObject(object);
+    <span class="keyword">if</span> (models.length === <span class="number">0</span>) {
+        models = [config.sqlForMapFeatures.baseTable];
+    }
+    <span class="keyword">return</span> getSqlForModels(models);
+};
+
+<span class="function"><span class="keyword">function</span> <span class="title">getSqlForModels</span><span class="params">(models)</span> {</span>
+    <span class="keyword">var</span> sql = [];
+    <span class="keyword">var</span> modelsAdded = [];
+
+    _.each(models, <span class="function"><span class="keyword">function</span> <span class="title">addModelToSql</span><span class="params">(model)</span> {</span>
+        <span class="keyword">if</span> (! _.contains(modelsAdded, model)) {
+            <span class="keyword">var</span> depends = config.sqlForMapFeatures.tables[model].depends;
+            depends = _.without(depends, modelsAdded);
+            <span class="keyword">if</span> (depends.length &gt; <span class="number">0</span>) {
+                _.each(depends, addModelToSql);
+            }
+
+            sql.push(config.sqlForMapFeatures.tables[model].sql);
+            modelsAdded.push(model);
+        }
+    });
+    <span class="keyword">return</span> sql.join(<span class="string">" "</span>);
+}
+
+<span class="function"><span class="keyword">function</span> <span class="title">getModelsForObject</span><span class="params">(object)</span> {</span>
+    <span class="keyword">var</span> models = [];
+    <span class="keyword">if</span> (_.isArray(object)) {
+        utils.traverseCombinator(object, <span class="keyword">function</span>(filter) {
+            models.concat(getModelsForObject(filter));
+        });
+    } <span class="keyword">else</span> <span class="keyword">if</span> (_.isObject(object) &amp;&amp; _.size(object) &gt; <span class="number">0</span>) {
+        utils.traverseObject(object, <span class="keyword">function</span>(predicate, fieldName) {
+            <span class="keyword">var</span> model = fieldName.split(<span class="string">'.'</span>)[<span class="number">0</span>];
+            <span class="keyword">if</span> (!config.modelMapping[model]) {
+                <span class="keyword">throw</span> <span class="keyword">new</span> Error(<span class="string">'The model name must be one of the following: '</span> + Object.keys(config.modelMapping).join(<span class="string">', '</span>) + <span class="string">'. Not '</span> + model);
+            }
+            models.push(model);
+        });
+    }
+
+    <span class="keyword">return</span> _.uniq(models);
+}</pre></div></div>
             
         </li>
         
