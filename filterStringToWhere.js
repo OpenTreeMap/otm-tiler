@@ -33,11 +33,11 @@ var utils = require('./filterStringUtils');
 // This module exports a single conversion function that takes a JSON format
 // string.
 
-exports = module.exports = function (s) {
-    if (!s) {
-        throw new Error('A null, undefined, or empty filter string cannot be converted to SQL');
+exports = module.exports = function (object) {
+    if (_.isUndefined(object) || _.isNull(object)) {
+        throw new Error('A null or undefined filter object cannot be converted to SQL');
     }
-    return filterToSql(JSON.parse(s));
+    return filterToSql(object);
 };
 
 // Constants

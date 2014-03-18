@@ -1,3 +1,5 @@
+"use strict";
+
 // Functions to create Grainstore SQL queries.
 // Grainstore expects to receive a subquery it can plug into another statement.
 // Postgres requires subqueries to be named.
@@ -14,19 +16,13 @@ var config = require('./config.json');
 function makeSqlForMapFeatures(filterString, instanceid, zoom, isUtfGridRequest) {
     var geom_field = makeGeomFieldSql(zoom),
         otherFields = (isUtfGridRequest ? config.sqlForMapFeatures.fields.utfGrid : config.sqlForMapFeatures.fields.base),
-        fields = geom_field + ', ' + otherFields;
+        fields = geom_field + ', ' + otherFields,
+        filterObject = filterString ? JSON.parse(filterString) : {};
 
-    var tables;
-    if (filterString) {
-        tables = filterStringToTables(filterString);
-    } else if (isUtfGridRequest) {
-        tables = config.sqlForMapFeatures.tables.mapfeature;
-    } else {
-        tables = config.sqlForMapFeatures.tables.base;
-    }
+    var tables = filterStringToTables(filterObject);
 
     var where = '',
-        filterClause = (filterString ? filterStringToWhere(filterString) : null),
+        filterClause = (filterString ? filterStringToWhere(filterObject) : null),
         instanceClause = (instanceid ? _.template(config.sqlForMapFeatures.where.instance)({instanceid: instanceid}) : null);
     if (filterString && instanceid) {
         where = '(' + filterClause + ') AND ' + instanceClause;
@@ -51,6 +47,11 @@ function makeSqlForMapFeatures(filterString, instanceid, zoom, isUtfGridRequest)
 function makeGeomFieldSql(zoom) {
     // Performance can suffer when zoomed out with many features per pixel,
     // so compute the pixel size and only select one feature per pixel.
+    //
+    // NOTE: The DISTINCT ON (the_geom_webmercator) is necessary regardles of
+    // the performance gains it gives us, as joining to the treephoto table
+    // can add multiple rows per mapfeature. If we ditch ST_SnapToGrid, make
+    // sure to retain the DISTINCT ON somewhere
     var worldWidth = 40075016.6856,
         tileSize = 256,
         unitsPerPixel = worldWidth / (tileSize * Math.pow(2, zoom)),
