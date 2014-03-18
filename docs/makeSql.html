@@ -86,14 +86,16 @@ directly into SQL</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="function"><span class="keyword">function</span> <span class="title">makeSqlForMapFeatures</span><span class="params">(filterString, instanceid, isUtfGridRequest)</span> {</span>
-    <span class="keyword">var</span> fields = (isUtfGridRequest ? config.sqlForMapFeatures.fields.utfGrid : config.sqlForMapFeatures.fields.base);
+            <div class="content"><div class='highlight'><pre><span class="function"><span class="keyword">function</span> <span class="title">makeSqlForMapFeatures</span><span class="params">(filterString, instanceid, zoom, isUtfGridRequest)</span> {</span>
+    <span class="keyword">var</span> geom_field = makeGeomFieldSql(zoom),
+        otherFields = (isUtfGridRequest ? config.sqlForMapFeatures.fields.utfGrid : config.sqlForMapFeatures.fields.base),
+        fields = geom_field + <span class="string">', '</span> + otherFields;
 
     <span class="keyword">var</span> tables;
     <span class="keyword">if</span> (filterString) {
         tables = filterStringToTables(filterString);
     } <span class="keyword">else</span> <span class="keyword">if</span> (isUtfGridRequest) {
-        tables = config.sqlForMapFeatures.tables.plot;
+        tables = config.sqlForMapFeatures.tables.mapfeature;
     } <span class="keyword">else</span> {
         tables = config.sqlForMapFeatures.tables.base;
     }
@@ -119,7 +121,9 @@ directly into SQL</p>
         tables: tables,
         where: where
     });
-}</pre></div></div>
+}
+
+<span class="function"><span class="keyword">function</span> <span class="title">makeGeomFieldSql</span><span class="params">(zoom)</span> {</span></pre></div></div>
             
         </li>
         
@@ -129,6 +133,27 @@ directly into SQL</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p>Performance can suffer when zoomed out with many features per pixel,
+so compute the pixel size and only select one feature per pixel.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="keyword">var</span> worldWidth = <span class="number">40075016.6856</span>,
+        tileSize = <span class="number">256</span>,
+        unitsPerPixel = worldWidth / (tileSize * Math.pow(<span class="number">2</span>, zoom)),
+        sql = <span class="string">'DISTINCT ON (the_geom_webmercator) ST_SnapToGrid(the_geom_webmercator, '</span> + unitsPerPixel + <span class="string">') AS the_geom_webmercator'</span>;
+    <span class="keyword">return</span> sql;
+}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
               </div>
               <p>Create a SQL query to return info about boundaries.
 Assumes that instanceid is an integer, ready to be plugged

@@ -181,11 +181,13 @@ function dateTimeStringToSqlValue(dtString) {
 // `convertValueToEscapedSqlLiteral` converts a string or number literal
 // to be used as SQL query values by wrapping non-numeric values in single quotes,
 // escaping single quotes within string literals by converting them into
-// a pair of single quotes, and converting YYYY-MM-DD HH:mm:ss datetime strings
-// into the correct Postgres literal.
+// a pair of single quotes, converting YYYY-MM-DD HH:mm:ss datetime strings
+// into the correct Postgres literal, and converting null into the string NULL.
 function convertValueToEscapedSqlLiteral(value) {
-    if (_.isNumber(value) || value === null) {
+    if (_.isNumber(value)) {
         return value;
+    } else if (value === null) {
+        return "NULL";
     } else if (isDateTimeString(value)) {
         return dateTimeStringToSqlValue(value);
     } else {
