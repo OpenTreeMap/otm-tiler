@@ -25,6 +25,7 @@
 var _ = require('underscore');
 var moment = require('moment');
 var config = require('./config.json');
+var utils = require('./filterObjectUtils');
 
 // Exports
 //---------------------------
@@ -32,11 +33,11 @@ var config = require('./config.json');
 // This module exports a single conversion function that takes a JSON format
 // string.
 
-exports = module.exports = function (s) {
-    if (!s) {
-        throw new Error('A null, undefined, or empty filter string cannot be converted to SQL');
+exports = module.exports = function (object) {
+    if (_.isUndefined(object) || _.isNull(object)) {
+        throw new Error('A null or undefined filter object cannot be converted to SQL');
     }
-    return filterToSql(JSON.parse(s));
+    return filterToSql(object);
 };
 
 // Constants
@@ -306,10 +307,7 @@ function fieldNameAndPredicateToSql(fieldName, predicate) {
 // `objectToSql` converts a filter object to a valid SQL WHERE clause.
 function objectToSql(o) {
     var statements = [];
-    if (Object.keys(o).length === 0) {
-        throw new Error("An empty object cannot be converted to SQL");
-    }
-    _.each(o, function (valueOrPredicate, fieldName) {
+    utils.traverseObject(o, function (valueOrPredicate, fieldName) {
         var predicate;
         if (!_.isObject(valueOrPredicate)) {
             predicate = {"IS": valueOrPredicate};
@@ -324,16 +322,8 @@ function objectToSql(o) {
 // `arrayToSql` converts a combinator array into a valid SQL WHERE clause.
 function arrayToSql(a) {
     var statements = [];
-    if (a.length === 0) {
-        throw new Error("An empty array is not a valid combinator");
-    }
-    if (a[0] !== "AND" && a[0] !== "OR") {
-        throw new Error('The first element of a combinator array must be "AND" or "OR", not ' + a[0]);
-    }
-    _.each(a, function(filter, index) {
-        if (index > 0) {
-            statements.push(filterToSql(filter));
-        }
+    utils.traverseCombinator(a, function(filter, index) {
+        statements.push(filterToSql(filter));
     });
     return '(' + statements.join(' ' + a[0] + ' ') + ')';
 }

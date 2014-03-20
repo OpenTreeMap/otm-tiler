@@ -19,13 +19,18 @@
           <div id="jump_page">
             
               
-              <a class="source" href="filterStringToTables.html">
-                filterStringToTables.js
+              <a class="source" href="filterObjectToTables.html">
+                filterObjectToTables.js
               </a>
             
               
-              <a class="source" href="filterStringToWhere.html">
-                filterStringToWhere.js
+              <a class="source" href="filterObjectToWhere.html">
+                filterObjectToWhere.js
+              </a>
+            
+              
+              <a class="source" href="filterObjectUtils.html">
+                filterObjectUtils.js
               </a>
             
               
@@ -58,18 +63,10 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-1">&#182;</a>
               </div>
-              <p>Functions to create Grainstore SQL queries.
-Grainstore expects to receive a subquery it can plug into another statement.
-Postgres requires subqueries to be named.</p>
-
+              
             </div>
             
-            <div class="content"><div class='highlight'><pre>
-<span class="keyword">var</span> _ = require(<span class="string">'underscore'</span>);
-
-<span class="keyword">var</span> filterStringToWhere = require(<span class="string">'./filterStringToWhere'</span>);
-<span class="keyword">var</span> filterStringToTables = require(<span class="string">'./filterStringToTables'</span>);
-<span class="keyword">var</span> config = require(<span class="string">'./config.json'</span>);</pre></div></div>
+            <div class="content"><div class='highlight'><pre><span class="string">"use strict"</span>;</pre></div></div>
             
         </li>
         
@@ -80,6 +77,28 @@ Postgres requires subqueries to be named.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-2">&#182;</a>
               </div>
+              <p>Functions to create Grainstore SQL queries.
+Grainstore expects to receive a subquery it can plug into another statement.
+Postgres requires subqueries to be named.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>
+<span class="keyword">var</span> _ = require(<span class="string">'underscore'</span>);
+
+<span class="keyword">var</span> filterObjectToWhere = require(<span class="string">'./filterObjectToWhere'</span>);
+<span class="keyword">var</span> filterObjectToTables = require(<span class="string">'./filterObjectToTables'</span>);
+<span class="keyword">var</span> config = require(<span class="string">'./config.json'</span>);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
               <p>Create a SQL query to return info about map features.
 Assumes that instanceid is an integer, ready to be plugged
 directly into SQL</p>
@@ -89,19 +108,13 @@ directly into SQL</p>
             <div class="content"><div class='highlight'><pre><span class="function"><span class="keyword">function</span> <span class="title">makeSqlForMapFeatures</span><span class="params">(filterString, instanceid, zoom, isUtfGridRequest)</span> {</span>
     <span class="keyword">var</span> geom_field = makeGeomFieldSql(zoom),
         otherFields = (isUtfGridRequest ? config.sqlForMapFeatures.fields.utfGrid : config.sqlForMapFeatures.fields.base),
-        fields = geom_field + <span class="string">', '</span> + otherFields;
+        fields = geom_field + <span class="string">', '</span> + otherFields,
+        filterObject = filterString ? JSON.parse(filterString) : {};
 
-    <span class="keyword">var</span> tables;
-    <span class="keyword">if</span> (filterString) {
-        tables = filterStringToTables(filterString);
-    } <span class="keyword">else</span> <span class="keyword">if</span> (isUtfGridRequest) {
-        tables = config.sqlForMapFeatures.tables.mapfeature;
-    } <span class="keyword">else</span> {
-        tables = config.sqlForMapFeatures.tables.base;
-    }
+    <span class="keyword">var</span> tables = filterObjectToTables(filterObject);
 
     <span class="keyword">var</span> where = <span class="string">''</span>,
-        filterClause = (filterString ? filterStringToWhere(filterString) : <span class="literal">null</span>),
+        filterClause = (filterString ? filterObjectToWhere(filterObject) : <span class="literal">null</span>),
         instanceClause = (instanceid ? _.template(config.sqlForMapFeatures.where.instance)({instanceid: instanceid}) : <span class="literal">null</span>);
     <span class="keyword">if</span> (filterString &amp;&amp; instanceid) {
         where = <span class="string">'('</span> + filterClause + <span class="string">') AND '</span> + instanceClause;
@@ -128,14 +141,18 @@ directly into SQL</p>
         </li>
         
         
-        <li id="section-3">
+        <li id="section-4">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-3">&#182;</a>
+                <a class="pilcrow" href="#section-4">&#182;</a>
               </div>
               <p>Performance can suffer when zoomed out with many features per pixel,
 so compute the pixel size and only select one feature per pixel.</p>
+<p>NOTE: The DISTINCT ON (the_geom_webmercator) is necessary regardles of
+the performance gains it gives us, as joining to the treephoto table
+can add multiple rows per mapfeature. If we ditch ST_SnapToGrid, make
+sure to retain the DISTINCT ON somewhere</p>
 
             </div>
             
@@ -149,11 +166,11 @@ so compute the pixel size and only select one feature per pixel.</p>
         </li>
         
         
-        <li id="section-4">
+        <li id="section-5">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-4">&#182;</a>
+                <a class="pilcrow" href="#section-5">&#182;</a>
               </div>
               <p>Create a SQL query to return info about boundaries.
 Assumes that instanceid is an integer, ready to be plugged
