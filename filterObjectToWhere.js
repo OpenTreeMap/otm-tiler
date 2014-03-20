@@ -25,7 +25,7 @@
 var _ = require('underscore');
 var moment = require('moment');
 var config = require('./config.json');
-var utils = require('./filterStringUtils');
+var utils = require('./filterObjectUtils');
 
 // Exports
 //---------------------------

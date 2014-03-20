@@ -2,7 +2,7 @@
 
 var _ = require('underscore');
 var config = require('./config.json');
-var utils = require("./filterStringUtils");
+var utils = require("./filterObjectUtils");
 
 exports = module.exports = function (object) {
     if (_.isUndefined(object) || _.isNull(object)) {

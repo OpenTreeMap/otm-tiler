@@ -1,26 +1,26 @@
 "use strict";
 
 var assert = require("assert");
-var filterStringToWhere = require("../filterStringToWhere");
+var filterObjectToWhere = require("../filterObjectToWhere");
 
 var assertSql = function(objectString, expectedSql) {
-    var result = filterStringToWhere(objectString);
+    var result = filterObjectToWhere(objectString);
     assert.equal(result, expectedSql);
 };
 
-describe('filterStringToWhere', function() {
+describe('filterObjectToWhere', function() {
 
     // NULL AND EMPTY HANDLING
 
     it('raises an error when passed undefined', function() {
         assert.throws(function() {
-            filterStringToWhere(undefined);
+            filterObjectToWhere(undefined);
         }, Error);
     });
 
     it('raises an error when passed null', function() {
         assert.throws(function() {
-            filterStringToWhere(null);
+            filterObjectToWhere(null);
         }, Error);
     });
 
@@ -28,13 +28,13 @@ describe('filterStringToWhere', function() {
 
     it('raises an error if the field is not prefixed with a model', function() {
         assert.throws(function() {
-            filterStringToWhere({"height": 1});
+            filterObjectToWhere({"height": 1});
         }, Error);
     });
 
     it('raises an error if the field is not prefixed with a valid model', function() {
         assert.throws(function() {
-            filterStringToWhere({"foo.height": 1});
+            filterObjectToWhere({"foo.height": 1});
         }, Error);
     });
 
@@ -54,7 +54,7 @@ describe('filterStringToWhere', function() {
 
     it('raises an error with an invalid predicate', function() {
         assert.throws(function() {
-            filterStringToWhere({"tree.height": {"WILLBE": 1}});
+            filterObjectToWhere({"tree.height": {"WILLBE": 1}});
         }, Error);
     });
 
@@ -105,7 +105,7 @@ describe('filterStringToWhere', function() {
 
     it('raises an error when IN is mixed with IS', function() {
         assert.throws(function() {
-            filterStringToWhere({"mapfeature.type": {"IN": [1,2], "IS": "Array"}});
+            filterObjectToWhere({"mapfeature.type": {"IN": [1,2], "IS": "Array"}});
         }, Error);
     });
 
@@ -182,37 +182,37 @@ describe('filterStringToWhere', function() {
 
     it('raises an error when MIN is mixed with IN', function() {
         assert.throws(function() {
-            filterStringToWhere({"tree.height": {"MIN": 1, "IN": [1]}});
+            filterObjectToWhere({"tree.height": {"MIN": 1, "IN": [1]}});
         }, Error);
     });
 
     it('raises an error when MAX is mixed with IN', function() {
         assert.throws(function() {
-            filterStringToWhere({"tree.height": {"MAX": 1, "IN": [1]}});
+            filterObjectToWhere({"tree.height": {"MAX": 1, "IN": [1]}});
         }, Error);
     });
 
     it('raises an error when MIN is mixed with IS', function() {
         assert.throws(function() {
-            filterStringToWhere({"tree.height": {"MIN": 1, "IS": 1}});
+            filterObjectToWhere({"tree.height": {"MIN": 1, "IS": 1}});
         }, Error);
     });
 
     it('raises an error when MAX is mixed with IN', function() {
         assert.throws(function() {
-            filterStringToWhere({"tree.height": {"MAX": 1, "IS": 1}});
+            filterObjectToWhere({"tree.height": {"MAX": 1, "IS": 1}});
         }, Error);
     });
 
     it('raises an error when MIN is mixed with LIKE', function() {
         assert.throws(function() {
-            filterStringToWhere({"tree.height": {"MIN": 1, "LIKE": "%market%"}});
+            filterObjectToWhere({"tree.height": {"MIN": 1, "LIKE": "%market%"}});
         }, Error);
     });
 
     it('raises an error when MAX is mixed with LIKE', function() {
         assert.throws(function() {
-            filterStringToWhere({"tree.height": {"MAX": 1, "LIKE": "%market%"}});
+            filterObjectToWhere({"tree.height": {"MAX": 1, "LIKE": "%market%"}});
         }, Error);
     });
 
@@ -243,7 +243,7 @@ describe('filterStringToWhere', function() {
 
     it('raises an error when a combinator is empty', function() {
         assert.throws(function() {
-            filterStringToWhere([]);
+            filterObjectToWhere([]);
         }, Error);
     });
 

@@ -6,8 +6,8 @@
 
 var _ = require('underscore');
 
-var filterStringToWhere = require('./filterStringToWhere');
-var filterStringToTables = require('./filterStringToTables');
+var filterObjectToWhere = require('./filterObjectToWhere');
+var filterObjectToTables = require('./filterObjectToTables');
 var config = require('./config.json');
 
 // Create a SQL query to return info about map features.
@@ -19,10 +19,10 @@ function makeSqlForMapFeatures(filterString, instanceid, zoom, isUtfGridRequest)
         fields = geom_field + ', ' + otherFields,
         filterObject = filterString ? JSON.parse(filterString) : {};
 
-    var tables = filterStringToTables(filterObject);
+    var tables = filterObjectToTables(filterObject);
 
     var where = '',
-        filterClause = (filterString ? filterStringToWhere(filterObject) : null),
+        filterClause = (filterString ? filterObjectToWhere(filterObject) : null),
         instanceClause = (instanceid ? _.template(config.sqlForMapFeatures.where.instance)({instanceid: instanceid}) : null);
     if (filterString && instanceid) {
         where = '(' + filterClause + ') AND ' + instanceClause;
