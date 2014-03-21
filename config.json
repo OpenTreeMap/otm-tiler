@@ -6,22 +6,22 @@
             "base": "feature_type",
             "utfGrid": "feature_type, treemap_mapfeature.id AS id"
         },
-        "baseTable": "mapfeature",
+        "baseTable": "mapFeature",
         "tables": {
-            "mapfeature": {
+            "mapFeature": {
                 "depends": [],
                 "sql": "treemap_mapfeature"
             },
             "tree": {
-                "depends": ["mapfeature"],
+                "depends": ["mapFeature"],
                 "sql": "LEFT OUTER JOIN treemap_tree ON treemap_mapfeature.id = treemap_tree.plot_id"
             },
             "species": {
-                "depends": ["mapfeature", "tree"],
+                "depends": ["mapFeature", "tree"],
                 "sql": "LEFT OUTER JOIN treemap_species ON treemap_tree.species_id = treemap_species.id"
             },
-            "treephoto": {
-                "depends": ["mapfeature", "tree"],
+            "treePhoto": {
+                "depends": ["mapFeature", "tree"],
                 "sql": "LEFT OUTER JOIN treemap_treephoto ON treemap_tree.id = treemap_treephoto.tree_id"
             }
         },
@@ -36,9 +36,9 @@
     },
     "interactivityForUtfGridRequests": "id",
     "modelMapping": {
-        "mapfeature": "treemap_mapfeature",
+        "mapFeature": "treemap_mapfeature",
         "tree": "treemap_tree",
         "species": "treemap_species",
-        "treephoto": "treemap_treephoto"
+        "treePhoto": "treemap_treephoto"
     }
 }
