@@ -9,17 +9,17 @@ describe('filterObjectToTables', function() {
         }, Error);
     });
 
-    it('returns the "mapfeature" table when the filter object is empty', function() {
+    it('returns the "mapFeature" table when the filter object is empty', function() {
         var sql = filterObjectToTables({});
-        assert.equal(sql, config.sqlForMapFeatures.tables.mapfeature.sql);
+        assert.equal(sql, config.sqlForMapFeatures.tables.mapFeature.sql);
     });
 
-    it('returns "mapfeature" tables when "mapfeature" is in the filter object', function() {
-        var sql = filterObjectToTables({"mapfeature.id":{"IS":"1"}});
-        assert.equal(sql, config.sqlForMapFeatures.tables.mapfeature.sql);
+    it('returns "mapFeature" tables when "mapFeature" is in the filter object', function() {
+        var sql = filterObjectToTables({"mapFeature.id":{"IS":"1"}});
+        assert.equal(sql, config.sqlForMapFeatures.tables.mapFeature.sql);
     });
 
-    it('returns tree JOINed to mapfeature when "tree" is in the filter object', function() {
+    it('returns tree JOINed to mapFeature when "tree" is in the filter object', function() {
         var sql = filterObjectToTables({"tree.id":{"ISNULL":true}});
         var expectedSql = "treemap_mapfeature " +
             "LEFT OUTER JOIN treemap_tree ON treemap_mapfeature.id = treemap_tree.plot_id";
@@ -34,8 +34,8 @@ describe('filterObjectToTables', function() {
         assert.equal(sql, expectedSql);
     });
 
-    it('returns tree and treephoto JOINs when "treephoto" is in the filter object', function() {
-        var sql = filterObjectToTables({"treephoto.id":{"ISNULL":true}});
+    it('returns tree and treePhoto JOINs when "treePhoto" is in the filter object', function() {
+        var sql = filterObjectToTables({"treePhoto.id":{"ISNULL":true}});
         var expectedSql = "treemap_mapfeature " +
             "LEFT OUTER JOIN treemap_tree ON treemap_mapfeature.id = treemap_tree.plot_id " +
             "LEFT OUTER JOIN treemap_treephoto ON treemap_tree.id = treemap_treephoto.tree_id";
@@ -43,7 +43,7 @@ describe('filterObjectToTables', function() {
     });
 
     it('returns tree joined once when species and photo are both in the filter object', function() {
-        var sql = filterObjectToTables({"treephoto.id":{"ISNULL":true}, "species.id": {"IS": 17}});
+        var sql = filterObjectToTables({"treePhoto.id":{"ISNULL":true}, "species.id": {"IS": 17}});
         var expectedSql = "treemap_mapfeature " +
             "LEFT OUTER JOIN treemap_tree ON treemap_mapfeature.id = treemap_tree.plot_id " +
             "LEFT OUTER JOIN treemap_treephoto ON treemap_tree.id = treemap_treephoto.tree_id " +

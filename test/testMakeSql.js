@@ -39,14 +39,14 @@ describe('testSqlForMapFeatures', function() {
 
     it('has base tables for plain request', function() {
         assertSqlContains({
-            expected: config.sqlForMapFeatures.tables.mapfeature.sql
+            expected: config.sqlForMapFeatures.tables.mapFeature.sql
         });
     });
 
-    it('has mapfeatures tables for UTF grid without filter', function() {
+    it('has mapFeatures tables for UTF grid without filter', function() {
         assertSqlContains({
             isUtfGridRequest: true,
-            expected: config.sqlForMapFeatures.tables.mapfeature.sql
+            expected: config.sqlForMapFeatures.tables.mapFeature.sql
         });
     });
 
