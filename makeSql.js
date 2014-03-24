@@ -7,6 +7,7 @@
 var _ = require('underscore');
 
 var filterObjectToWhere = require('./filterObjectToWhere');
+var displayFiltersToWhere = require('./displayFiltersToWhere');
 var filtersToTables = require('./filtersToTables');
 var config = require('./config.json');
 
@@ -24,13 +25,21 @@ function makeSqlForMapFeatures(filterString, displayString, instanceid, zoom, is
 
     var where = '',
         filterClause = (filterString ? filterObjectToWhere(filterObject) : null),
+        displayClause = (displayString ? displayFiltersToWhere(displayFilters) : null),
         instanceClause = (instanceid ? _.template(config.sqlForMapFeatures.where.instance)({instanceid: instanceid}) : null);
-    if (filterString && instanceid) {
-        where = '(' + filterClause + ') AND ' + instanceClause;
-    } else if (filterString) {
+
+    function addToWhere(clause) {
+        return where ? '( ' + clause + ' ) AND ' + where : clause;
+    }
+
+    if (filterString) {
         where = filterClause;
-    } else if (instanceid) {
-        where = instanceClause;
+    }
+    if (displayString) {
+        where = addToWhere(displayClause);
+    }
+    if (instanceid) {
+        where = addToWhere(instanceClause);
     }
     if (where) {
         where = 'WHERE ' + where;

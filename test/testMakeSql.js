@@ -1,3 +1,5 @@
+"use strict";
+
 var assert = require("assert");
 var makeSql = require("../makeSql");
 var config = require("../config.json");
@@ -61,6 +63,26 @@ describe('testSqlForMapFeatures', function() {
     it('has WHERE clause when filter string passed', function() {
         assertSqlContains({
             filter: filterString,
+            expected: ' WHERE '
+        });
+    });
+
+    it('has WHERE clause when tree display filter passed', function() {
+        assertSqlContains({
+            displayFilter: '["Tree"]',
+            expected: ' WHERE '
+        });
+    });
+
+    it('has WHERE clause when plot display filter passed', function() {
+        assertSqlContains({
+            displayFilter: '["Plot"]',
+            expected: ' WHERE '
+        });
+    });
+
+    it('lacks WHERE clause when no display filter passed', function() {
+        assertSqlLacks({
             expected: ' WHERE '
         });
     });
