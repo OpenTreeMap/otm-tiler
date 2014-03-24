@@ -23,7 +23,6 @@
 //                    | [combinator, filter*]
 
 var _ = require('underscore');
-var moment = require('moment');
 var config = require('./config.json');
 var utils = require('./filterObjectUtils');
 
@@ -49,7 +48,7 @@ var PREDICATE_TYPES = {
     IS: {
         combinesWith: [],
         matcher: '=',
-        valueConverter: convertValueToEscapedSqlLiteral
+        valueConverter: utils.convertValueToEscapedSqlLiteral
     },
     ISNULL: {
         combinesWith: [],
@@ -64,19 +63,19 @@ var PREDICATE_TYPES = {
     LIKE: {
         combinesWith: [],
         matcher: 'ILIKE',
-        valueConverter: convertValueToEscapedSqlLiteral
+        valueConverter: utils.convertValueToEscapedSqlLiteral
     },
     MIN: {
         combinesWith: ['MAX'],
         matcher: '>=',
         exclusiveMatcher: '>',
-        valueConverter: convertValueToEscapedSqlLiteral
+        valueConverter: utils.convertValueToEscapedSqlLiteral
     },
     MAX: {
         combinesWith: ['MIN'],
         matcher: '<=',
         exclusiveMatcher: '<',
-        valueConverter: convertValueToEscapedSqlLiteral
+        valueConverter: utils.convertValueToEscapedSqlLiteral
     },
     IN_BOUNDARY: {
         combinesWith: ['WITHIN_RADIUS'],
@@ -110,24 +109,8 @@ function transformWithinRadiusPredicate(predicateValue) {
     return template;
 }
 
-// The `DATETIME_FORMATS` dictionary contains constant strings used to validate
-// and format date and datetime strings.
-var DATETIME_FORMATS = {
-    full: 'YYYY-MM-DD HH:mm:ss',
-    date: 'YYYY-MM-DD',
-    time: 'HH:mm:ss'
-};
-
 // Internal Methods
 //---------------------------
-
-// The tiler is built on top of Windshaft, which uses sql strings for filtering
-// rather than a more complex (but safer) parameterized query system. As a result
-// we need this 'sanitizeSqlString' method to remove malicous SQL injection tricks.
-function sanitizeSqlString(value) {
-    // Strip off a trailing statement to prevent "value = 4; DROP TABLE FOO;"
-    return value.replace(/;[\w\s;]*$/, '');
-}
 
 // `fieldNameToColumnName` converts a string of the format model.column
 // to "physicalTableName"."column"
@@ -155,7 +138,7 @@ function fieldNameToColumnName(fieldName) {
         column = '"' + config.scalar_udf_field + "\"->'" +
             column.substring(4).replace("'","''") + "'";
     } else {
-        column =  sanitizeSqlString(modelAndColumn[1]);
+        column =  utils.sanitizeSqlString(modelAndColumn[1]);
         customColumnName = config.customDbFieldNames[column];
 
         column = customColumnName || column;
@@ -163,37 +146,6 @@ function fieldNameToColumnName(fieldName) {
     }
 
     return '"' + model + '".' + column;
-}
-
-// `isDateString` returns a boolean indicating whether or not the string value
-// should be treated as datetime.
-function isDateTimeString(value) {
-    return moment(value, DATETIME_FORMATS.full).isValid();
-}
-
-// `dateTimeStringToSqlValue` converts a datetime string into a Postgres
-// compatible literal date and time value.
-function dateTimeStringToSqlValue(dtString) {
-    var m = moment(dtString, DATETIME_FORMATS.full);
-    return "(DATE '" + m.format(DATETIME_FORMATS.date) +
-        "' + TIME '" + m.format(DATETIME_FORMATS.time) + "')";
-}
-
-// `convertValueToEscapedSqlLiteral` converts a string or number literal
-// to be used as SQL query values by wrapping non-numeric values in single quotes,
-// escaping single quotes within string literals by converting them into
-// a pair of single quotes, converting YYYY-MM-DD HH:mm:ss datetime strings
-// into the correct Postgres literal, and converting null into the string NULL.
-function convertValueToEscapedSqlLiteral(value) {
-    if (_.isNumber(value)) {
-        return value;
-    } else if (value === null) {
-        return "NULL";
-    } else if (isDateTimeString(value)) {
-        return dateTimeStringToSqlValue(value);
-    } else {
-        return "'" + sanitizeSqlString(value).replace("'", "''") + "'";
-    }
 }
 
 // `convertArrayValueToEscapedSqlLiteral` converts an array of string or number
@@ -217,7 +169,7 @@ function convertArrayValueToEscapedSqlLiteral(arrayValue) {
 // a pair of single quotes, and converting YYYY-MM-DD HH:mm:ss datetime strings
 // into the correct Postgres literal.
 function convertValuesToEscapedSqlLiterals(values) {
-    return _.map(values, convertValueToEscapedSqlLiteral);
+    return _.map(values, utils.convertValueToEscapedSqlLiteral);
 }
 
 // `convertValueForIsNull` converts a literal to "NULL" or "NOT NULL" based on its

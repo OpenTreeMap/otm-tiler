@@ -16,7 +16,7 @@ describe('testSqlForMapFeatures', function() {
 
     function testSql(options) {
         var zoom = options.zoom || 11,
-            sql = makeSql.makeSqlForMapFeatures(options.filter, options.instanceId, zoom, options.isUtfGridRequest);
+            sql = makeSql.makeSqlForMapFeatures(options.filter, options.displayFilter, options.instanceId, zoom, options.isUtfGridRequest);
         return sql.indexOf(options.expected);
     }
 
