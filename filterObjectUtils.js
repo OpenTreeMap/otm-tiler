@@ -37,13 +37,6 @@ function traverseCombinator (array, callback) {
     _.each(_.rest(array), callback);
 }
 
-function traverseObject (object, callback) {
-    if (Object.keys(object).length === 0) {
-        throw new Error("An empty object cannot be converted to SQL");
-    }
-    _.each(object, callback);
-}
-
 function isTreeInDisplayFilters (displayFilters) {
     if (_.isArray(displayFilters)) {
         return _.any(displayFilters, function(filter) {
@@ -80,8 +73,6 @@ function sanitizeSqlString (value) {
 
 module.exports = {
     traverseCombinator: traverseCombinator,
-
-    traverseObject: traverseObject,
 
     isTreeInDisplayFilters: isTreeInDisplayFilters,
 

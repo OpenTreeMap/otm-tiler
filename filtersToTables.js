@@ -44,7 +44,7 @@ function getModelsForFilterObject(object) {
             models.concat(getModelsForFilterObject(filter));
         });
     } else if (_.isObject(object) && _.size(object) > 0) {
-        utils.traverseObject(object, function(predicate, fieldName) {
+        _.each(object, function(predicate, fieldName) {
             var model = fieldName.split('.')[0];
             if (!config.modelMapping[model]) {
                 throw new Error('The model name must be one of the following: ' +

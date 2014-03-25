@@ -259,7 +259,10 @@ function fieldNameAndPredicateToSql(fieldName, predicate) {
 // `objectToSql` converts a filter object to a valid SQL WHERE clause.
 function objectToSql(o) {
     var statements = [];
-    utils.traverseObject(o, function (valueOrPredicate, fieldName) {
+    if (Object.keys(o).length === 0) {
+        return '';
+    }
+    _.each(o, function (valueOrPredicate, fieldName) {
         var predicate;
         if (!_.isObject(valueOrPredicate)) {
             predicate = {"IS": valueOrPredicate};
