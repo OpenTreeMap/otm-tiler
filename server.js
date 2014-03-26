@@ -1,3 +1,5 @@
+"use strict";
+
 var Windshaft = require('windshaft');
 var _ = require('underscore');
 var makeSql = require('./makeSql.js');
@@ -33,7 +35,7 @@ var windshaftConfig = {
 
     // Tell server how to handle HTTP request 'req' (by specifying properties in req.params).
     req2params: function(req, callback) {
-        var instanceid, isUtfGridRequest, table, zoom, filterString;
+        var instanceid, isUtfGridRequest, table, zoom, filterString, displayString;
         // Specify SQL subquery to extract desired features from desired DB layer.
         // (This will be wrapped in an outer query, in many cases extracting geometry
         // using the magic column name "the_geom_webmercator".)
@@ -43,8 +45,13 @@ var windshaftConfig = {
             zoom = req.params.z;
             if (table === 'treemap_mapfeature') {
                 filterString = req.query[config.filterQueryArgumentName];
+                displayString = req.query[config.displayQueryArgumentName];
                 isUtfGridRequest = (req.params.format === 'grid.json');
-                req.query.sql = makeSql.makeSqlForMapFeatures(filterString, instanceid, zoom, isUtfGridRequest);
+                req.query.sql = makeSql.makeSqlForMapFeatures(filterString,
+                                                              displayString,
+                                                              instanceid,
+                                                              zoom,
+                                                              isUtfGridRequest);
             } else if (table === 'treemap_boundary' && instanceid) {
                 req.query.sql = makeSql.makeSqlForBoundaries(instanceid);
             }
@@ -58,7 +65,7 @@ var windshaftConfig = {
         req.params.interactivity = (isUtfGridRequest ? config.interactivityForUtfGridRequests : null);
 
         // Override request params with query params
-        // (allows for example testing different SQL, e.g. ...png?sql=select * from my_table limit 10)
+        // Note that we *always* overwrite req.query.sql above
         req.params =  _.extend({}, req.params);
         _.extend(req.params, req.query);
 

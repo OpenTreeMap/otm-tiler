@@ -7,29 +7,39 @@
 var _ = require('underscore');
 
 var filterObjectToWhere = require('./filterObjectToWhere');
-var filterObjectToTables = require('./filterObjectToTables');
+var displayFiltersToWhere = require('./displayFiltersToWhere');
+var filtersToTables = require('./filtersToTables');
 var config = require('./config.json');
 
 // Create a SQL query to return info about map features.
 // Assumes that instanceid is an integer, ready to be plugged
 // directly into SQL
-function makeSqlForMapFeatures(filterString, instanceid, zoom, isUtfGridRequest) {
+function makeSqlForMapFeatures(filterString, displayString, instanceid, zoom, isUtfGridRequest) {
     var geom_field = makeGeomFieldSql(zoom),
         otherFields = (isUtfGridRequest ? config.sqlForMapFeatures.fields.utfGrid : config.sqlForMapFeatures.fields.base),
         fields = geom_field + ', ' + otherFields,
-        filterObject = filterString ? JSON.parse(filterString) : {};
+        filterObject = filterString ? JSON.parse(filterString) : {},
+        displayFilters = displayString ? JSON.parse(displayString) : undefined;
 
-    var tables = filterObjectToTables(filterObject);
+    var tables = filtersToTables(filterObject, displayFilters);
 
     var where = '',
         filterClause = (filterString ? filterObjectToWhere(filterObject) : null),
+        displayClause = (displayString ? displayFiltersToWhere(displayFilters) : null),
         instanceClause = (instanceid ? _.template(config.sqlForMapFeatures.where.instance)({instanceid: instanceid}) : null);
-    if (filterString && instanceid) {
-        where = '(' + filterClause + ') AND ' + instanceClause;
-    } else if (filterString) {
+
+    function addToWhere(clause) {
+        return where ? '( ' + clause + ' ) AND ' + where : clause;
+    }
+
+    if (filterString) {
         where = filterClause;
-    } else if (instanceid) {
-        where = instanceClause;
+    }
+    if (displayString) {
+        where = addToWhere(displayClause);
+    }
+    if (instanceid) {
+        where = addToWhere(instanceClause);
     }
     if (where) {
         where = 'WHERE ' + where;

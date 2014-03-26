@@ -4,11 +4,14 @@ var _ = require('underscore');
 var config = require('./config.json');
 var utils = require("./filterObjectUtils");
 
-exports = module.exports = function (object) {
-    if (_.isUndefined(object) || _.isNull(object)) {
+exports = module.exports = function (filterObject, displayFilters) {
+    if (_.isUndefined(filterObject) || _.isNull(filterObject)) {
         throw new Error('A null or undefined filter object cannot be converted to SQL');
     }
-    var models = getModelsForObject(object);
+    var models = getModelsForFilterObject(filterObject);
+    if (displayFilters && utils.isTreeInDisplayFilters(displayFilters)) {
+        models = _.union(models, ['tree']);
+    }
     if (models.length === 0) {
         models = [config.sqlForMapFeatures.baseTable];
     }
@@ -34,17 +37,18 @@ function getSqlForModels(models) {
     return sql.join(" ");
 }
 
-function getModelsForObject(object) {
+function getModelsForFilterObject(object) {
     var models = [];
     if (_.isArray(object)) {
         utils.traverseCombinator(object, function(filter) {
-            models.concat(getModelsForObject(filter));
+            models.concat(getModelsForFilterObject(filter));
         });
     } else if (_.isObject(object) && _.size(object) > 0) {
-        utils.traverseObject(object, function(predicate, fieldName) {
+        _.each(object, function(predicate, fieldName) {
             var model = fieldName.split('.')[0];
             if (!config.modelMapping[model]) {
-                throw new Error('The model name must be one of the following: ' + Object.keys(config.modelMapping).join(', ') + '. Not ' + model);
+                throw new Error('The model name must be one of the following: ' +
+                        Object.keys(config.modelMapping).join(', ') + '. Not ' + model);
             }
             models.push(model);
         });
@@ -52,3 +56,4 @@ function getModelsForObject(object) {
 
     return _.uniq(models);
 }
+

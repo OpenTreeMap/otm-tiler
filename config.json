@@ -1,5 +1,6 @@
 {
     "filterQueryArgumentName": "q",
+    "displayQueryArgumentName": "show",
     "scalar_udf_field": "udf_scalar_values",
     "sqlForMapFeatures": {
         "fields": {
@@ -29,6 +30,7 @@
             "instance" : "treemap_mapfeature.instance_id = <%= instanceid %>"
         }
     },
+    "treeDisplayFilters": ["EmptyPlot", "Tree"],
     "boundaryGrainstoreSql": "(SELECT the_geom_webmercator FROM treemap_boundary JOIN treemap_instance_boundaries ON treemap_instance_boundaries.boundary_id = treemap_boundary.id WHERE treemap_instance_boundaries.instance_id=<%= instanceid %>) otmfiltersql",
     "getBoundarySql" : "SELECT the_geom_webmercator FROM treemap_boundary WHERE id=<%= boundaryId %>",
     "customDbFieldNames": {
