@@ -53,7 +53,7 @@ var PREDICATE_TYPES = {
     ISNULL: {
         combinesWith: [],
         matcher: 'IS',
-        valueConverter: convertValueForIsNull,
+        valueConverter: convertValueForIsNull
     },
     IN: {
         combinesWith: [],
