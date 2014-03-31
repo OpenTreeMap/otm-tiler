@@ -6,7 +6,8 @@
 // A filter string must be valid JSON and conform to the following grammar:
 //
 //     literal        = json literal | GMT date string in 'YYYY-MM-DD HH:mm:ss'
-//     model          = 'mapFeature' | 'tree'
+//     model-name     = 'mapFeature' | 'tree' | 'species' | 'treePhoto'
+//     model          = 'udf:'model-name | model-name
 //     value-property = 'MIN'
 //                    | 'MAX'
 //                    | 'EXCLUSIVE'
@@ -17,8 +18,8 @@
 //                    | 'WITHIN_RADIUS'
 //                    | 'IN_BOUNDARY'
 //     combinator     = 'AND' | 'OR'
-//     predicate      = { model.[udf:]field: literal }
-//                    | { model.[udf:]field: { (value-property: literal)* }}
+//     predicate      = { model.['udf:']field: literal }
+//                    | { model.['udf:']field: { (value-property: literal)* }}
 //     filter         = predicate
 //                    | [combinator, filter*]
 
@@ -109,43 +110,62 @@ function transformWithinRadiusPredicate(predicateValue) {
     return template;
 }
 
+// `accessHstore` takes an HStore column name and a key for that collection and
+// returns a sql escaped string for accessing that member in the SELECT clause
+// of a SQL statement.
+// accessHStore('grab_bag', 'is_valid') -> "grab_bag"->'is_valid'
+function accessHStore(hStoreColumn, accessor) {
+    // TODO: sql injection? why don't we call sanitize?
+    var t = _.template('"<%= hStoreColumn %>"->\'<%= accessor %>\'');
+    return t({hStoreColumn: hStoreColumn,
+              accessor: accessor.replace("'","''")});
+};
+
+
 // Internal Methods
 //---------------------------
 
 // `fieldNameToColumnName` converts a string of the format model.column
-// to "physicalTableName"."column"
+// to "physicalTableName"."column" for simple fieldNames. For udf scalar or collection
+// fieldNames, the fieldName is converted to "physicalTableName"."column"->"hStoreMember".
 function fieldNameToColumnName(fieldName) {
-    var modelAndColumn = fieldName.split('.');
-    var model, column, customColumnName;
-    if (modelAndColumn.length != 2) {
-        throw new Error('Field names in predicate objects should be of the form "model.field", not "' + fieldName + '"');
+    var model, column, customColumnName, tableName, modelAndColumn, udfCollectionData;
+
+    if (fieldName.indexOf('udf:') === 0) {
+        udfCollectionData = utils.parseUdfCollectionFieldName(fieldName);
+        model = udfCollectionData.modelName;
+        column = accessHStore('data', udfCollectionData.hStoreMember);
+    } else {
+        modelAndColumn = fieldName.split('.');
+
+        if (modelAndColumn.length != 2) {
+            throw new Error('Field names in predicate objects ' +
+                            'should be of the form "model.field", not "' + fieldName + '"');
+        }
+
+        model = modelAndColumn[0];
+        column = modelAndColumn[1];
+        // udf columns are prefixed by 'udf:'
+        if (column.indexOf('udf:') === 0) {
+            column = accessHStore(config.scalar_udf_field, column.substring(4));
+        } else {
+            column = utils.sanitizeSqlString(modelAndColumn[1]);
+            customColumnName = config.customDbFieldNames[column];
+
+            column = customColumnName || column;
+            column = '"' + column + '"';
+        }
     }
+
     // The `modelMapping` dictionary is used to convert a short model name to a
     // physical table name.
-    if (!config.modelMapping[modelAndColumn[0]]) {
-        throw new Error('The model name must be one of the following: ' + Object.keys(config.modelMapping).join(', ') + '. Not ' + modelAndColumn[0]);
+    if (!config.modelMapping[model]) {
+        throw new Error('The model name must be one of the following: ' +
+                        Object.keys(config.modelMapping).join(', ') + '. Not ' + model);
     }
-    model = config.modelMapping[modelAndColumn[0]]; // model is not sanitized because there is a whitelist
+    tableName = config.modelMapping[model]; // model is not sanitized because there is a whitelist
 
-    if (!config.modelMapping[modelAndColumn[0]]) {
-        throw new Error('The model name must be one of the following: ' + Object.keys(config.modelMapping).join(', ') + '. Not ' + modelAndColumn[0]);
-    }
-
-    column = modelAndColumn[1];
-
-    // udf columns need are prefixed by 'udf:'
-    if (column.indexOf('udf:') === 0) {
-        column = '"' + config.scalar_udf_field + "\"->'" +
-            column.substring(4).replace("'","''") + "'";
-    } else {
-        column =  utils.sanitizeSqlString(modelAndColumn[1]);
-        customColumnName = config.customDbFieldNames[column];
-
-        column = customColumnName || column;
-        column = '"' + column + '"';
-    }
-
-    return '"' + model + '".' + column;
+    return '"' + tableName + '".' + column;
 }
 
 // `convertArrayValueToEscapedSqlLiteral` converts an array of string or number

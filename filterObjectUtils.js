@@ -71,6 +71,47 @@ function sanitizeSqlString (value) {
     return value.replace(/;[\w\s;]*$/, '');
 }
 
+// Clauses in the filterObject that correspond to
+// `(python)UserDefinedCollectionValue` data are transmitted as keys
+// with a special syntax. `parseUdfCollectionFieldName` parses this
+// syntax into an object of the relevant components.
+function parseUdfCollectionFieldName (fieldName) {
+    var tokens = fieldName.split(':'),
+        fieldDefIdAndHStoreMember;
+
+    if (tokens.length !== 3) {
+        return null;
+    }
+
+    fieldDefIdAndHStoreMember = tokens[2].split('.');
+
+    return {
+        modelName: 'udf:' + tokens[1],
+        fieldDefId: fieldDefIdAndHStoreMember[0],
+        hStoreMember: fieldDefIdAndHStoreMember[1]
+    };
+}
+
+// `getUdfFieldDefId` examines a filterObject to determine if it has
+// predicates for `(python)UserDefinedCollectionValues`. This is
+// necessary for adding an additional component to the where clause to
+// filter on the `(python)UserDefinedFieldDefinition` id.  When ids
+// are found, they are validated not to allow multiple ids, which are
+// not supported.  returns null for non UDCV queries.
+function getUdfFieldDefId (filterObject) {
+    var udfCollectionValues = _.reject(_(_.keys(filterObject)).map(parseUdfCollectionFieldName), _.isNull),
+        udfFieldDefIds = _.uniq(_.pluck(udfCollectionValues, 'fieldDefId'));
+    if (udfFieldDefIds.length === 1) {
+        return udfFieldDefIds[0];
+    } else if (udfFieldDefIds.length === 0) {
+        return null;
+    } else {
+        throw ("Multiple UserDefinedFieldDefinition ids found in filterObject. " +
+               "Only one is supported per request.");
+    }
+}
+
+
 module.exports = {
     traverseCombinator: traverseCombinator,
 
@@ -78,5 +119,9 @@ module.exports = {
 
     convertValueToEscapedSqlLiteral: convertValueToEscapedSqlLiteral,
 
-    sanitizeSqlString: sanitizeSqlString
+    sanitizeSqlString: sanitizeSqlString,
+
+    parseUdfCollectionFieldName: parseUdfCollectionFieldName,
+
+    getUdfFieldDefId: getUdfFieldDefId
 };
