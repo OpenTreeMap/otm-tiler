@@ -15,10 +15,10 @@ exports = module.exports = function (filterObject, displayFilters) {
     if (models.length === 0) {
         models = [config.sqlForMapFeatures.baseTable];
     }
-    return getSqlForModels(models);
+    return getSqlForModels(models, utils.getUdfFieldDefId(filterObject));
 };
 
-function getSqlForModels(models) {
+function getSqlForModels(models, maybeUdfFieldDefId) {
     var sql = [];
     var modelsAdded = [];
 
@@ -30,13 +30,22 @@ function getSqlForModels(models) {
                 _.each(depends, addModelToSql);
             }
 
-            sql.push(config.sqlForMapFeatures.tables[model].sql);
+            var template = config.sqlForMapFeatures.tables[model].sqlTemplate;
+            if (_.isUndefined(template)) {
+                sql.push(config.sqlForMapFeatures.tables[model].sql);
+            } else {
+                sql.push(_.template(template)({udfFieldDefId: maybeUdfFieldDefId}));
+            }
+
             modelsAdded.push(model);
         }
     });
     return sql.join(" ");
 }
 
+// `getModelsForFilterObject` looks at a nested filterObject with
+// clauses and produces a flat list of models to use in FROM/JOIN
+// clauses.
 function getModelsForFilterObject(object) {
     var models = [];
     if (_.isArray(object)) {
@@ -45,7 +54,12 @@ function getModelsForFilterObject(object) {
         });
     } else if (_.isObject(object) && _.size(object) > 0) {
         _.each(object, function(predicate, fieldName) {
-            var model = fieldName.split('.')[0];
+            var model;
+            if (fieldName.indexOf('udf:') === 0) {
+                model = utils.parseUdfCollectionFieldName(fieldName).modelName;
+            } else {
+                model = fieldName.split('.')[0];
+            }
             if (!config.modelMapping[model]) {
                 throw new Error('The model name must be one of the following: ' +
                         Object.keys(config.modelMapping).join(', ') + '. Not ' + model);

@@ -92,6 +92,13 @@ describe('filterObjectToWhere', function() {
                   "ILIKE '%Market St%')");
     });
 
+    // UDF COLLECTION MATCHES
+    it('processes udf values', function() {
+        assertSql({"udf:tree:18.Action": {"LIKE": "%Watering%"}},
+                  "(\"treemap_userdefinedcollectionvalue\".\"data\"->'Action' " +
+                  "ILIKE '%Watering%')");
+    });
+
     // LIST MATCHES
 
     it('returns an IN clause for a numeric list', function () {

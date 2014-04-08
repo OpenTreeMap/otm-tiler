@@ -65,4 +65,23 @@ describe('filtersToTables', function() {
         var expectedSql = "treemap_mapfeature";
         assert.equal(sql, expectedSql);
     });
+
+    it('returns udfd/udcv and tree/plot joins for udf tree filter objects', function () {
+        var sql = filtersToTables({"udf:tree:18.Action": {"LIKE": "%Watering%"}}, undefined);
+        var expectedSql = "treemap_mapfeature LEFT OUTER JOIN treemap_tree " +
+                "ON treemap_mapfeature.id = treemap_tree.plot_id " +
+                "LEFT OUTER JOIN treemap_userdefinedcollectionvalue " +
+                "ON (treemap_tree.id = treemap_userdefinedcollectionvalue.model_id AND " +
+                "treemap_userdefinedcollectionvalue.field_definition_id = 18)";
+        assert.equal(sql, expectedSql);
+    });
+
+    it('returns udfd/udcv and joins for udf mapfeature filter objects', function () {
+        var sql = filtersToTables({"udf:mapFeature:18.Action": {"LIKE": "%Watering%"}}, undefined);
+        var expectedSql =
+                "treemap_mapfeature LEFT OUTER JOIN treemap_userdefinedcollectionvalue " +
+                "ON (treemap_mapfeature.id = treemap_userdefinedcollectionvalue.model_id AND " +
+                "treemap_userdefinedcollectionvalue.field_definition_id = 18)";
+        assert.equal(sql, expectedSql);
+    });
 });
