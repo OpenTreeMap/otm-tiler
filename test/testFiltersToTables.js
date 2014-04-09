@@ -28,6 +28,13 @@ describe('filtersToTables', function() {
         assert.equal(sql, expectedSql);
     });
 
+    it('returns tree JOINed to mapFeature when "tree" is in the filter array', function() {
+        var sql = filtersToTables(["AND", {"tree.id":{"MIN":1}}, {"tree.id":{"MAX":12}}], undefined);
+        var expectedSql = "treemap_mapfeature " +
+            "LEFT OUTER JOIN treemap_tree ON treemap_mapfeature.id = treemap_tree.plot_id";
+        assert.equal(sql, expectedSql);
+    });
+
     it('returns tree and species JOINs when "species" is in the filter object', function() {
         var sql = filtersToTables({"species.id":{"ISNULL":true}}, undefined);
         var expectedSql = "treemap_mapfeature " +

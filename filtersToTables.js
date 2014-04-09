@@ -50,7 +50,7 @@ function getModelsForFilterObject(object) {
     var models = [];
     if (_.isArray(object)) {
         utils.traverseCombinator(object, function(filter) {
-            models.concat(getModelsForFilterObject(filter));
+            models = models.concat(getModelsForFilterObject(filter));
         });
     } else if (_.isObject(object) && _.size(object) > 0) {
         _.each(object, function(predicate, fieldName) {
