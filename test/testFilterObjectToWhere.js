@@ -292,7 +292,7 @@ describe('filterObjectToWhere', function() {
     });
 
     it('converts hstore date fields from string to postgres date without timezone', function () {
-        assertSql({"udf:mapFeature:19.Date": {"MIN": "2014-03-02 00:00:00"}},
+        assertSql({"udf:plot:19.Date": {"MIN": "2014-03-02 00:00:00"}},
                   "(to_date(\"treemap_userdefinedcollectionvalue\".\"data\"->'Date'::text, 'YYYY-MM-DD') " +
                   ">= (DATE '2014-03-02' + TIME '00:00:00'))");
     });

@@ -29,7 +29,7 @@
                 "depends": ["mapFeature", "tree"],
                 "sqlTemplate": "LEFT OUTER JOIN treemap_userdefinedcollectionvalue ON (treemap_tree.id = treemap_userdefinedcollectionvalue.model_id AND treemap_userdefinedcollectionvalue.field_definition_id = <%= udfFieldDefId %>)"
             },
-            "udf:mapFeature": {
+            "udf:plot": {
                 "depends": ["mapFeature"],
                 "sqlTemplate": "LEFT OUTER JOIN treemap_userdefinedcollectionvalue ON (treemap_mapfeature.id = treemap_userdefinedcollectionvalue.model_id AND treemap_userdefinedcollectionvalue.field_definition_id = <%= udfFieldDefId %>)"
             }
@@ -51,6 +51,6 @@
         "species": "treemap_species",
         "treePhoto": "treemap_treephoto",
         "udf:tree": "treemap_userdefinedcollectionvalue",
-        "udf:mapFeature": "treemap_userdefinedcollectionvalue"
+        "udf:plot": "treemap_userdefinedcollectionvalue"
     }
 }
