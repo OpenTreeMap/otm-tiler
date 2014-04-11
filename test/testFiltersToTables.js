@@ -84,7 +84,7 @@ describe('filtersToTables', function() {
     });
 
     it('returns udfd/udcv and joins for udf mapfeature filter objects', function () {
-        var sql = filtersToTables({"udf:mapFeature:18.Action": {"LIKE": "%Watering%"}}, undefined);
+        var sql = filtersToTables({"udf:plot:18.Action": {"LIKE": "%Watering%"}}, undefined);
         var expectedSql =
                 "treemap_mapfeature LEFT OUTER JOIN treemap_userdefinedcollectionvalue " +
                 "ON (treemap_mapfeature.id = treemap_userdefinedcollectionvalue.model_id AND " +
