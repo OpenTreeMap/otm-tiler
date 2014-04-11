@@ -123,5 +123,7 @@ module.exports = {
 
     parseUdfCollectionFieldName: parseUdfCollectionFieldName,
 
-    getUdfFieldDefId: getUdfFieldDefId
+    getUdfFieldDefId: getUdfFieldDefId,
+
+    DATETIME_FORMATS: DATETIME_FORMATS
 };

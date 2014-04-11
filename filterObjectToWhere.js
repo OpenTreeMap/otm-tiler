@@ -23,9 +23,10 @@
 //     filter         = predicate
 //                    | [combinator, filter*]
 
-var _ = require('underscore');
-var config = require('./config.json');
-var utils = require('./filterObjectUtils');
+var _ = require('underscore'),
+    config = require('./config.json'),
+    utils = require('./filterObjectUtils'),
+    format = require('util').format;
 
 // Exports
 //---------------------------
@@ -270,6 +271,15 @@ function fieldNameAndPredicateToSql(fieldName, predicate) {
         if (f.sql_template) {
             return _.template(f.sql_template, { 'column': columnName });
         } else {
+            // if the column is an hstore field and the value is a
+            // datestring literal the hstore field must be converted
+            // from text to date before comparsion
+            if (columnName.indexOf('->') !== -1 &&
+                f.value.indexOf('(DATE') === 0) {
+                columnName = format(
+                    "to_date(%s::text, '%s')",
+                    columnName, utils.DATETIME_FORMATS.date);
+            }
             return columnName + ' ' + f.matcher + ' ' + f.value;
         }
     });
