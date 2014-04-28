@@ -56,6 +56,8 @@ function convertValueToEscapedSqlLiteral (value) {
         return value;
     } else if (value === null) {
         return "NULL";
+    } else if (_.isBoolean(value)) {
+        return value ? "TRUE" : "FALSE";
     } else if (isDateTimeString(value)) {
         return dateTimeStringToSqlValue(value);
     } else {
