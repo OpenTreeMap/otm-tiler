@@ -81,7 +81,9 @@ var windshaftConfig = {
     }
 };
 
-if (cluster.isMaster) {
+// The global v8debug will be present if this is started via:
+//  'node debug', node-debug' or 'node --debug-brk' (but not 'node --debug' !?!)
+if (cluster.isMaster && typeof v8debug !== 'object') {
     console.log("Map tiles will be served from http://localhost:" + port + windshaftConfig.base_url + '/:zoom/:x/:y');
 
     console.log('Creating ' + workerCount + ' workers.');
