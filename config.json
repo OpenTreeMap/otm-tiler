@@ -21,9 +21,9 @@
                 "depends": ["mapFeature", "tree"],
                 "sql": "LEFT OUTER JOIN treemap_species ON treemap_tree.species_id = treemap_species.id"
             },
-            "treePhoto": {
-                "depends": ["mapFeature", "tree"],
-                "sql": "LEFT OUTER JOIN treemap_treephoto ON treemap_tree.id = treemap_treephoto.tree_id"
+            "mapFeaturePhoto": {
+                "depends": ["mapFeature"],
+                "sql": "LEFT OUTER JOIN treemap_mapfeaturephoto ON treemap_mapfeature.id = treemap_mapfeaturephoto.map_feature_id"
             },
             "udf:tree": {
                 "depends": ["mapFeature", "tree"],
@@ -49,7 +49,7 @@
         "mapFeature": "treemap_mapfeature",
         "tree": "treemap_tree",
         "species": "treemap_species",
-        "treePhoto": "treemap_treephoto",
+        "mapFeaturePhoto": "treemap_mapfeaturephoto",
         "udf:tree": "treemap_userdefinedcollectionvalue",
         "udf:plot": "treemap_userdefinedcollectionvalue"
     }
