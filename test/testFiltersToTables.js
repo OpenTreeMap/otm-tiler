@@ -43,20 +43,10 @@ describe('filtersToTables', function() {
         assert.equal(sql, expectedSql);
     });
 
-    it('returns tree and treephoto JOINs when "treePhoto" is in the filter object', function() {
-        var sql = filtersToTables({"treePhoto.id":{"ISNULL":true}}, undefined);
+    it('returns mapfeaturephoto JOINs when "mapFeaturePhoto" is in the filter object', function() {
+        var sql = filtersToTables({"mapFeaturePhoto.id":{"ISNULL":true}}, undefined);
         var expectedSql = "treemap_mapfeature " +
-            "LEFT OUTER JOIN treemap_tree ON treemap_mapfeature.id = treemap_tree.plot_id " +
-            "LEFT OUTER JOIN treemap_treephoto ON treemap_tree.id = treemap_treephoto.tree_id";
-        assert.equal(sql, expectedSql);
-    });
-
-    it('returns tree joined once when species and photo are both in the filter object', function() {
-        var sql = filtersToTables({"treePhoto.id":{"ISNULL":true}, "species.id": {"IS": 17}}, undefined);
-        var expectedSql = "treemap_mapfeature " +
-            "LEFT OUTER JOIN treemap_tree ON treemap_mapfeature.id = treemap_tree.plot_id " +
-            "LEFT OUTER JOIN treemap_treephoto ON treemap_tree.id = treemap_treephoto.tree_id " +
-            "LEFT OUTER JOIN treemap_species ON treemap_tree.species_id = treemap_species.id";
+            "LEFT OUTER JOIN treemap_mapfeaturephoto ON treemap_mapfeature.id = treemap_mapfeaturephoto.map_feature_id";
         assert.equal(sql, expectedSql);
     });
 

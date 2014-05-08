@@ -6,7 +6,7 @@
 // A filter string must be valid JSON and conform to the following grammar:
 //
 //     literal        = json literal | GMT date string in 'YYYY-MM-DD HH:mm:ss'
-//     model-name     = 'mapFeature' | 'tree' | 'species' | 'treePhoto'
+//     model-name     = 'mapFeature' | 'tree' | 'species' | 'mapFeaturePhoto'
 //     model          = 'udf:'model-name | model-name
 //     value-property = 'MIN'
 //                    | 'MAX'
