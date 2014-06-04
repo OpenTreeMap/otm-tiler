@@ -4,6 +4,7 @@
     "scalar_udf_field": "udf_scalar_values",
     "sqlForMapFeatures": {
         "fields": {
+            "geom": "the_geom_webmercator",
             "base": "feature_type",
             "utfGrid": "feature_type, treemap_mapfeature.id AS id"
         },
@@ -52,5 +53,6 @@
         "mapFeaturePhoto": "treemap_mapfeaturephoto",
         "udf:tree": "treemap_userdefinedcollectionvalue",
         "udf:plot": "treemap_userdefinedcollectionvalue"
-    }
+    },
+    "treeMarkerMaxWidth": 20
 }

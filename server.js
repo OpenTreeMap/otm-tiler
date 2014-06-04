@@ -16,6 +16,25 @@ var ws;
 var windshaftConfig = {
     useProfiler: false,  // if true, returns X-Tiler-Profiler header with rendering times
     enable_cors: true,
+    mapnik: {
+        // When looking for objects to render on a tile, mapnik by default adds 64 pixels
+        // on all sides of a tile so if e.g. a label spans two tiles
+        // it will be rendered on both rather than getting cut off at the boundary.
+        // Because we're only rendering tree dots we can reduce the buffer based on our
+        // biggest dot. This speeds up rendering by as much as 25%.
+        bufferSize: Math.floor(config.treeMarkerMaxWidth / 2) + 1,
+        // Metatiles aren't a good fit for rendering tree dots using multiple servers and workers.
+        // When you request a 256x256 tile, mapnik renders by default a 1024x1024 metatile,
+        // and caches the resulting 16 tiles. They're aiming at basemaps, where for example
+        // if a road segment crosses three tiles it's more efficient to render it once
+        // than three times since you'll often want all 3 tiles.
+        // That's a bad fit for OTM for two reasons. First, our tree dots are less likely
+        // to span multiple tiles. Second, since metatiles aren't shared across servers
+        // or even across workers on the same server, our AWS tiler setup
+        // (currently two tile servers with two workers each) is likely to render
+        // each metatile multiple times, making things slower rather than faster.
+        metatile: 1
+    },
     redis: {host: settings.redishost || '127.0.0.1', port: 6379},
 
     // How to access the database
