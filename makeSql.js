@@ -19,6 +19,9 @@
 //    case of ANDing a plot predicate with a null tree value is
 //    prohibitively complicated using filterQuery syntax.
 
+// Performance note: We tried using ST_SnapToGrid to reduce the number of trees rendered.
+// While rendering does get faster, database queries slow down by a factor of at least five.
+// That particularly hurts in production where we have just one DB server and four renderers.
 
 var _ = require('underscore');
 
@@ -32,9 +35,8 @@ var config = require('./config.json');
 // Assumes that instanceid is an integer, ready to be plugged
 // directly into SQL
 function makeSqlForMapFeatures(filterString, displayString, instanceid, zoom, isUtfGridRequest) {
-    var geom_field = makeGeomFieldSql(zoom),
+    var geom_field = config.sqlForMapFeatures.fields.geom,
         otherFields = (isUtfGridRequest ? config.sqlForMapFeatures.fields.utfGrid : config.sqlForMapFeatures.fields.base),
-        fields = geom_field + ', ' + otherFields,
         filterObject = filterString ? JSON.parse(filterString) : {},
         displayFilters = displayString ? JSON.parse(displayString) : undefined,
 
@@ -60,30 +62,17 @@ function makeSqlForMapFeatures(filterString, displayString, instanceid, zoom, is
     }
     if (where) {
         where = 'WHERE ' + where;
+        // Because some searches (e.g. on photos and udf's) join to other tables,
+        // add DISTINCT so we only get one row.
+        geom_field = 'DISTINCT(' + geom_field + ')'
     }
-
     return _.template(
         '( SELECT <%= fields %> FROM <%= tables %> <%= where %> ) otmfiltersql '
     )({
-        fields: fields,
+        fields: geom_field + ', ' + otherFields,
         tables: tables,
         where: where
     });
-}
-
-function makeGeomFieldSql(zoom) {
-    // Performance can suffer when zoomed out with many features per pixel,
-    // so compute the pixel size and only select one feature per pixel.
-    //
-    // NOTE: The DISTINCT ON (the_geom_webmercator) is necessary regardles of
-    // the performance gains it gives us, as joining to the treephoto table
-    // can add multiple rows per mapfeature. If we ditch ST_SnapToGrid, make
-    // sure to retain the DISTINCT ON somewhere
-    var worldWidth = 40075016.6856,
-        tileSize = 256,
-        unitsPerPixel = worldWidth / (tileSize * Math.pow(2, zoom)),
-        sql = 'DISTINCT ON (the_geom_webmercator) ST_SnapToGrid(the_geom_webmercator, ' + unitsPerPixel + ') AS the_geom_webmercator';
-    return sql;
 }
 
 // Create a SQL query to return info about boundaries.
