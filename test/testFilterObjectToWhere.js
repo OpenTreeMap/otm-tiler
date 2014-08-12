@@ -93,10 +93,21 @@ describe('filterObjectToWhere', function() {
     });
 
     // UDF COLLECTION MATCHES
-    it('processes udf values', function() {
+    it('processes udf values, includes JOIN criteria in WHERE clause', function() {
         assertSql({"udf:tree:18.Action": {"LIKE": "%Watering%"}},
-                  "(\"treemap_userdefinedcollectionvalue\".\"data\"->'Action' " +
-                  "ILIKE '%Watering%')");
+                  "(\"treemap_userdefinedcollectionvalue\".\"data\"->'Action' ILIKE '%Watering%'" +
+                  " AND treemap_userdefinedcollectionvalue.field_definition_id=18" +
+                  " AND treemap_userdefinedcollectionvalue.model_id=treemap_tree.id)");
+    });
+
+    it('processes allows multiple UDF collections to be searched', function() {
+        assertSql({"udf:tree:18.Action": {"LIKE": "%Watering%"}, "udf:plot:17.Action": {"LIKE": "%Destroying%"}},
+                  "(\"treemap_userdefinedcollectionvalue\".\"data\"->'Action' ILIKE '%Watering%'" +
+                  " AND treemap_userdefinedcollectionvalue.field_definition_id=18" +
+                  " AND treemap_userdefinedcollectionvalue.model_id=treemap_tree.id)" +
+                  " AND (\"treemap_userdefinedcollectionvalue\".\"data\"->'Action' ILIKE '%Destroying%'" +
+                  " AND treemap_userdefinedcollectionvalue.field_definition_id=17" +
+                  " AND treemap_userdefinedcollectionvalue.model_id=treemap_mapfeature.id)");
     });
 
     // LIST MATCHES
@@ -243,7 +254,12 @@ describe('filterObjectToWhere', function() {
                   "((\"treemap_tree\".\"height\" >= 1) AND ((\"treemap_mapfeature\".\"type\" IN (1,2)) OR (\"treemap_tree\".\"dbh\" >= 3)))");
     });
 
-    it('generates working SQL from a one element combinator', function () {
+    it('generates working SQL from a one element AND combinator', function () {
+        assertSql(["AND", {"tree.height": {"MIN": 1}}],
+                  "((\"treemap_tree\".\"height\" >= 1))");
+    });
+
+    it('generates working SQL from a one element OR combinator', function () {
         assertSql(["OR", {"tree.height": {"MIN": 1}}],
                   "((\"treemap_tree\".\"height\" >= 1))");
     });
@@ -292,8 +308,8 @@ describe('filterObjectToWhere', function() {
     });
 
     it('converts hstore date fields from string to postgres date without timezone', function () {
-        assertSql({"udf:plot:19.Date": {"MIN": "2014-03-02 00:00:00"}},
-                  "(to_date(\"treemap_userdefinedcollectionvalue\".\"data\"->'Date'::text, 'YYYY-MM-DD') " +
+        assertSql({"tree.udf:Date": {"MIN": "2014-03-02 00:00:00"}},
+                  "(to_date(\"treemap_tree\".\"udf_scalar_values\"->'Date'::text, 'YYYY-MM-DD') " +
                   ">= (DATE '2014-03-02' + TIME '00:00:00'))");
     });
 

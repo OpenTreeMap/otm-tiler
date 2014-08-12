@@ -15,10 +15,10 @@ exports = module.exports = function (filterObject, displayFilters) {
     if (models.length === 0) {
         models = [config.sqlForMapFeatures.baseTable];
     }
-    return getSqlForModels(models, utils.getUdfFieldDefId(filterObject));
+    return getSqlForModels(models);
 };
 
-function getSqlForModels(models, maybeUdfFieldDefId) {
+function getSqlForModels(models) {
     var sql = [];
     var modelsAdded = [];
 
@@ -33,8 +33,6 @@ function getSqlForModels(models, maybeUdfFieldDefId) {
             var template = config.sqlForMapFeatures.tables[model].sqlTemplate;
             if (_.isUndefined(template)) {
                 sql.push(config.sqlForMapFeatures.tables[model].sql);
-            } else {
-                sql.push(_.template(template)({udfFieldDefId: maybeUdfFieldDefId}));
             }
 
             modelsAdded.push(model);

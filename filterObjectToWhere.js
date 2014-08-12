@@ -120,7 +120,7 @@ function accessHStore(hStoreColumn, accessor) {
     var t = _.template('"<%= hStoreColumn %>"->\'<%= accessor %>\'');
     return t({hStoreColumn: hStoreColumn,
               accessor: accessor.replace("'","''")});
-};
+}
 
 
 // Internal Methods
@@ -274,8 +274,7 @@ function fieldNameAndPredicateToSql(fieldName, predicate) {
             // if the column is an hstore field and the value is a
             // datestring literal the hstore field must be converted
             // from text to date before comparsion
-            if (columnName.indexOf('->') !== -1 &&
-                f.value.indexOf('(DATE') === 0) {
+            if (columnName.indexOf('->') !== -1 && f.value.indexOf('(DATE') === 0) {
                 columnName = format(
                     "to_date(%s::text, '%s')",
                     columnName, utils.DATETIME_FORMATS.date);
@@ -283,6 +282,15 @@ function fieldNameAndPredicateToSql(fieldName, predicate) {
             return columnName + ' ' + f.matcher + ' ' + f.value;
         }
     });
+    // If this is a query for collection UDFs, we need extra information in the
+    // WHERE clause to act as a join criteria, since the table is CROSS JOINed
+    if (fieldName.indexOf('udf:') === 0) {
+        var udfCollectionData = utils.parseUdfCollectionFieldName(fieldName);
+        var model = udfCollectionData.modelName;
+        var udfcTemplate = _.template(config.udfcTemplates[model]);
+
+        filterStatements.push(udfcTemplate({fieldDefId: udfCollectionData.fieldDefId}));
+    }
     return '(' + filterStatements.join(' AND ') + ')' ;
 }
 

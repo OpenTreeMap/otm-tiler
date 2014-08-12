@@ -94,26 +94,6 @@ function parseUdfCollectionFieldName (fieldName) {
     };
 }
 
-// `getUdfFieldDefId` examines a filterObject to determine if it has
-// predicates for `(python)UserDefinedCollectionValues`. This is
-// necessary for adding an additional component to the where clause to
-// filter on the `(python)UserDefinedFieldDefinition` id.  When ids
-// are found, they are validated not to allow multiple ids, which are
-// not supported.  returns null for non UDCV queries.
-function getUdfFieldDefId (filterObject) {
-    var udfCollectionValues = _.reject(_(_.keys(filterObject)).map(parseUdfCollectionFieldName), _.isNull),
-        udfFieldDefIds = _.uniq(_.pluck(udfCollectionValues, 'fieldDefId'));
-    if (udfFieldDefIds.length === 1) {
-        return udfFieldDefIds[0];
-    } else if (udfFieldDefIds.length === 0) {
-        return null;
-    } else {
-        throw ("Multiple UserDefinedFieldDefinition ids found in filterObject. " +
-               "Only one is supported per request.");
-    }
-}
-
-
 module.exports = {
     traverseCombinator: traverseCombinator,
 
@@ -124,8 +104,6 @@ module.exports = {
     sanitizeSqlString: sanitizeSqlString,
 
     parseUdfCollectionFieldName: parseUdfCollectionFieldName,
-
-    getUdfFieldDefId: getUdfFieldDefId,
 
     DATETIME_FORMATS: DATETIME_FORMATS
 };
