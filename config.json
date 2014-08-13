@@ -26,13 +26,17 @@
                 "depends": ["mapFeature"],
                 "sql": "LEFT OUTER JOIN treemap_mapfeaturephoto ON treemap_mapfeature.id = treemap_mapfeaturephoto.map_feature_id"
             },
+            "udf": {
+                "depends": [],
+                "sql": "CROSS JOIN treemap_userdefinedcollectionvalue"
+            },
             "udf:tree": {
-                "depends": ["mapFeature", "tree"],
-                "sqlTemplate": "LEFT OUTER JOIN treemap_userdefinedcollectionvalue ON (treemap_tree.id = treemap_userdefinedcollectionvalue.model_id AND treemap_userdefinedcollectionvalue.field_definition_id = <%= udfFieldDefId %>)"
+                "depends": ["mapFeature", "tree", "udf"],
+                "sql": ""
             },
             "udf:plot": {
-                "depends": ["mapFeature"],
-                "sqlTemplate": "LEFT OUTER JOIN treemap_userdefinedcollectionvalue ON (treemap_mapfeature.id = treemap_userdefinedcollectionvalue.model_id AND treemap_userdefinedcollectionvalue.field_definition_id = <%= udfFieldDefId %>)"
+                "depends": ["mapFeature", "udf"],
+                "sql": ""
             }
         },
         "where": {
@@ -53,6 +57,10 @@
         "mapFeaturePhoto": "treemap_mapfeaturephoto",
         "udf:tree": "treemap_userdefinedcollectionvalue",
         "udf:plot": "treemap_userdefinedcollectionvalue"
+    },
+    "udfcTemplates": {
+        "udf:tree": "treemap_userdefinedcollectionvalue.field_definition_id=<%= fieldDefId %> AND treemap_userdefinedcollectionvalue.model_id=treemap_tree.id",
+        "udf:plot": "treemap_userdefinedcollectionvalue.field_definition_id=<%= fieldDefId %> AND treemap_userdefinedcollectionvalue.model_id=treemap_mapfeature.id"
     },
     "treeMarkerMaxWidth": 20
 }
