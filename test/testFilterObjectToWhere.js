@@ -88,7 +88,7 @@ describe('filterObjectToWhere', function() {
     // UDF MATCHES
     it('processes udf values', function() {
         assertSql({"mapFeature.udf:Clever Name": {"LIKE": "%Market St%"}},
-                  "(\"treemap_mapfeature\".\"udf_scalar_values\"->'Clever Name' " +
+                  "(\"treemap_mapfeature\".\"udfs\"->'Clever Name' " +
                   "ILIKE '%Market St%')");
     });
 
@@ -309,7 +309,7 @@ describe('filterObjectToWhere', function() {
 
     it('converts hstore date fields from string to postgres date without timezone', function () {
         assertSql({"tree.udf:Date": {"MIN": "2014-03-02 00:00:00"}},
-                  "(to_date(\"treemap_tree\".\"udf_scalar_values\"->'Date'::text, 'YYYY-MM-DD') " +
+                  "(to_date(\"treemap_tree\".\"udfs\"->'Date'::text, 'YYYY-MM-DD') " +
                   ">= (DATE '2014-03-02' + TIME '00:00:00'))");
     });
 

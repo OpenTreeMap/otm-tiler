@@ -1,7 +1,7 @@
 {
     "filterQueryArgumentName": "q",
     "displayQueryArgumentName": "show",
-    "scalar_udf_field": "udf_scalar_values",
+    "scalar_udf_field": "udfs",
     "sqlForMapFeatures": {
         "fields": {
             "geom": "the_geom_webmercator",
