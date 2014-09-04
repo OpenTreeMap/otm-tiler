@@ -1,4 +1,4 @@
-# OpenTreeMap 2 Map Tile Server
+# OpenTreeMap 2 Map Tile Server [![Build Status](https://travis-ci.org/OpenTreeMap/OTM2-tiler.svg?branch=master)](https://travis-ci.org/OpenTreeMap/OTM2-tiler)
 
 This project requires a `settings.json` file in the root directory, containing connection information.
 
