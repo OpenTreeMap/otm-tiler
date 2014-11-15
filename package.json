@@ -1,27 +1,32 @@
 {
-    "name": "otm2-tiler",
-    "version": "0.0.1-SNAPSHOT",
-    "description": "Wraps Windshaft to provide map tiles for OpenTreeMap 2",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/azavea/OTM2-tiler"
-    },
-    "dependencies": {
-        "windshaft": "0.19.4",
-        "underscore": "~1.3",
-        "semver": "~1.1.0",
-        "moment": "~2.1.0"
-    },
-    "devDependencies": {
-        "mocha": "~1.2.1",
-        "docco": "~0.6.2"
-    },
-    "main": "./server.js",
-    "scripts": {
-        "test": "mocha test/*.js"
-    },
-    "licenses": [{
-        "type": "BSD",
-        "url": "https://github.com/Vizzuality/Windshaft/blob/master/LICENCE"
-    }]
+  "name": "otm2-tiler",
+  "version": "0.0.1-SNAPSHOT",
+  "description": "Wraps Windshaft to provide map tiles for OpenTreeMap 2",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/azavea/OTM2-tiler"
+  },
+  "dependencies": {
+    "moment": "~2.1.0",
+    "semver": "~1.1.0",
+    "underscore": "~1.3",
+    "windshaft": "0.19.4"
+  },
+  "devDependencies": {
+    "coveralls": "^2.11.2",
+    "docco": "~0.6.2",
+    "istanbul": "^0.3.2",
+    "mocha": "~1.2.1"
+  },
+  "main": "./server.js",
+  "scripts": {
+    "test": "_mocha test/*.js",
+    "coverage": "istanbul cover ./node_modules/.bin/_mocha --report lcovonly -- test/*.js"
+  },
+  "licenses": [
+    {
+      "type": "BSD",
+      "url": "https://github.com/Vizzuality/Windshaft/blob/master/LICENCE"
+    }
+  ]
 }
