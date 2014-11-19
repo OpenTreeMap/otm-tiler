@@ -8,4 +8,6 @@ before_install:
   - sudo apt-get install libboost-dev libgdal1h libgdal-dev libmapnik libmapnik-dev
 
 install: make all
-script: make test
+script: make coverage
+
+after_success: cat coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js
