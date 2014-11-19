@@ -1,5 +1,5 @@
-# OpenTreeMap 2 Map Tile Server [![Build Status](https://travis-ci.org/OpenTreeMap/OTM2-tiler.svg?branch=master)](https://travis-ci.org/OpenTreeMap/OTM2-tiler)
-[![Coverage Status](https://coveralls.io/repos/OpenTreeMap/OTM2-tiler/badge.png?branch=master)](https://coveralls.io/r/OpenTreeMap/OTM2-tiler?branch=master)
+# OpenTreeMap 2 Map Tile Server
+[![Build Status](https://travis-ci.org/OpenTreeMap/OTM2-tiler.svg?branch=master)](https://travis-ci.org/OpenTreeMap/OTM2-tiler) [![Coverage Status](https://coveralls.io/repos/OpenTreeMap/OTM2-tiler/badge.png?branch=master)](https://coveralls.io/r/OpenTreeMap/OTM2-tiler?branch=master)
 
 This project requires a `settings.json` file in the root directory, containing connection information.
 
