@@ -2,13 +2,20 @@
 
 var Windshaft = require('windshaft');
 var _ = require('underscore');
+var cluster = require('cluster');
+var fs = require('fs');
 var makeSql = require('./makeSql.js');
 var config = require('./config.json');
 var settings = require('./settings.json');
-var cluster = require('cluster');
+
 var workerCount = process.env.WORKERS || require('os').cpus().length;
 var port = process.env.PORT || 4000;
 var ws;
+
+var styles = {
+    boundary: fs.readFileSync('style/boundary.mms', {encoding: 'utf-8'}),
+    mapfeature: fs.readFileSync('style/mapfeature.mms', {encoding: 'utf-8'})
+};
 
 // Configure the Windshaft tile server to handle OTM's HTTP requests, which retrieve
 // e.g. a map tile or UTF grid with map features like tree plots or boundaries.
@@ -71,8 +78,10 @@ var windshaftConfig = {
                                                               instanceid,
                                                               zoom,
                                                               isUtfGridRequest);
+                req.params.style = styles.mapfeature;
             } else if (table === 'treemap_boundary' && instanceid) {
                 req.query.sql = makeSql.makeSqlForBoundaries(instanceid);
+                req.params.style = styles.boundary;
             }
         } catch (err) {
             callback(err, null);
