@@ -15,24 +15,24 @@
         marker-line-width: 1;
     }
     [zoom < 15] {
-       marker-line-width: 0;
+        marker-line-width: 0;
     }
 
 
     [zoom >= 18] {
-       marker-width: 20;
+        marker-width: 20;
     }
     [zoom = 17] {
-       marker-width: 15;
+        marker-width: 15;
     }
     [zoom = 16] {
-       marker-width: 12;
+        marker-width: 12;
     }
     [zoom = 15] {
-       marker-width: 8;
+        marker-width: 8;
     }
     [zoom <= 14] {
-       marker-width: 5;
+        marker-width: 5;
     }
 
 }
