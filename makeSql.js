@@ -34,13 +34,14 @@ var config = require('./config.json');
 // Create a SQL query to return info about map features.
 // Assumes that instanceid is an integer, ready to be plugged
 // directly into SQL
-function makeSqlForMapFeatures(filterString, displayString, instanceid, zoom, isUtfGridRequest) {
-    var geom_field = config.sqlForMapFeatures.fields.geom,
+function makeSqlForMapFeatures(filterString, displayString, instanceid, zoom, isUtfGridRequest, isPolygonRequest) {
+    var geom_spec = config.sqlForMapFeatures.fields.geom,
+        geom_field = isPolygonRequest ? geom_spec.polygon : geom_spec.point,
         otherFields = (isUtfGridRequest ? config.sqlForMapFeatures.fields.utfGrid : config.sqlForMapFeatures.fields.base),
         filterObject = filterString ? JSON.parse(filterString) : {},
         displayFilters = displayString ? JSON.parse(displayString) : undefined,
 
-        tables = filtersToTables(filterObject, displayFilters),
+        tables = filtersToTables(filterObject, displayFilters, isPolygonRequest),
 
         where = '',
         filterClause = (filterString ? filterObjectToWhere(filterObject) : null),
@@ -64,7 +65,7 @@ function makeSqlForMapFeatures(filterString, displayString, instanceid, zoom, is
         where = 'WHERE ' + where;
         // Because some searches (e.g. on photos and udf's) join to other tables,
         // add DISTINCT so we only get one row.
-        geom_field = 'DISTINCT(' + geom_field + ')'
+        geom_field = 'DISTINCT(' + geom_field + ') AS ' + config.customDbFieldNames.geom
     }
     return _.template(
         '( SELECT <%= fields %> FROM <%= tables %> <%= where %> ) otmfiltersql '

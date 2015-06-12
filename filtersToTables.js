@@ -4,7 +4,7 @@ var _ = require('underscore');
 var config = require('./config.json');
 var utils = require("./filterObjectUtils");
 
-exports = module.exports = function (filterObject, displayFilters) {
+exports = module.exports = function (filterObject, displayFilters, isPolygonRequest) {
     if (_.isUndefined(filterObject) || _.isNull(filterObject)) {
         throw new Error('A null or undefined filter object cannot be converted to SQL');
     }
@@ -13,7 +13,9 @@ exports = module.exports = function (filterObject, displayFilters) {
         models = _.union(models, ['tree']);
     }
     if (models.length === 0) {
-        models = [config.sqlForMapFeatures.baseTable];
+        models = isPolygonRequest
+            ? [config.sqlForMapFeatures.basePointModel, config.sqlForMapFeatures.basePolygonModel]
+            : [config.sqlForMapFeatures.basePointModel];
     }
     return getSqlForModels(models);
 };

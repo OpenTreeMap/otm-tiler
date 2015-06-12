@@ -18,7 +18,13 @@ describe('testSqlForMapFeatures', function() {
 
     function testSql(options) {
         var zoom = options.zoom || 11,
-            sql = makeSql.makeSqlForMapFeatures(options.filter, options.displayFilter, options.instanceId, zoom, options.isUtfGridRequest);
+            sql = makeSql.makeSqlForMapFeatures(
+                options.filter,
+                options.displayFilter,
+                options.instanceId,
+                zoom,
+                options.isUtfGridRequest,
+                options.isPolygonRequest);
         return sql.indexOf(options.expected);
     }
 
@@ -27,6 +33,13 @@ describe('testSqlForMapFeatures', function() {
     it('has base fields for plain request', function() {
         assertSqlContains({
             expected: config.sqlForMapFeatures.fields.base
+        });
+    });
+
+    it('has correct column for polygon request', function() {
+        assertSqlContains({
+            isPolygonRequest: true,
+            expected: config.sqlForMapFeatures.fields.geom.polygon
         });
     });
 
@@ -42,6 +55,13 @@ describe('testSqlForMapFeatures', function() {
     it('has base tables for plain request', function() {
         assertSqlContains({
             expected: config.sqlForMapFeatures.tables.mapFeature.sql
+        });
+    });
+
+    it('has base polygon table for polygon request', function() {
+        assertSqlContains({
+            isPolygonRequest: true,
+            expected: config.sqlForMapFeatures.tables.polygonalMapFeature.sql
         });
     });
 

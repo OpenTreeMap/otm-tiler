@@ -4,15 +4,23 @@
     "scalar_udf_field": "udfs",
     "sqlForMapFeatures": {
         "fields": {
-            "geom": "the_geom_webmercator",
+            "geom": {
+                "point": "the_geom_webmercator",
+                "polygon": "stormwater_polygonalmapfeature.polygon"
+            },
             "base": "feature_type",
             "utfGrid": "feature_type, treemap_mapfeature.id AS id"
         },
-        "baseTable": "mapFeature",
+        "basePointModel": "mapFeature",
+        "basePolygonModel": "polygonalMapFeature",
         "tables": {
             "mapFeature": {
                 "depends": [],
                 "sql": "treemap_mapfeature"
+            },
+            "polygonalMapFeature": {
+                "depends": ["mapFeature"],
+                "sql": "INNER JOIN stormwater_polygonalmapfeature ON stormwater_polygonalmapfeature.mapfeature_ptr_id = treemap_mapfeature.id"
             },
             "tree": {
                 "depends": ["mapFeature"],
@@ -52,6 +60,7 @@
     "interactivityForUtfGridRequests": "id",
     "modelMapping": {
         "mapFeature": "treemap_mapfeature",
+        "polygonalMapFeature": "stormwater_polygonalmapfeature",
         "tree": "treemap_tree",
         "species": "treemap_species",
         "mapFeaturePhoto": "treemap_mapfeaturephoto",
