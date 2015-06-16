@@ -13,10 +13,13 @@ exports = module.exports = function (filterObject, displayFilters, isPolygonRequ
         models = _.union(models, ['tree']);
     }
     if (models.length === 0) {
-        models = isPolygonRequest
-            ? [config.sqlForMapFeatures.basePointModel, config.sqlForMapFeatures.basePolygonModel]
-            : [config.sqlForMapFeatures.basePointModel];
+        models = [config.sqlForMapFeatures.basePointModel];
     }
+
+    if (isPolygonRequest) {
+        models = _.union(models, [config.sqlForMapFeatures.basePolygonModel]);
+    }
+
     return getSqlForModels(models);
 };
 
