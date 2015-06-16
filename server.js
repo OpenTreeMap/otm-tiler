@@ -14,7 +14,8 @@ var ws;
 
 var styles = {
     boundary: fs.readFileSync('style/boundary.mms', {encoding: 'utf-8'}),
-    mapfeature: fs.readFileSync('style/mapfeature.mms', {encoding: 'utf-8'})
+    mapFeature: fs.readFileSync('style/mapFeature.mms', {encoding: 'utf-8'}),
+    polygonalMapFeature: fs.readFileSync('style/polygonalMapFeature.mms', {encoding: 'utf-8'})
 };
 
 // Configure the Windshaft tile server to handle OTM's HTTP requests, which retrieve
@@ -61,7 +62,7 @@ var windshaftConfig = {
 
     // Tell server how to handle HTTP request 'req' (by specifying properties in req.params).
     req2params: function(req, callback) {
-        var instanceid, isUtfGridRequest, table, zoom, filterString, displayString;
+        var instanceid, isUtfGridRequest, isPolygonRequest, table, zoom, filterString, displayString;
         // Specify SQL subquery to extract desired features from desired DB layer.
         // (This will be wrapped in an outer query, in many cases extracting geometry
         // using the magic column name "the_geom_webmercator".)
@@ -69,7 +70,8 @@ var windshaftConfig = {
             instanceid = parseInt(req.query['instance_id'], 10);
             table = req.params.table;
             zoom = req.params.z;
-            if (table === 'treemap_mapfeature') {
+            isPolygonRequest = (table === 'stormwater_polygonalmapfeature');
+            if (table === 'treemap_mapfeature' || isPolygonRequest) {
                 filterString = req.query[config.filterQueryArgumentName];
                 displayString = req.query[config.displayQueryArgumentName];
                 isUtfGridRequest = (req.params.format === 'grid.json');
@@ -77,8 +79,11 @@ var windshaftConfig = {
                                                               displayString,
                                                               instanceid,
                                                               zoom,
-                                                              isUtfGridRequest);
-                req.params.style = styles.mapfeature;
+                                                              isUtfGridRequest,
+                                                              isPolygonRequest);
+                req.params.style = isPolygonRequest
+                    ? styles.polygonalMapFeature
+                    : styles.mapFeature;
             } else if (table === 'treemap_boundary' && instanceid) {
                 req.query.sql = makeSql.makeSqlForBoundaries(instanceid);
                 req.params.style = styles.boundary;

@@ -86,7 +86,7 @@ exports = module.exports = <span class="function"><span class="keyword">function
         models = _.union(models, [<span class="string">'tree'</span>]);
     }
     <span class="keyword">if</span> (models.length === <span class="number">0</span>) {
-        models = [config.sqlForMapFeatures.baseTable];
+        models = [config.sqlForMapFeatures.basePointModel];
     }
     <span class="keyword">return</span> getSqlForModels(models, utils.getUdfFieldDefId(filterObject));
 };
