@@ -16,12 +16,14 @@
     "coveralls": "^2.11.2",
     "docco": "~0.6.2",
     "istanbul": "^0.3.2",
-    "mocha": "~1.2.1"
+    "mocha": "~1.2.1",
+    "supervisor": "^0.6.0"
   },
   "main": "./server.js",
   "scripts": {
     "test": "_mocha test/*.js",
-    "coverage": "istanbul cover ./node_modules/.bin/_mocha --report lcovonly -- test/*.js"
+    "coverage": "istanbul cover ./node_modules/.bin/_mocha --report lcovonly -- test/*.js",
+    "watch": "supervisor --watch .,style --extensions js,mss server.js"
   },
   "licenses": [
     {
