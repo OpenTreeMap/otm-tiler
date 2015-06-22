@@ -190,6 +190,8 @@ into the correct Postgres literal, and converting null into the string NULL.</p>
         <span class="keyword">return</span> value;
     } <span class="keyword">else</span> <span class="keyword">if</span> (value === <span class="literal">null</span>) {
         <span class="keyword">return</span> <span class="string">"NULL"</span>;
+    } <span class="keyword">else</span> <span class="keyword">if</span> (_.isBoolean(value)) {
+        <span class="keyword">return</span> value ? <span class="string">"TRUE"</span> : <span class="string">"FALSE"</span>;
     } <span class="keyword">else</span> <span class="keyword">if</span> (isDateTimeString(value)) {
         <span class="keyword">return</span> dateTimeStringToSqlValue(value);
     } <span class="keyword">else</span> {
@@ -261,39 +263,7 @@ syntax into an object of the relevant components.</p>
         fieldDefId: fieldDefIdAndHStoreMember[<span class="number">0</span>],
         hStoreMember: fieldDefIdAndHStoreMember[<span class="number">1</span>]
     };
-}</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-10">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-10">&#182;</a>
-              </div>
-              <p><code>getUdfFieldDefId</code> examines a filterObject to determine if it has
-predicates for <code>(python)UserDefinedCollectionValues</code>. This is
-necessary for adding an additional component to the where clause to
-filter on the <code>(python)UserDefinedFieldDefinition</code> id.  When ids
-are found, they are validated not to allow multiple ids, which are
-not supported.  returns null for non UDCV queries.</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre><span class="function"><span class="keyword">function</span> <span class="title">getUdfFieldDefId</span> <span class="params">(filterObject)</span> {</span>
-    <span class="keyword">var</span> udfCollectionValues = _.reject(_(_.keys(filterObject)).map(parseUdfCollectionFieldName), _.isNull),
-        udfFieldDefIds = _.uniq(_.pluck(udfCollectionValues, <span class="string">'fieldDefId'</span>));
-    <span class="keyword">if</span> (udfFieldDefIds.length === <span class="number">1</span>) {
-        <span class="keyword">return</span> udfFieldDefIds[<span class="number">0</span>];
-    } <span class="keyword">else</span> <span class="keyword">if</span> (udfFieldDefIds.length === <span class="number">0</span>) {
-        <span class="keyword">return</span> <span class="literal">null</span>;
-    } <span class="keyword">else</span> {
-        <span class="keyword">throw</span> (<span class="string">"Multiple UserDefinedFieldDefinition ids found in filterObject. "</span> +
-               <span class="string">"Only one is supported per request."</span>);
-    }
 }
-
 
 module.exports = {
     traverseCombinator: traverseCombinator,
@@ -306,7 +276,7 @@ module.exports = {
 
     parseUdfCollectionFieldName: parseUdfCollectionFieldName,
 
-    getUdfFieldDefId: getUdfFieldDefId
+    DATETIME_FORMATS: DATETIME_FORMATS
 };</pre></div></div>
             
         </li>

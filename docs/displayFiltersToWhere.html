@@ -122,7 +122,7 @@ module.exports = <span class="keyword">function</span>(displayFilters) {
             }
             filter = <span class="string">'Plot'</span>;
         }
-        modelNameString = utils.convertValueToEscapedSqlLiteral (filter);
+        modelNameString = utils.convertValueToEscapedSqlLiteral(filter);
         modelSql = format(<span class="string">'"%s"."feature_type" = %s'</span>, config.modelMapping.mapFeature, modelNameString);
         <span class="keyword">if</span> (treeSql) {
             <span class="keyword">return</span> format(<span class="string">"(%s) AND (%s)"</span>, treeSql, modelSql);

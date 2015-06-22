@@ -65,7 +65,7 @@ function makeSqlForMapFeatures(filterString, displayString, instanceid, zoom, is
         where = 'WHERE ' + where;
         // Because some searches (e.g. on photos and udf's) join to other tables,
         // add DISTINCT so we only get one row.
-        geom_field = 'DISTINCT(' + geom_field + ') AS ' + config.customDbFieldNames.geom
+        geom_field = 'DISTINCT(' + geom_field + ') AS ' + config.customDbFieldNames.geom;
     }
     return _.template(
         '( SELECT <%= fields %> FROM <%= tables %> <%= where %> ) otmfiltersql '

@@ -99,6 +99,9 @@ Postgres requires subqueries to be named.</p>
    clause. This was created as a sidecare to filterQuery because the
    case of ANDing a plot predicate with a null tree value is
    prohibitively complicated using filterQuery syntax.</p>
+<p>Performance note: We tried using ST_SnapToGrid to reduce the number of trees rendered.
+While rendering does get faster, database queries slow down by a factor of at least five.
+That particularly hurts in production where we have just one DB server and four renderers.</p>
 
             </div>
             
@@ -124,14 +127,14 @@ directly into SQL</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="function"><span class="keyword">function</span> <span class="title">makeSqlForMapFeatures</span><span class="params">(filterString, displayString, instanceid, zoom, isUtfGridRequest)</span> {</span>
-    <span class="keyword">var</span> geom_field = makeGeomFieldSql(zoom),
+            <div class="content"><div class='highlight'><pre><span class="function"><span class="keyword">function</span> <span class="title">makeSqlForMapFeatures</span><span class="params">(filterString, displayString, instanceid, zoom, isUtfGridRequest, isPolygonRequest)</span> {</span>
+    <span class="keyword">var</span> geom_spec = config.sqlForMapFeatures.fields.geom,
+        geom_field = isPolygonRequest ? geom_spec.polygon : geom_spec.point,
         otherFields = (isUtfGridRequest ? config.sqlForMapFeatures.fields.utfGrid : config.sqlForMapFeatures.fields.base),
-        fields = geom_field + <span class="string">', '</span> + otherFields,
         filterObject = filterString ? JSON.parse(filterString) : {},
         displayFilters = displayString ? JSON.parse(displayString) : <span class="literal">undefined</span>,
 
-        tables = filtersToTables(filterObject, displayFilters),
+        tables = filtersToTables(filterObject, displayFilters, isPolygonRequest),
 
         where = <span class="string">''</span>,
         filterClause = (filterString ? filterObjectToWhere(filterObject) : <span class="literal">null</span>),
@@ -152,19 +155,7 @@ directly into SQL</p>
         where = addToWhere(instanceClause);
     }
     <span class="keyword">if</span> (where) {
-        where = <span class="string">'WHERE '</span> + where;
-    }
-
-    <span class="keyword">return</span> _.template(
-        <span class="string">'( SELECT &lt;%= fields %&gt; FROM &lt;%= tables %&gt; &lt;%= where %&gt; ) otmfiltersql '</span>
-    )({
-        fields: fields,
-        tables: tables,
-        where: where
-    });
-}
-
-<span class="function"><span class="keyword">function</span> <span class="title">makeGeomFieldSql</span><span class="params">(zoom)</span> {</span></pre></div></div>
+        where = <span class="string">'WHERE '</span> + where;</pre></div></div>
             
         </li>
         
@@ -175,20 +166,20 @@ directly into SQL</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-4">&#182;</a>
               </div>
-              <p>Performance can suffer when zoomed out with many features per pixel,
-so compute the pixel size and only select one feature per pixel.</p>
-<p>NOTE: The DISTINCT ON (the_geom_webmercator) is necessary regardles of
-the performance gains it gives us, as joining to the treephoto table
-can add multiple rows per mapfeature. If we ditch ST_SnapToGrid, make
-sure to retain the DISTINCT ON somewhere</p>
+              <p>Because some searches (e.g. on photos and udf&#39;s) join to other tables,
+add DISTINCT so we only get one row.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    <span class="keyword">var</span> worldWidth = <span class="number">40075016.6856</span>,
-        tileSize = <span class="number">256</span>,
-        unitsPerPixel = worldWidth / (tileSize * Math.pow(<span class="number">2</span>, zoom)),
-        sql = <span class="string">'DISTINCT ON (the_geom_webmercator) ST_SnapToGrid(the_geom_webmercator, '</span> + unitsPerPixel + <span class="string">') AS the_geom_webmercator'</span>;
-    <span class="keyword">return</span> sql;
+            <div class="content"><div class='highlight'><pre>        geom_field = <span class="string">'DISTINCT('</span> + geom_field + <span class="string">') AS '</span> + config.customDbFieldNames.geom;
+    }
+    <span class="keyword">return</span> _.template(
+        <span class="string">'( SELECT &lt;%= fields %&gt; FROM &lt;%= tables %&gt; &lt;%= where %&gt; ) otmfiltersql '</span>
+    )({
+        fields: geom_field + <span class="string">', '</span> + otherFields,
+        tables: tables,
+        where: where
+    });
 }</pre></div></div>
             
         </li>

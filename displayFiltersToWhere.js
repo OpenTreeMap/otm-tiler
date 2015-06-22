@@ -36,7 +36,7 @@ module.exports = function(displayFilters) {
             }
             filter = 'Plot';
         }
-        modelNameString = utils.convertValueToEscapedSqlLiteral (filter);
+        modelNameString = utils.convertValueToEscapedSqlLiteral(filter);
         modelSql = format('"%s"."feature_type" = %s', config.modelMapping.mapFeature, modelNameString);
         if (treeSql) {
             return format("(%s) AND (%s)", treeSql, modelSql);
