@@ -5,12 +5,29 @@ var _ = require('underscore'),
     utils = require('./filterObjectUtils'),
     config = require('./config.json');
 
-module.exports = function(displayFilters) {
+module.exports = function(displayFilters, models) {
     var featureTypes, inClause;
 
-    if (_.isUndefined(displayFilters) || _.isNull(displayFilters)) {
-        throw new Error('A null or undefined display filter list cannot be converted to SQL');
+    if ( ! _.isArray(models) || models.length === 0) {
+        throw new Error('The models list must be a non-empty array.');
     }
+
+    // If there are trees referenced in the models list, narrow the display
+    // filters to only tree display filters.
+    if (_.contains(models, 'tree')) {
+        if (_.isArray(displayFilters) && displayFilters.length > 0) {
+            displayFilters = _.intersection(displayFilters, ['Tree', 'Plot', 'EmptyPlot']);
+        } else {
+            displayFilters = ['Plot'];
+        }
+    }
+
+    // If there are still no display filters (none from query args, and we're
+    // not filtering trees), return `null` to indicate that there is no SQL generated
+    if (_.isUndefined(displayFilters) || _.isNull(displayFilters)) {
+        return null;
+    }
+
     if ( ! _.isArray(displayFilters)) {
         throw new Error('The display filter list must be a list to be converted to SQL');
     }

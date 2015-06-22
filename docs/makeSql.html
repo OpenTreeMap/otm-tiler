@@ -137,21 +137,21 @@ directly into SQL</p>
         tables = filtersToTables(filterObject, displayFilters, isPolygonRequest),
 
         where = <span class="string">''</span>,
+        displayClause = displayFiltersToWhere(displayFilters, tables.models),
         filterClause = (filterString ? filterObjectToWhere(filterObject) : <span class="literal">null</span>),
-        displayClause = (displayString ? displayFiltersToWhere(displayFilters) : <span class="literal">null</span>),
         instanceClause = (instanceid ? _.template(config.sqlForMapFeatures.where.instance)({instanceid: instanceid}) : <span class="literal">null</span>);
 
     <span class="function"><span class="keyword">function</span> <span class="title">addToWhere</span><span class="params">(clause)</span> {</span>
         <span class="keyword">return</span> where ? <span class="string">'( '</span> + clause + <span class="string">' ) AND '</span> + where : clause;
     }
 
-    <span class="keyword">if</span> (filterString) {
+    <span class="keyword">if</span> (filterClause) {
         where = filterClause;
     }
-    <span class="keyword">if</span> (displayString) {
+    <span class="keyword">if</span> (displayClause) {
         where = addToWhere(displayClause);
     }
-    <span class="keyword">if</span> (instanceid) {
+    <span class="keyword">if</span> (instanceClause) {
         where = addToWhere(instanceClause);
     }
     <span class="keyword">if</span> (where) {
@@ -177,7 +177,7 @@ add DISTINCT so we only get one row.</p>
         <span class="string">'( SELECT &lt;%= fields %&gt; FROM &lt;%= tables %&gt; &lt;%= where %&gt; ) otmfiltersql '</span>
     )({
         fields: geom_field + <span class="string">', '</span> + otherFields,
-        tables: tables,
+        tables: tables.sql,
         where: where
     });
 }</pre></div></div>

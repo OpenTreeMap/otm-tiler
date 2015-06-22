@@ -3,24 +3,43 @@
 var assert = require("assert");
 var displayFiltersToWhere = require("../displayFiltersToWhere");
 
-var assertSql = function(list, expectedSql) {
-    var result = displayFiltersToWhere(list);
+var assertSqlForModels = function(list, models, expectedSql) {
+    var result = displayFiltersToWhere(list, models);
     assert.equal(result, expectedSql);
+};
+
+var assertSql = function(list, expectedSql) {
+    assertSqlForModels(list, ['mapFeature'], expectedSql);
 };
 
 describe('displayFiltersToWhere', function() {
 
     // NULL AND EMPTY HANDLING
-    it('raises an error when passed undefined', function() {
+    it('raises an error when passed a non-empty array for models', function() {
         assert.throws(function() {
-            displayFiltersToWhere(undefined);
+            displayFiltersToWhere(null, null);
+        }, Error);
+
+        assert.throws(function() {
+            displayFiltersToWhere(['Tree'], undefined);
+        }, Error);
+
+        assert.throws(function() {
+            displayFiltersToWhere(['Tree'], 2);
+        }, Error);
+
+        assert.throws(function() {
+            displayFiltersToWhere(['Tree'], []);
         }, Error);
     });
 
-    it('raises an error when passed null', function() {
-        assert.throws(function() {
-            displayFiltersToWhere(null);
-        }, Error);
+    it('returns null when passed null or undefined for displayList w/ no tree models', function() {
+        assertSqlForModels(null, ['mapFeature']);
+    });
+
+    // MODEL LIST HANDLING
+    it('returns an IN clause for only Plots when tree is in the model filter', function() {
+        assertSqlForModels(null, ['tree'], '"treemap_mapfeature"."feature_type" IN ( \'Plot\' )');
     });
 
     // EMPTY LIST HANDLING

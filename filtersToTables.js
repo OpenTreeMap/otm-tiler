@@ -20,10 +20,10 @@ exports = module.exports = function (filterObject, displayFilters, isPolygonRequ
         models = _.union(models, [config.sqlForMapFeatures.basePolygonModel]);
     }
 
-    return getSqlForModels(models);
+    return getSqlAndModels(models);
 };
 
-function getSqlForModels(models) {
+function getSqlAndModels(models) {
     var sql = [];
     var modelsAdded = [];
 
@@ -43,7 +43,11 @@ function getSqlForModels(models) {
             modelsAdded.push(model);
         }
     });
-    return sql.join(" ");
+
+    return {
+        sql: sql.join(" "),
+        models: modelsAdded
+    };
 }
 
 // `getModelsForFilterObject` looks at a nested filterObject with

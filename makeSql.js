@@ -44,21 +44,21 @@ function makeSqlForMapFeatures(filterString, displayString, instanceid, zoom, is
         tables = filtersToTables(filterObject, displayFilters, isPolygonRequest),
 
         where = '',
+        displayClause = displayFiltersToWhere(displayFilters, tables.models),
         filterClause = (filterString ? filterObjectToWhere(filterObject) : null),
-        displayClause = (displayString ? displayFiltersToWhere(displayFilters) : null),
         instanceClause = (instanceid ? _.template(config.sqlForMapFeatures.where.instance)({instanceid: instanceid}) : null);
 
     function addToWhere(clause) {
         return where ? '( ' + clause + ' ) AND ' + where : clause;
     }
 
-    if (filterString) {
+    if (filterClause) {
         where = filterClause;
     }
-    if (displayString) {
+    if (displayClause) {
         where = addToWhere(displayClause);
     }
-    if (instanceid) {
+    if (instanceClause) {
         where = addToWhere(instanceClause);
     }
     if (where) {
@@ -71,7 +71,7 @@ function makeSqlForMapFeatures(filterString, displayString, instanceid, zoom, is
         '( SELECT <%= fields %> FROM <%= tables %> <%= where %> ) otmfiltersql '
     )({
         fields: geom_field + ', ' + otherFields,
-        tables: tables,
+        tables: tables.sql,
         where: where
     });
 }
