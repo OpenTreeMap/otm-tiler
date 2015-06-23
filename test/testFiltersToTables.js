@@ -4,6 +4,11 @@ var assert = require("assert");
 var filtersToTables = require("../filtersToTables");
 var config = require("../config.json");
 
+var assertSql = function(filter, displayFilters, expectedSql) {
+    var tables = filtersToTables(filter, displayFilters);
+    assert.equal(tables.sql, expectedSql);
+};
+
 describe('filtersToTables', function() {
     it('raises an error when passed an unknown model in the filter object', function() {
         assert.throws(function() {
@@ -12,79 +17,68 @@ describe('filtersToTables', function() {
     });
 
     it('returns the "mapFeature" table when the filter object is empty', function() {
-        var sql = filtersToTables({}, undefined);
-        assert.equal(sql, config.sqlForMapFeatures.tables.mapFeature.sql);
+        assertSql({}, undefined, config.sqlForMapFeatures.tables.mapFeature.sql);
     });
 
     it('returns "mapFeature" tables when "mapFeature" is in the filter object', function() {
-        var sql = filtersToTables({"mapFeature.id":{"IS":"1"}}, undefined);
-        assert.equal(sql, config.sqlForMapFeatures.tables.mapFeature.sql);
+        assertSql({"mapFeature.id":{"IS":"1"}}, undefined, config.sqlForMapFeatures.tables.mapFeature.sql);
     });
 
     it('returns tree JOINed to mapFeature when "tree" is in the filter object', function() {
-        var sql = filtersToTables({"tree.id":{"ISNULL":true}}, undefined);
         var expectedSql = "treemap_mapfeature " +
             "LEFT OUTER JOIN treemap_tree ON treemap_mapfeature.id = treemap_tree.plot_id";
-        assert.equal(sql, expectedSql);
+        assertSql({"tree.id":{"ISNULL":true}}, undefined, expectedSql);
     });
 
     it('returns tree JOINed to mapFeature when "tree" is in the filter array', function() {
-        var sql = filtersToTables(["AND", {"tree.id":{"MIN":1}}, {"tree.id":{"MAX":12}}], undefined);
         var expectedSql = "treemap_mapfeature " +
             "LEFT OUTER JOIN treemap_tree ON treemap_mapfeature.id = treemap_tree.plot_id";
-        assert.equal(sql, expectedSql);
+        assertSql(["AND", {"tree.id":{"MIN":1}}, {"tree.id":{"MAX":12}}], undefined, expectedSql);
     });
 
     it('returns tree and species JOINs when "species" is in the filter object', function() {
-        var sql = filtersToTables({"species.id":{"ISNULL":true}}, undefined);
         var expectedSql = "treemap_mapfeature " +
             "LEFT OUTER JOIN treemap_tree ON treemap_mapfeature.id = treemap_tree.plot_id " +
             "LEFT OUTER JOIN treemap_species ON treemap_tree.species_id = treemap_species.id";
-        assert.equal(sql, expectedSql);
+        assertSql({"species.id":{"ISNULL":true}}, undefined, expectedSql);
     });
 
     it('returns mapfeaturephoto JOINs when "mapFeaturePhoto" is in the filter object', function() {
-        var sql = filtersToTables({"mapFeaturePhoto.id":{"ISNULL":true}}, undefined);
         var expectedSql = "treemap_mapfeature " +
             "LEFT OUTER JOIN treemap_mapfeaturephoto ON treemap_mapfeature.id = treemap_mapfeaturephoto.map_feature_id";
-        assert.equal(sql, expectedSql);
+        assertSql({"mapFeaturePhoto.id":{"ISNULL":true}}, undefined, expectedSql);
     });
 
     it('returns tree joined when a tree model is in the display filters', function() {
-        var sql = filtersToTables({}, ['Tree', 'RainBarrel']);
         var expectedSql = "treemap_mapfeature " +
             "LEFT OUTER JOIN treemap_tree ON treemap_mapfeature.id = treemap_tree.plot_id";
-        assert.equal(sql, expectedSql);
+        assertSql({}, ['Tree', 'RainBarrel'], expectedSql);
     });
 
     it('returns mapfeature when no tree models are in the display filters', function() {
-        var sql = filtersToTables({}, ['Plot', 'FireHydrant']);
         var expectedSql = "treemap_mapfeature";
-        assert.equal(sql, expectedSql);
+        assertSql({}, ['Plot', 'FireHydrant'], expectedSql);
     });
 
     it('returns udfd/udcv and tree/plot joins for udf tree filter objects', function () {
-        var sql = filtersToTables({"udf:tree:18.Action": {"LIKE": "%Watering%"}}, undefined);
         var expectedSql = "treemap_mapfeature LEFT OUTER JOIN treemap_tree " +
                 "ON treemap_mapfeature.id = treemap_tree.plot_id " +
                 "CROSS JOIN treemap_userdefinedcollectionvalue ";
-        assert.equal(sql, expectedSql);
+        assertSql({"udf:tree:18.Action": {"LIKE": "%Watering%"}}, undefined, expectedSql);
     });
 
     it('returns udfd/udcv and joins for udf mapfeature filter objects', function () {
-        var sql = filtersToTables({"udf:plot:18.Action": {"LIKE": "%Watering%"}}, undefined);
         var expectedSql =
                 "treemap_mapfeature CROSS JOIN treemap_userdefinedcollectionvalue ";
-        assert.equal(sql, expectedSql);
+        assertSql({"udf:plot:18.Action": {"LIKE": "%Watering%"}}, undefined, expectedSql);
     });
 
     it('returns udfd/udcv and joins to tree and mapfeature for udf tree and mapfeature filter objects', function () {
-        var sql = filtersToTables(["OR", {"udf:plot:18.Action": {"LIKE": "%Watering%"}},
-                                         {"udf:tree:17.Action": {"LIKE": "%Burning%"}}], undefined);
         var expectedSql =
                 "treemap_mapfeature" +
                 " CROSS JOIN treemap_userdefinedcollectionvalue " +
                 " LEFT OUTER JOIN treemap_tree ON treemap_mapfeature.id = treemap_tree.plot_id ";
-        assert.equal(sql, expectedSql);
+        assertSql(["OR", {"udf:plot:18.Action": {"LIKE": "%Watering%"}},
+                         {"udf:tree:17.Action": {"LIKE": "%Burning%"}}], undefined, expectedSql);
     });
 });

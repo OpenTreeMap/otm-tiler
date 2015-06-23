@@ -86,7 +86,7 @@
 SQL WHERE clause.</p>
 <p>A filter string must be valid JSON and conform to the following grammar:</p>
 <pre><code>literal        = json literal | GMT date string in &#39;YYYY-MM-DD HH:mm:ss&#39;
-model-name     = &#39;mapFeature&#39; | &#39;tree&#39; | &#39;species&#39; | &#39;treePhoto&#39;
+model-name     = &#39;mapFeature&#39; | &#39;tree&#39; | &#39;species&#39; | &#39;mapFeaturePhoto&#39;
 model          = &#39;udf:&#39;model-name | model-name
 value-property = &#39;MIN&#39;
                | &#39;MAX&#39;
@@ -105,9 +105,10 @@ filter         = predicate
 
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="keyword">var</span> _ = require(<span class="string">'underscore'</span>);
-<span class="keyword">var</span> config = require(<span class="string">'./config.json'</span>);
-<span class="keyword">var</span> utils = require(<span class="string">'./filterObjectUtils'</span>);</pre></div></div>
+            <div class="content"><div class='highlight'><pre><span class="keyword">var</span> _ = require(<span class="string">'underscore'</span>),
+    config = require(<span class="string">'./config.json'</span>),
+    utils = require(<span class="string">'./filterObjectUtils'</span>),
+    format = require(<span class="string">'util'</span>).format;</pre></div></div>
             
         </li>
         
@@ -293,7 +294,7 @@ accessHStore(&#39;grab_bag&#39;, &#39;is_valid&#39;) -&gt; &quot;grab_bag&quot;-
             <div class="content"><div class='highlight'><pre>    <span class="keyword">var</span> t = _.template(<span class="string">'"&lt;%= hStoreColumn %&gt;"-&gt;\'&lt;%= accessor %&gt;\''</span>);
     <span class="keyword">return</span> t({hStoreColumn: hStoreColumn,
               accessor: accessor.replace(<span class="string">"'"</span>,<span class="string">"''"</span>)});
-};</pre></div></div>
+}</pre></div></div>
             
         </li>
         
@@ -611,12 +612,7 @@ an underscore template</p>
             
             <div class="content"><div class='highlight'><pre>        <span class="keyword">if</span> (f.sql_template) {
             <span class="keyword">return</span> _.template(f.sql_template, { <span class="string">'column'</span>: columnName });
-        } <span class="keyword">else</span> {
-            <span class="keyword">return</span> columnName + <span class="string">' '</span> + f.matcher + <span class="string">' '</span> + f.value;
-        }
-    });
-    <span class="keyword">return</span> <span class="string">'('</span> + filterStatements.join(<span class="string">' AND '</span>) + <span class="string">')'</span> ;
-}</pre></div></div>
+        } <span class="keyword">else</span> {</pre></div></div>
             
         </li>
         
@@ -626,6 +622,54 @@ an underscore template</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-25">&#182;</a>
+              </div>
+              <p>if the column is an hstore field and the value is a
+datestring literal the hstore field must be converted
+from text to date before comparsion</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>            <span class="keyword">if</span> (columnName.indexOf(<span class="string">'-&gt;'</span>) !== -<span class="number">1</span> &amp;&amp; f.value.indexOf(<span class="string">'(DATE'</span>) === <span class="number">0</span>) {
+                columnName = format(
+                    <span class="string">"to_date(%s::text, '%s')"</span>,
+                    columnName, utils.DATETIME_FORMATS.date);
+            }
+            <span class="keyword">return</span> columnName + <span class="string">' '</span> + f.matcher + <span class="string">' '</span> + f.value;
+        }
+    });</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-26">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-26">&#182;</a>
+              </div>
+              <p>If this is a query for collection UDFs, we need extra information in the
+WHERE clause to act as a join criteria, since the table is CROSS JOINed</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="keyword">if</span> (fieldName.indexOf(<span class="string">'udf:'</span>) === <span class="number">0</span>) {
+        <span class="keyword">var</span> udfCollectionData = utils.parseUdfCollectionFieldName(fieldName);
+        <span class="keyword">var</span> model = udfCollectionData.modelName;
+        <span class="keyword">var</span> udfcTemplate = _.template(config.udfcTemplates[model]);
+
+        filterStatements.push(udfcTemplate({fieldDefId: udfCollectionData.fieldDefId}));
+    }
+    <span class="keyword">return</span> <span class="string">'('</span> + filterStatements.join(<span class="string">' AND '</span>) + <span class="string">')'</span> ;
+}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-27">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-27">&#182;</a>
               </div>
               <p><code>objectToSql</code> converts a filter object to a valid SQL WHERE clause.</p>
 
@@ -651,11 +695,11 @@ an underscore template</p>
         </li>
         
         
-        <li id="section-26">
+        <li id="section-28">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-26">&#182;</a>
+                <a class="pilcrow" href="#section-28">&#182;</a>
               </div>
               <p><code>arrayToSql</code> converts a combinator array into a valid SQL WHERE clause.</p>
 
@@ -672,11 +716,11 @@ an underscore template</p>
         </li>
         
         
-        <li id="section-27">
+        <li id="section-29">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-27">&#182;</a>
+                <a class="pilcrow" href="#section-29">&#182;</a>
               </div>
               <p><code>filterToSql</code> converts any filter object or combinator array into a valid SQL WHERE clause.</p>
 
