@@ -226,7 +226,7 @@ using the magic column name &quot;the_geom_webmercator&quot;.)</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>        <span class="keyword">try</span> {
-            instanceid = parseInt(req.query[<span class="string">'instance_id'</span>], <span class="number">10</span>);
+            instanceid = parseInt(req.query.instance_id, <span class="number">10</span>);
             table = req.params.table;
             zoom = req.params.z;
             isPolygonRequest = (table === <span class="string">'stormwater_polygonalmapfeature'</span>);
@@ -240,9 +240,8 @@ using the magic column name &quot;the_geom_webmercator&quot;.)</p>
                                                               zoom,
                                                               isUtfGridRequest,
                                                               isPolygonRequest);
-                req.params.style = isPolygonRequest
-                    ? styles.polygonalMapFeature
-                    : styles.mapFeature;
+
+                req.params.style = isPolygonRequest ? styles.polygonalMapFeature : styles.mapFeature;
             } <span class="keyword">else</span> <span class="keyword">if</span> (table === <span class="string">'treemap_boundary'</span> &amp;&amp; instanceid) {
                 req.query.sql = makeSql.makeSqlForBoundaries(instanceid);
                 req.params.style = styles.boundary;
