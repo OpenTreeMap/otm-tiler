@@ -6,6 +6,8 @@
         "module": true,
         "exports": true,
         "process": true,
-        "console": true
+        "console": true,
+        "describe": false,
+        "it": false
     }
 }

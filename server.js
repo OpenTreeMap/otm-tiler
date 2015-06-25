@@ -67,7 +67,7 @@ var windshaftConfig = {
         // (This will be wrapped in an outer query, in many cases extracting geometry
         // using the magic column name "the_geom_webmercator".)
         try {
-            instanceid = parseInt(req.query['instance_id'], 10);
+            instanceid = parseInt(req.query.instance_id, 10);
             table = req.params.table;
             zoom = req.params.z;
             isPolygonRequest = (table === 'stormwater_polygonalmapfeature');
@@ -81,9 +81,8 @@ var windshaftConfig = {
                                                               zoom,
                                                               isUtfGridRequest,
                                                               isPolygonRequest);
-                req.params.style = isPolygonRequest
-                    ? styles.polygonalMapFeature
-                    : styles.mapFeature;
+
+                req.params.style = isPolygonRequest ? styles.polygonalMapFeature : styles.mapFeature;
             } else if (table === 'treemap_boundary' && instanceid) {
                 req.query.sql = makeSql.makeSqlForBoundaries(instanceid);
                 req.params.style = styles.boundary;
