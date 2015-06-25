@@ -19,6 +19,11 @@
           <div id="jump_page">
             
               
+              <a class="source" href="addDefaultsToFilter.html">
+                addDefaultsToFilter.js
+              </a>
+            
+              
               <a class="source" href="displayFiltersToWhere.html">
                 displayFiltersToWhere.js
               </a>
@@ -110,6 +115,7 @@ That particularly hurts in production where we have just one DB server and four 
 <span class="keyword">var</span> filterObjectToWhere = require(<span class="string">'./filterObjectToWhere'</span>);
 <span class="keyword">var</span> displayFiltersToWhere = require(<span class="string">'./displayFiltersToWhere'</span>);
 <span class="keyword">var</span> filtersToTables = require(<span class="string">'./filtersToTables'</span>);
+<span class="keyword">var</span> addDefaultsToFilter = require(<span class="string">'./addDefaultsToFilter'</span>);
 <span class="keyword">var</span> config = require(<span class="string">'./config.json'</span>);</pre></div></div>
             
         </li>
@@ -131,14 +137,16 @@ directly into SQL</p>
     <span class="keyword">var</span> geom_spec = config.sqlForMapFeatures.fields.geom,
         geom_field = isPolygonRequest ? geom_spec.polygon : geom_spec.point,
         otherFields = (isUtfGridRequest ? config.sqlForMapFeatures.fields.utfGrid : config.sqlForMapFeatures.fields.base),
-        filterObject = filterString ? JSON.parse(filterString) : {},
+        parsedFilterObject = filterString ? JSON.parse(filterString) : {},
         displayFilters = displayString ? JSON.parse(displayString) : <span class="literal">undefined</span>,
+
+        filterObject = addDefaultsToFilter(parsedFilterObject, zoom, isPolygonRequest),
 
         tables = filtersToTables(filterObject, displayFilters, isPolygonRequest),
 
         where = <span class="string">''</span>,
         displayClause = displayFiltersToWhere(displayFilters, tables.models),
-        filterClause = (filterString ? filterObjectToWhere(filterObject) : <span class="literal">null</span>),
+        filterClause = filterObjectToWhere(filterObject),
         instanceClause = (instanceid ? _.template(config.sqlForMapFeatures.where.instance)({instanceid: instanceid}) : <span class="literal">null</span>);
 
     <span class="function"><span class="keyword">function</span> <span class="title">addToWhere</span><span class="params">(clause)</span> {</span>

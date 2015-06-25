@@ -28,6 +28,7 @@ var _ = require('underscore');
 var filterObjectToWhere = require('./filterObjectToWhere');
 var displayFiltersToWhere = require('./displayFiltersToWhere');
 var filtersToTables = require('./filtersToTables');
+var addDefaultsToFilter = require('./addDefaultsToFilter');
 var config = require('./config.json');
 
 
@@ -38,14 +39,16 @@ function makeSqlForMapFeatures(filterString, displayString, instanceid, zoom, is
     var geom_spec = config.sqlForMapFeatures.fields.geom,
         geom_field = isPolygonRequest ? geom_spec.polygon : geom_spec.point,
         otherFields = (isUtfGridRequest ? config.sqlForMapFeatures.fields.utfGrid : config.sqlForMapFeatures.fields.base),
-        filterObject = filterString ? JSON.parse(filterString) : {},
+        parsedFilterObject = filterString ? JSON.parse(filterString) : {},
         displayFilters = displayString ? JSON.parse(displayString) : undefined,
+
+        filterObject = addDefaultsToFilter(parsedFilterObject, zoom, isPolygonRequest),
 
         tables = filtersToTables(filterObject, displayFilters, isPolygonRequest),
 
         where = '',
         displayClause = displayFiltersToWhere(displayFilters, tables.models),
-        filterClause = (filterString ? filterObjectToWhere(filterObject) : null),
+        filterClause = filterObjectToWhere(filterObject),
         instanceClause = (instanceid ? _.template(config.sqlForMapFeatures.where.instance)({instanceid: instanceid}) : null);
 
     function addToWhere(clause) {
