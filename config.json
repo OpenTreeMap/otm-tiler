@@ -20,7 +20,7 @@
             },
             "polygonalMapFeature": {
                 "depends": ["mapFeature"],
-                "sql": "INNER JOIN stormwater_polygonalmapfeature ON stormwater_polygonalmapfeature.mapfeature_ptr_id = treemap_mapfeature.id"
+                "sql": "LEFT OUTER JOIN stormwater_polygonalmapfeature ON stormwater_polygonalmapfeature.mapfeature_ptr_id = treemap_mapfeature.id"
             },
             "tree": {
                 "depends": ["mapFeature"],
