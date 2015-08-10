@@ -9,11 +9,15 @@ describe('testSqlForMapFeatures', function() {
     var filterString = '{"tree.id":{"IS":"1"}}';
 
     function assertSqlContains(options) {
-        assert.ok(testSql(options) > -1);
+        assert.ok(testSql(options).indexOf(options.expected) > -1);
     }
 
     function assertSqlLacks(options) {
-        assert.ok(testSql(options) === -1);
+        assert.ok(testSql(options).indexOf(options.expected) === -1);
+    }
+
+    function assertSqlEqual(options) {
+        assert.equal(testSql(options), options.expected);
     }
 
     function testSql(options) {
@@ -25,7 +29,7 @@ describe('testSqlForMapFeatures', function() {
                 zoom,
                 options.isUtfGridRequest,
                 options.isPolygonRequest);
-        return sql.indexOf(options.expected);
+        return sql;
     }
 
     // Fields
@@ -122,4 +126,40 @@ describe('testSqlForMapFeatures', function() {
         });
     });
 
+
+    it('disregards non-tree models when a simple tree filter is active', function() {
+        assertSqlEqual({
+            isPolygonRequest: true,
+            displayFilter: '["Tree", "FireHydrant"]',
+            filter: '{"tree.diameter":{"MIN":1,"MAX":100}}',
+            expected: '( SELECT DISTINCT(stormwater_polygonalmapfeature.polygon) AS the_geom_webmercator, ' +
+                'feature_type FROM treemap_mapfeature LEFT OUTER JOIN treemap_tree ON ' +
+                'treemap_mapfeature.id = treemap_tree.plot_id ' +
+                'LEFT OUTER JOIN stormwater_polygonalmapfeature ' +
+                'ON stormwater_polygonalmapfeature.mapfeature_ptr_id = treemap_mapfeature.id ' +
+                'WHERE ( (("treemap_tree"."id" IS NOT NULL) AND ("treemap_mapfeature"."feature_type" = \'Plot\')) ) ' +
+                'AND ("treemap_tree"."diameter" >= 1 ' +
+                'AND "treemap_tree"."diameter" <= 100) ' +
+                ') otmfiltersql '
+        });
+    });
+
+    it('disregards non-tree models when a complex tree filter is active', function() {
+        assertSqlEqual({
+            isPolygonRequest: true,
+            displayFilter: '["Tree", "FireHydrant"]',
+            filter: '["AND",{"tree.diameter":{"MIN":1,"MAX":100}},["OR",{"udf:tree:198.Status":{"IS":"Unresolved"}}]]',
+            expected: '( SELECT DISTINCT(stormwater_polygonalmapfeature.polygon) AS the_geom_webmercator, ' +
+                'feature_type FROM treemap_mapfeature LEFT OUTER JOIN treemap_tree ON ' +
+                'treemap_mapfeature.id = treemap_tree.plot_id CROSS JOIN treemap_userdefinedcollectionvalue  ' +
+                'LEFT OUTER JOIN stormwater_polygonalmapfeature ' +
+                'ON stormwater_polygonalmapfeature.mapfeature_ptr_id = treemap_mapfeature.id ' +
+                'WHERE ( (("treemap_tree"."id" IS NOT NULL) AND ("treemap_mapfeature"."feature_type" = \'Plot\')) ) ' +
+                'AND (("treemap_tree"."diameter" >= 1 ' +
+                'AND "treemap_tree"."diameter" <= 100) ' +
+                'AND (("treemap_userdefinedcollectionvalue"."data"->\'Status\' = \'Unresolved\' ' +
+                'AND treemap_userdefinedcollectionvalue.field_definition_id=198 ' +
+                'AND treemap_userdefinedcollectionvalue.model_id=treemap_tree.id))) ) otmfiltersql '
+        });
+    });
 });

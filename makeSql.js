@@ -30,6 +30,7 @@ var displayFiltersToWhere = require('./displayFiltersToWhere');
 var filtersToTables = require('./filtersToTables');
 var addDefaultsToFilter = require('./addDefaultsToFilter');
 var config = require('./config.json');
+var utils = require('./filterObjectUtils');
 
 
 // Create a SQL query to return info about map features.
@@ -47,7 +48,7 @@ function makeSqlForMapFeatures(filterString, displayString, instanceid, zoom, is
         tables = filtersToTables(filterObject, displayFilters, isPolygonRequest),
 
         where = '',
-        displayClause = displayFiltersToWhere(displayFilters, tables.models),
+        displayClause = displayFiltersToWhere(displayFilters, displayPlotsOnly(filterObject)),
         filterClause = filterObjectToWhere(filterObject),
         instanceClause = (instanceid ? _.template(config.sqlForMapFeatures.where.instance)({instanceid: instanceid}) : null);
 
@@ -77,6 +78,14 @@ function makeSqlForMapFeatures(filterString, displayString, instanceid, zoom, is
         tables: tables.sql,
         where: where
     });
+}
+
+// If there are trees referenced in the filter object, narrow the
+// display filters to only tree display filters.
+function displayPlotsOnly(filterObject) {
+    var isTreeFilterObject = function(s) {return s.substring(0, 4) === 'tree'; };
+    var treeKeys = _.filter(utils.filterObjectKeys(filterObject), isTreeFilterObject);
+    return treeKeys.length > 0;
 }
 
 // Create a SQL query to return info about boundaries.

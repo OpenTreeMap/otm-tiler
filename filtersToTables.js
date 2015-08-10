@@ -54,27 +54,19 @@ function getSqlAndModels(models) {
 // clauses and produces a flat list of models to use in FROM/JOIN
 // clauses.
 function getModelsForFilterObject(object) {
-    var models = [];
-    if (_.isArray(object)) {
-        utils.traverseCombinator(object, function(filter) {
-            models = models.concat(getModelsForFilterObject(filter));
-        });
-    } else if (_.isObject(object) && _.size(object) > 0) {
-        _.each(object, function(predicate, fieldName) {
-            var model;
-            if (fieldName.indexOf('udf:') === 0) {
-                model = utils.parseUdfCollectionFieldName(fieldName).modelName;
-            } else {
-                model = fieldName.split('.')[0];
-            }
-            if (!config.modelMapping[model]) {
-                throw new Error('The model name must be one of the following: ' +
-                        Object.keys(config.modelMapping).join(', ') + '. Not ' + model);
-            }
-            models.push(model);
-        });
+    function fieldNameToModel(fieldName) {
+        var model;
+        if (fieldName.indexOf('udf:') === 0) {
+            model = utils.parseUdfCollectionFieldName(fieldName).modelName;
+        } else {
+            model = fieldName.split('.')[0];
+        }
+        if (!config.modelMapping[model]) {
+            throw new Error('The model name must be one of the following: ' +
+                            Object.keys(config.modelMapping).join(', ') + '. Not ' + model);
+        }
+        return model;
     }
-
-    return _.uniq(models);
+    return _.uniq(_.map(utils.filterObjectKeys(object), fieldNameToModel));
 }
 

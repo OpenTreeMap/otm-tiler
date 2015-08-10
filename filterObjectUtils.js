@@ -94,8 +94,22 @@ function parseUdfCollectionFieldName (fieldName) {
     };
 }
 
+function filterObjectKeys(fObj) {
+    var keys = [];
+    if (_.isArray(fObj)) {
+        traverseCombinator(fObj, function (nestedfObj) {
+            keys = keys.concat(filterObjectKeys(nestedfObj));
+        });
+    } else {
+        _.each(fObj, function(__, key) { keys.push(key); });
+    }
+    return keys;
+}
+
 module.exports = {
     traverseCombinator: traverseCombinator,
+
+    filterObjectKeys: filterObjectKeys,
 
     isTreeInDisplayFilters: isTreeInDisplayFilters,
 

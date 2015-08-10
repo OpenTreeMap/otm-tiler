@@ -5,16 +5,14 @@ var _ = require('underscore'),
     utils = require('./filterObjectUtils'),
     config = require('./config.json');
 
-module.exports = function(displayFilters, models) {
+module.exports = function(displayFilters, displayPlotsOnly) {
     var featureTypes, inClause;
 
-    if ( ! _.isArray(models) || models.length === 0) {
-        throw new Error('The models list must be a non-empty array.');
+    if ( ! _.isBoolean(displayPlotsOnly)) {
+        throw new Error('`displayPlotsOnly must be a boolean value.');
     }
 
-    // If there are trees referenced in the models list, narrow the display
-    // filters to only tree display filters.
-    if (_.contains(models, 'tree')) {
+    if (displayPlotsOnly) {
         if (_.isArray(displayFilters) && displayFilters.length > 0) {
             displayFilters = _.intersection(displayFilters, ['Tree', 'Plot', 'EmptyPlot']);
         } else {
