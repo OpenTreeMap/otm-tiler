@@ -3,19 +3,19 @@
 var assert = require("assert");
 var displayFiltersToWhere = require("../displayFiltersToWhere");
 
-var assertSqlForModels = function(list, models, expectedSql) {
-    var result = displayFiltersToWhere(list, models);
+var assertSqlForModels = function(list, displayPlotsOnly, expectedSql) {
+    var result = displayFiltersToWhere(list, displayPlotsOnly);
     assert.equal(result, expectedSql);
 };
 
 var assertSql = function(list, expectedSql) {
-    assertSqlForModels(list, ['mapFeature'], expectedSql);
+    assertSqlForModels(list, false, expectedSql);
 };
 
 describe('displayFiltersToWhere', function() {
 
     // NULL AND EMPTY HANDLING
-    it('raises an error when passed a non-empty array for models', function() {
+    it('raises an error when passed a non-boolean for displayPlotsOnly', function() {
         assert.throws(function() {
             displayFiltersToWhere(null, null);
         }, Error);
@@ -33,13 +33,17 @@ describe('displayFiltersToWhere', function() {
         }, Error);
     });
 
-    it('returns null when passed null or undefined for displayList w/ no tree models', function() {
-        assertSqlForModels(null, ['mapFeature']);
+    it('returns null when passed null and not instructed to show only plots', function() {
+        assertSqlForModels(null, false, null);
+    });
+
+    it('returns null when passed undefined and not instructed to show only plots', function() {
+        assertSqlForModels(undefined, false, null);
     });
 
     // MODEL LIST HANDLING
-    it('returns an IN clause for only Plots when tree is in the model filter', function() {
-        assertSqlForModels(null, ['tree'], '"treemap_mapfeature"."feature_type" IN ( \'Plot\' )');
+    it('returns an IN clause for only Plots when instructed to show only plots', function() {
+        assertSqlForModels(null, true, '"treemap_mapfeature"."feature_type" IN ( \'Plot\' )');
     });
 
     // EMPTY LIST HANDLING
@@ -62,8 +66,13 @@ describe('displayFiltersToWhere', function() {
                 ' OR ("treemap_mapfeature"."feature_type" = \'FireHydrant\')');
     });
 
+    it('returns IN clause for all non-plot models', function() {
+        assertSql(['FireHydrant'],
+                  '"treemap_mapfeature"."feature_type" IN ( \'FireHydrant\' )');
+    });
+
     // MapFeature HANDLING
-    it('returns IN cluase for all non-tree models', function() {
+    it('returns IN clause for all non-tree models', function() {
         assertSql(['FireHydrant', 'Plot'], '"treemap_mapfeature"."feature_type" IN ( \'FireHydrant\', \'Plot\' )');
     });
 });
