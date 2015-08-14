@@ -84,7 +84,6 @@
 <span class="keyword">var</span> fs = require(<span class="string">'fs'</span>);
 <span class="keyword">var</span> makeSql = require(<span class="string">'./makeSql.js'</span>);
 <span class="keyword">var</span> config = require(<span class="string">'./config.json'</span>);
-<span class="keyword">var</span> settings = require(<span class="string">'./settings.json'</span>);
 
 <span class="keyword">var</span> workerCount = process.env.WORKERS || require(<span class="string">'os'</span>).cpus().length;
 <span class="keyword">var</span> port = process.env.PORT || <span class="number">4000</span>;
@@ -158,7 +157,10 @@ each metatile multiple times, making things slower rather than faster.</p>
             
             <div class="content"><div class='highlight'><pre>        metatile: <span class="number">1</span>
     },
-    redis: {host: settings.redishost || <span class="string">'127.0.0.1'</span>, port: <span class="number">6379</span>},</pre></div></div>
+    redis: {
+        host: process.env.OTM_CACHE_HOST || <span class="string">'127.0.0.1'</span>,
+        port: process.env.OTM_CACHE_PORT || <span class="number">6379</span>
+    },</pre></div></div>
             
         </li>
         
@@ -176,10 +178,10 @@ each metatile multiple times, making things slower rather than faster.</p>
             <div class="content"><div class='highlight'><pre>    postgres: { password: <span class="string">'otm'</span>, user: <span class="string">'otm'</span> },
     grainstore: {
         datasource: {
-            user: settings.username || <span class="string">'otm'</span>,
-            password: settings.password || <span class="string">'otm'</span>,
-            host: settings.host || <span class="string">'localhost'</span>,
-            port: settings.port || <span class="number">5432</span>
+            user: process.env.OTM_DB_USER || <span class="string">'otm'</span>,
+            password: process.env.OTM_DB_PASSWORD || <span class="string">'otm'</span>,
+            host: process.env.OTM_DB_HOST || <span class="string">'localhost'</span>,
+            port: process.env.OTM_DB_PORT || <span class="number">5432</span>
         }
     }, <span class="comment">// See grainstore npm for other options</span></pre></div></div>
             

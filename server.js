@@ -6,7 +6,6 @@ var cluster = require('cluster');
 var fs = require('fs');
 var makeSql = require('./makeSql.js');
 var config = require('./config.json');
-var settings = require('./settings.json');
 
 var workerCount = process.env.WORKERS || require('os').cpus().length;
 var port = process.env.PORT || 4000;
@@ -43,16 +42,19 @@ var windshaftConfig = {
         // each metatile multiple times, making things slower rather than faster.
         metatile: 1
     },
-    redis: {host: settings.redishost || '127.0.0.1', port: 6379},
+    redis: {
+        host: process.env.OTM_CACHE_HOST || '127.0.0.1',
+        port: process.env.OTM_CACHE_PORT || 6379
+    },
 
     // How to access the database
     postgres: { password: 'otm', user: 'otm' },
     grainstore: {
         datasource: {
-            user: settings.username || 'otm',
-            password: settings.password || 'otm',
-            host: settings.host || 'localhost',
-            port: settings.port || 5432
+            user: process.env.OTM_DB_USER || 'otm',
+            password: process.env.OTM_DB_PASSWORD || 'otm',
+            host: process.env.OTM_DB_HOST || 'localhost',
+            port: process.env.OTM_DB_PORT || 5432
         }
     }, // See grainstore npm for other options
 

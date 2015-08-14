@@ -1,17 +1,17 @@
 # OpenTreeMap 2 Map Tile Server
 [![Build Status](https://travis-ci.org/OpenTreeMap/otm-tiler.svg?branch=master)](https://travis-ci.org/OpenTreeMap/otm-tiler) [![Coverage Status](https://coveralls.io/repos/OpenTreeMap/otm-tiler/badge.png?branch=master)](https://coveralls.io/r/OpenTreeMap/otm-tiler?branch=master)
 
-This project requires a `settings.json` file in the root directory, containing connection information.
+This project requires several environment variables, containing connection information.
 
-It should be similar to:
+They should be similar to:
 ```
-{
-    "username": "user",
-    "host": "1.2.3.4",
-    "password": "users_password",
-    "port": "123",
-    "redishost": "2.3.4.5"
-}
+OTM_DB_USER = 'otm',
+OTM_DB_PASSWORD = 'otm',
+OTM_DB_HOST = 'localhost',
+OTM_DB_PORT = 5432
+
+OTM_CACHE_HOST = '127.0.0.1',
+OTM_CACHE_PORT = 6379
 ```
 
 Please view the [javascript documentation](https://rawgithub.com/OpenTreeMap/OTM2-tiler/master/docs/filterObjectToWhere.html).
