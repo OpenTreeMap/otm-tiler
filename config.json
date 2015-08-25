@@ -49,6 +49,10 @@
             "udf:bioswale": {
                 "depends": ["mapFeature", "udf"],
                 "sql": ""
+            },
+            "udf:rainGarden": {
+                "depends": ["mapFeature", "udf"],
+                "sql": ""
             }
         },
         "where": {
@@ -70,12 +74,14 @@
         "mapFeaturePhoto": "treemap_mapfeaturephoto",
         "udf:tree": "treemap_userdefinedcollectionvalue",
         "udf:plot": "treemap_userdefinedcollectionvalue",
-        "udf:bioswale": "treemap_userdefinedcollectionvalue"
+        "udf:bioswale": "treemap_userdefinedcollectionvalue",
+        "udf:rainGarden": "treemap_userdefinedcollectionvalue"
     },
     "udfcTemplates": {
         "udf:tree": "treemap_userdefinedcollectionvalue.field_definition_id=<%= fieldDefId %> AND treemap_userdefinedcollectionvalue.model_id=treemap_tree.id",
         "udf:plot": "treemap_userdefinedcollectionvalue.field_definition_id=<%= fieldDefId %> AND treemap_userdefinedcollectionvalue.model_id=treemap_mapfeature.id",
-        "udf:bioswale": "treemap_userdefinedcollectionvalue.field_definition_id=<%= fieldDefId %> AND treemap_userdefinedcollectionvalue.model_id=treemap_mapfeature.id"
+        "udf:bioswale": "treemap_userdefinedcollectionvalue.field_definition_id=<%= fieldDefId %> AND treemap_userdefinedcollectionvalue.model_id=treemap_mapfeature.id",
+        "udf:rainGarden": "treemap_userdefinedcollectionvalue.field_definition_id=<%= fieldDefId %> AND treemap_userdefinedcollectionvalue.model_id=treemap_mapfeature.id"
     },
     "treeMarkerMaxWidth": 20
 }
