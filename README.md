@@ -14,4 +14,4 @@ It should be similar to:
 }
 ```
 
-Please view the [javascript documentation](https://rawgithub.com/OpenTreeMap/OTM2-tiler/master/docs/filterObjectToWhere.html).
+Please view the [javascript documentation](http://opentreemap.github.io/otm-tiler/server.html).
