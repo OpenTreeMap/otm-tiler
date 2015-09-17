@@ -24,7 +24,7 @@
 //                    | [combinator, filter*]
 
 var _ = require('underscore'),
-    config = require('./config.json'),
+    config = require('./config'),
     utils = require('./filterObjectUtils'),
     format = require('util').format;
 

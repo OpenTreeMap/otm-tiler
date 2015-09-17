@@ -2,7 +2,7 @@
 
 var _ = require('underscore');
 var moment = require('moment');
-var config = require('./config.json');
+var config = require('./config');
 
 // The `DATETIME_FORMATS` dictionary contains constant strings used to validate
 // and format date and datetime strings.

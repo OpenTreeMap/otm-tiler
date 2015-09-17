@@ -1,4 +1,4 @@
-{
+module.exports = {
     "filterQueryArgumentName": "q",
     "displayQueryArgumentName": "show",
     "scalar_udf_field": "udfs",
@@ -78,4 +78,4 @@
         "udf:bioswale": "treemap_userdefinedcollectionvalue.field_definition_id=<%= fieldDefId %> AND treemap_userdefinedcollectionvalue.model_id=treemap_mapfeature.id"
     },
     "treeMarkerMaxWidth": 20
-}
+};

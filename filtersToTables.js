@@ -1,7 +1,7 @@
 "use strict";
 
 var _ = require('underscore');
-var config = require('./config.json');
+var config = require('./config');
 var utils = require("./filterObjectUtils");
 
 exports = module.exports = function (filterObject, displayFilters, isPolygonRequest) {

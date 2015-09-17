@@ -3,7 +3,7 @@
 var _ = require('underscore'),
     format = require('util').format,
     utils = require('./filterObjectUtils'),
-    config = require('./config.json');
+    config = require('./config');
 
 module.exports = function(displayFilters, displayPlotsOnly) {
     var featureTypes, inClause;

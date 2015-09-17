@@ -2,7 +2,7 @@
 
 var assert = require("assert");
 var filtersToTables = require("../filtersToTables");
-var config = require("../config.json");
+var config = require("../config");
 
 var assertSql = function(filter, displayFilters, expectedSql) {
     var tables = filtersToTables(filter, displayFilters);

@@ -2,7 +2,7 @@
 
 var assert = require("assert");
 var makeSql = require("../makeSql");
-var config = require("../config.json");
+var config = require("../config");
 
 describe('testSqlForMapFeatures', function() {
 
