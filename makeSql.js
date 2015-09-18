@@ -29,7 +29,7 @@ var filterObjectToWhere = require('./filterObjectToWhere');
 var displayFiltersToWhere = require('./displayFiltersToWhere');
 var filtersToTables = require('./filtersToTables');
 var addDefaultsToFilter = require('./addDefaultsToFilter');
-var config = require('./config.json');
+var config = require('./config');
 var utils = require('./filterObjectUtils');
 
 

@@ -1,6 +1,7 @@
-{
+module.exports = {
     "filterQueryArgumentName": "q",
     "displayQueryArgumentName": "show",
+    // This is the column name of the hstore column used for scalar udfs
     "scalar_udf_field": "udfs",
     "sqlForMapFeatures": {
         "fields": {
@@ -13,6 +14,8 @@
         },
         "basePointModel": "mapFeature",
         "basePolygonModel": "polygonalMapFeature",
+        // The tables object gets walked by filtersToTables to build the FROM and JOIN clauses of the SQL string.
+        // The "depends" property of each item should include any tables used in the "sql" property to JOIN to that table
         "tables": {
             "mapFeature": {
                 "depends": [],
@@ -35,20 +38,11 @@
                 "sql": "LEFT OUTER JOIN treemap_mapfeaturephoto ON treemap_mapfeature.id = treemap_mapfeaturephoto.map_feature_id"
             },
             "udf": {
-                "depends": [],
+                // Despite mapFeature not being referenced in the "sql" property it will
+                // be used in the filter for udf and so it is required
+                "depends": ["mapFeature"],
+                // udf uses a CROSS JOIN, but in filterObjectToWhere a restrictive WHERE clause is added
                 "sql": "CROSS JOIN treemap_userdefinedcollectionvalue"
-            },
-            "udf:tree": {
-                "depends": ["mapFeature", "tree", "udf"],
-                "sql": ""
-            },
-            "udf:plot": {
-                "depends": ["mapFeature", "udf"],
-                "sql": ""
-            },
-            "udf:bioswale": {
-                "depends": ["mapFeature", "udf"],
-                "sql": ""
             }
         },
         "where": {
@@ -68,14 +62,11 @@
         "tree": "treemap_tree",
         "species": "treemap_species",
         "mapFeaturePhoto": "treemap_mapfeaturephoto",
-        "udf:tree": "treemap_userdefinedcollectionvalue",
-        "udf:plot": "treemap_userdefinedcollectionvalue",
-        "udf:bioswale": "treemap_userdefinedcollectionvalue"
+        "udf": "treemap_userdefinedcollectionvalue"
     },
     "udfcTemplates": {
-        "udf:tree": "treemap_userdefinedcollectionvalue.field_definition_id=<%= fieldDefId %> AND treemap_userdefinedcollectionvalue.model_id=treemap_tree.id",
-        "udf:plot": "treemap_userdefinedcollectionvalue.field_definition_id=<%= fieldDefId %> AND treemap_userdefinedcollectionvalue.model_id=treemap_mapfeature.id",
-        "udf:bioswale": "treemap_userdefinedcollectionvalue.field_definition_id=<%= fieldDefId %> AND treemap_userdefinedcollectionvalue.model_id=treemap_mapfeature.id"
+        "tree": "treemap_userdefinedcollectionvalue.field_definition_id=<%= fieldDefId %> AND treemap_userdefinedcollectionvalue.model_id=treemap_tree.id",
+        "mapFeature": "treemap_userdefinedcollectionvalue.field_definition_id=<%= fieldDefId %> AND treemap_userdefinedcollectionvalue.model_id=treemap_mapfeature.id",
     },
     "treeMarkerMaxWidth": 20
-}
+};

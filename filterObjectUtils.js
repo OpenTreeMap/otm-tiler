@@ -2,7 +2,7 @@
 
 var _ = require('underscore');
 var moment = require('moment');
-var config = require('./config.json');
+var config = require('./config');
 
 // The `DATETIME_FORMATS` dictionary contains constant strings used to validate
 // and format date and datetime strings.
@@ -88,7 +88,7 @@ function parseUdfCollectionFieldName (fieldName) {
     fieldDefIdAndHStoreMember = tokens[2].split('.');
 
     return {
-        modelName: 'udf:' + tokens[1],
+        modelName: tokens[1],
         fieldDefId: fieldDefIdAndHStoreMember[0],
         hStoreMember: fieldDefIdAndHStoreMember[1]
     };

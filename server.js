@@ -5,7 +5,7 @@ var _ = require('underscore');
 var cluster = require('cluster');
 var fs = require('fs');
 var makeSql = require('./makeSql.js');
-var config = require('./config.json');
+var config = require('./config');
 var settings = require('./settings.json');
 
 var workerCount = process.env.WORKERS || require('os').cpus().length;

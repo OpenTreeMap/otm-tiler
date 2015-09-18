@@ -2,7 +2,7 @@
 
 var assert = require("assert");
 var filtersToTables = require("../filtersToTables");
-var config = require("../config.json");
+var config = require("../config");
 
 var assertSql = function(filter, displayFilters, expectedSql) {
     var tables = filtersToTables(filter, displayFilters);
@@ -63,21 +63,21 @@ describe('filtersToTables', function() {
     it('returns udfd/udcv and tree/plot joins for udf tree filter objects', function () {
         var expectedSql = "treemap_mapfeature LEFT OUTER JOIN treemap_tree " +
                 "ON treemap_mapfeature.id = treemap_tree.plot_id " +
-                "CROSS JOIN treemap_userdefinedcollectionvalue ";
+                "CROSS JOIN treemap_userdefinedcollectionvalue";
         assertSql({"udf:tree:18.Action": {"LIKE": "%Watering%"}}, undefined, expectedSql);
     });
 
     it('returns udfd/udcv and joins for udf mapfeature filter objects', function () {
         var expectedSql =
-                "treemap_mapfeature CROSS JOIN treemap_userdefinedcollectionvalue ";
+                "treemap_mapfeature CROSS JOIN treemap_userdefinedcollectionvalue";
         assertSql({"udf:plot:18.Action": {"LIKE": "%Watering%"}}, undefined, expectedSql);
     });
 
     it('returns udfd/udcv and joins to tree and mapfeature for udf tree and mapfeature filter objects', function () {
         var expectedSql =
-                "treemap_mapfeature" +
-                " CROSS JOIN treemap_userdefinedcollectionvalue " +
-                " LEFT OUTER JOIN treemap_tree ON treemap_mapfeature.id = treemap_tree.plot_id ";
+                "treemap_mapfeature " +
+                "CROSS JOIN treemap_userdefinedcollectionvalue " +
+                "LEFT OUTER JOIN treemap_tree ON treemap_mapfeature.id = treemap_tree.plot_id";
         assertSql(["OR", {"udf:plot:18.Action": {"LIKE": "%Watering%"}},
                          {"udf:tree:17.Action": {"LIKE": "%Burning%"}}], undefined, expectedSql);
     });
