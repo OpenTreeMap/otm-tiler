@@ -58,15 +58,20 @@ function getModelsForFilterObject(object) {
         var model;
         if (fieldName.indexOf('udf:') === 0) {
             model = utils.parseUdfCollectionFieldName(fieldName).modelName;
-        } else {
-            model = fieldName.split('.')[0];
+            if (model === "tree") {
+                return ["tree", "udf"];
+            }
+            return ["udf"];
         }
+
+        model = fieldName.split('.')[0];
+
         if (!config.modelMapping[model]) {
             throw new Error('The model name must be one of the following: ' +
                             Object.keys(config.modelMapping).join(', ') + '. Not ' + model);
         }
-        return model;
+        return [model];
     }
-    return _.uniq(_.map(utils.filterObjectKeys(object), fieldNameToModel));
+    return _.uniq(_.flatten(_.map(utils.filterObjectKeys(object), fieldNameToModel)));
 }
 

@@ -136,6 +136,7 @@ function fieldNameToColumnName(fieldName) {
         udfCollectionData = utils.parseUdfCollectionFieldName(fieldName);
         model = udfCollectionData.modelName;
         column = accessHStore('data', udfCollectionData.hStoreMember);
+        tableName = config.modelMapping.udf;
     } else {
         modelAndColumn = fieldName.split('.');
 
@@ -156,15 +157,16 @@ function fieldNameToColumnName(fieldName) {
             column = customColumnName || column;
             column = '"' + column + '"';
         }
-    }
 
-    // The `modelMapping` dictionary is used to convert a short model name to a
-    // physical table name.
-    if (!config.modelMapping[model]) {
-        throw new Error('The model name must be one of the following: ' +
-                        Object.keys(config.modelMapping).join(', ') + '. Not ' + model);
+        // The `modelMapping` dictionary is used to convert a short model name to a
+        // physical table name.
+        if (!config.modelMapping[model]) {
+            throw new Error('The model name must be one of the following: ' +
+                            Object.keys(config.modelMapping).join(', ') + '. Not ' + model);
+        }
+
+        tableName = config.modelMapping[model]; // model is not sanitized because there is a whitelist
     }
-    tableName = config.modelMapping[model]; // model is not sanitized because there is a whitelist
 
     return '"' + tableName + '".' + column;
 }
@@ -287,7 +289,9 @@ function fieldNameAndPredicateToSql(fieldName, predicate) {
     if (fieldName.indexOf('udf:') === 0) {
         var udfCollectionData = utils.parseUdfCollectionFieldName(fieldName);
         var model = udfCollectionData.modelName;
-        var udfcTemplate = _.template(config.udfcTemplates[model]);
+
+        // Most collection UDFs relate to MapFeatures.  The odd duck is Tree Collection UDFs
+        var udfcTemplate = _.template(model === "tree" ? config.udfcTemplates.tree : config.udfcTemplates.mapFeature);
 
         filterStatements.push(udfcTemplate({fieldDefId: udfCollectionData.fieldDefId}));
     }

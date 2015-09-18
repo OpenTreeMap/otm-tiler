@@ -88,7 +88,7 @@ function parseUdfCollectionFieldName (fieldName) {
     fieldDefIdAndHStoreMember = tokens[2].split('.');
 
     return {
-        modelName: 'udf:' + tokens[1],
+        modelName: tokens[1],
         fieldDefId: fieldDefIdAndHStoreMember[0],
         hStoreMember: fieldDefIdAndHStoreMember[1]
     };
