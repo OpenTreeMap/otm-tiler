@@ -24,6 +24,11 @@
               </a>
             
               
+              <a class="source" href="config.html">
+                config.js
+              </a>
+            
+              
               <a class="source" href="displayFiltersToWhere.html">
                 displayFiltersToWhere.js
               </a>
@@ -83,7 +88,7 @@
 <span class="keyword">var</span> cluster = require(<span class="string">'cluster'</span>);
 <span class="keyword">var</span> fs = require(<span class="string">'fs'</span>);
 <span class="keyword">var</span> makeSql = require(<span class="string">'./makeSql.js'</span>);
-<span class="keyword">var</span> config = require(<span class="string">'./config.json'</span>);
+<span class="keyword">var</span> config = require(<span class="string">'./config'</span>);
 <span class="keyword">var</span> settings = require(<span class="string">'./settings.json'</span>);
 
 <span class="keyword">var</span> workerCount = process.env.WORKERS || require(<span class="string">'os'</span>).cpus().length;
@@ -213,7 +218,8 @@ each metatile multiple times, making things slower rather than faster.</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>    req2params: <span class="keyword">function</span>(req, callback) {
-        <span class="keyword">var</span> instanceid, isUtfGridRequest, isPolygonRequest, table, zoom, filterString, displayString;</pre></div></div>
+        <span class="keyword">var</span> instanceid, isUtfGridRequest, isPolygonRequest, table,
+            zoom, filterString, displayString, restrictFeatureString;</pre></div></div>
             
         </li>
         
@@ -238,9 +244,11 @@ using the magic column name &quot;the_geom_webmercator&quot;.)</p>
             <span class="keyword">if</span> (table === <span class="string">'treemap_mapfeature'</span> || isPolygonRequest) {
                 filterString = req.query[config.filterQueryArgumentName];
                 displayString = req.query[config.displayQueryArgumentName];
+                restrictFeatureString = req.query[config.restrictFeatureQueryArgumentName];
                 isUtfGridRequest = (req.params.format === <span class="string">'grid.json'</span>);
                 req.query.sql = makeSql.makeSqlForMapFeatures(filterString,
                                                               displayString,
+                                                              restrictFeatureString,
                                                               instanceid,
                                                               zoom,
                                                               isUtfGridRequest,

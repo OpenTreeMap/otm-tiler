@@ -24,6 +24,11 @@
               </a>
             
               
+              <a class="source" href="config.html">
+                config.js
+              </a>
+            
+              
               <a class="source" href="displayFiltersToWhere.html">
                 displayFiltersToWhere.js
               </a>
@@ -79,7 +84,7 @@
             <div class="content"><div class='highlight'><pre><span class="string">"use strict"</span>;
 
 <span class="keyword">var</span> _ = require(<span class="string">'underscore'</span>);
-<span class="keyword">var</span> config = require(<span class="string">'./config.json'</span>);
+<span class="keyword">var</span> config = require(<span class="string">'./config'</span>);
 <span class="keyword">var</span> utils = require(<span class="string">"./filterObjectUtils"</span>);
 
 exports = module.exports = <span class="function"><span class="keyword">function</span> <span class="params">(filterObject, displayFilters, isPolygonRequest)</span> {</span>
@@ -144,28 +149,25 @@ clauses.</p>
             </div>
             
             <div class="content"><div class='highlight'><pre><span class="function"><span class="keyword">function</span> <span class="title">getModelsForFilterObject</span><span class="params">(object)</span> {</span>
-    <span class="keyword">var</span> models = [];
-    <span class="keyword">if</span> (_.isArray(object)) {
-        utils.traverseCombinator(object, <span class="keyword">function</span>(filter) {
-            models = models.concat(getModelsForFilterObject(filter));
-        });
-    } <span class="keyword">else</span> <span class="keyword">if</span> (_.isObject(object) &amp;&amp; _.size(object) &gt; <span class="number">0</span>) {
-        _.each(object, <span class="keyword">function</span>(predicate, fieldName) {
-            <span class="keyword">var</span> model;
-            <span class="keyword">if</span> (fieldName.indexOf(<span class="string">'udf:'</span>) === <span class="number">0</span>) {
-                model = utils.parseUdfCollectionFieldName(fieldName).modelName;
-            } <span class="keyword">else</span> {
-                model = fieldName.split(<span class="string">'.'</span>)[<span class="number">0</span>];
+    <span class="function"><span class="keyword">function</span> <span class="title">fieldNameToModel</span><span class="params">(fieldName)</span> {</span>
+        <span class="keyword">var</span> model;
+        <span class="keyword">if</span> (fieldName.indexOf(<span class="string">'udf:'</span>) === <span class="number">0</span>) {
+            model = utils.parseUdfCollectionFieldName(fieldName).modelName;
+            <span class="keyword">if</span> (model === <span class="string">"tree"</span>) {
+                <span class="keyword">return</span> [<span class="string">"tree"</span>, <span class="string">"udf"</span>];
             }
-            <span class="keyword">if</span> (!config.modelMapping[model]) {
-                <span class="keyword">throw</span> <span class="keyword">new</span> Error(<span class="string">'The model name must be one of the following: '</span> +
-                        Object.keys(config.modelMapping).join(<span class="string">', '</span>) + <span class="string">'. Not '</span> + model);
-            }
-            models.push(model);
-        });
-    }
+            <span class="keyword">return</span> [<span class="string">"udf"</span>];
+        }
 
-    <span class="keyword">return</span> _.uniq(models);
+        model = fieldName.split(<span class="string">'.'</span>)[<span class="number">0</span>];
+
+        <span class="keyword">if</span> (!config.modelMapping[model]) {
+            <span class="keyword">throw</span> <span class="keyword">new</span> Error(<span class="string">'The model name must be one of the following: '</span> +
+                            Object.keys(config.modelMapping).join(<span class="string">', '</span>) + <span class="string">'. Not '</span> + model);
+        }
+        <span class="keyword">return</span> [model];
+    }
+    <span class="keyword">return</span> _.uniq(_.flatten(_.map(utils.filterObjectKeys(object), fieldNameToModel)));
 }</pre></div></div>
             
         </li>
