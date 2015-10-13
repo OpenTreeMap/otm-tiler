@@ -30,15 +30,6 @@ module.exports = function(displayFilters, restrictFeatureFilters, displayPlotsOn
         displayFilters = _.union(restrictFeatureFilters || [], defaultPlotFilter);
     }
 
-    // If there are still no display filters (none from query args, and we're
-    // not filtering trees), return `null` to indicate that there is no SQL generated
-    if (_.isUndefined(displayFilters) || _.isNull(displayFilters)) {
-        return null;
-    }
-
-    if ( ! _.isArray(displayFilters)) {
-        throw new Error('The display filter list must be a list to be converted to SQL');
-    }
     if (_.isEmpty(displayFilters)) {
         // With empty display filters, nothing should ever be shown
         // 'WHERE FALSE' should override any other filters
