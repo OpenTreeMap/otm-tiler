@@ -5,8 +5,10 @@ var _ = require('underscore'),
     utils = require('./filterObjectUtils'),
     config = require('./config');
 
-module.exports = function(displayFilters, displayPlotsOnly) {
-    var featureTypes, inClause;
+module.exports = function(displayFilters, restrictFeatureFilters, displayPlotsOnly) {
+    var featureTypes, inClause,
+        plotFilters = ['Tree', 'Plot', 'EmptyPlot'],
+        defaultPlotFilter = ['Plot'];
 
     if ( ! _.isBoolean(displayPlotsOnly)) {
         throw new Error('`displayPlotsOnly must be a boolean value.');
@@ -14,10 +16,18 @@ module.exports = function(displayFilters, displayPlotsOnly) {
 
     if (displayPlotsOnly) {
         if (_.isArray(displayFilters) && displayFilters.length > 0) {
-            displayFilters = _.intersection(displayFilters, ['Tree', 'Plot', 'EmptyPlot']);
+            displayFilters = _.intersection(displayFilters, plotFilters);
         } else {
-            displayFilters = ['Plot'];
+            displayFilters = defaultPlotFilter;
         }
+    }
+
+    if (_.isArray(displayFilters)) {
+        displayFilters = _.intersection(
+            displayFilters,
+            _.union(restrictFeatureFilters || [], plotFilters));
+    } else {
+        displayFilters = _.union(restrictFeatureFilters || [], defaultPlotFilter);
     }
 
     // If there are still no display filters (none from query args, and we're

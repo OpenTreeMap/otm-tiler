@@ -25,6 +25,7 @@ describe('makeSql', function() {
             sql = makeSql.makeSqlForMapFeatures(
                 options.filter,
                 options.displayFilter,
+                options.restrictFeatureFilter,
                 options.instanceId,
                 zoom,
                 options.isUtfGridRequest,
@@ -78,8 +79,8 @@ describe('makeSql', function() {
 
     // WHERE
 
-    it('has no WHERE clause for plain request', function() {
-        assertSqlLacks({
+    it('has WHERE clause for plain request', function() {
+        assertSqlContains({
             expected: 'WHERE'
         });
     });
@@ -105,8 +106,8 @@ describe('makeSql', function() {
         });
     });
 
-    it('lacks WHERE clause when no display filter passed', function() {
-        assertSqlLacks({
+    it('contains WHERE clause even when no display filter passed', function() {
+        assertSqlContains({
             expected: ' WHERE '
         });
     });
@@ -131,6 +132,7 @@ describe('makeSql', function() {
         assertSqlEqual({
             isPolygonRequest: true,
             displayFilter: '["Tree", "FireHydrant"]',
+            restrictFeatureFilter: undefined,
             filter: '{"tree.diameter":{"MIN":1,"MAX":100}}',
             expected: '( SELECT DISTINCT(stormwater_polygonalmapfeature.polygon) AS the_geom_webmercator, ' +
                 'feature_type FROM treemap_mapfeature LEFT OUTER JOIN treemap_tree ON ' +

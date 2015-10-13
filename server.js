@@ -62,7 +62,8 @@ var windshaftConfig = {
 
     // Tell server how to handle HTTP request 'req' (by specifying properties in req.params).
     req2params: function(req, callback) {
-        var instanceid, isUtfGridRequest, isPolygonRequest, table, zoom, filterString, displayString;
+        var instanceid, isUtfGridRequest, isPolygonRequest, table,
+            zoom, filterString, displayString, restrictFeatureString;
         // Specify SQL subquery to extract desired features from desired DB layer.
         // (This will be wrapped in an outer query, in many cases extracting geometry
         // using the magic column name "the_geom_webmercator".)
@@ -74,9 +75,11 @@ var windshaftConfig = {
             if (table === 'treemap_mapfeature' || isPolygonRequest) {
                 filterString = req.query[config.filterQueryArgumentName];
                 displayString = req.query[config.displayQueryArgumentName];
+                restrictFeatureString = req.query[config.restrictFeatureQueryArgumentName];
                 isUtfGridRequest = (req.params.format === 'grid.json');
                 req.query.sql = makeSql.makeSqlForMapFeatures(filterString,
                                                               displayString,
+                                                              restrictFeatureString,
                                                               instanceid,
                                                               zoom,
                                                               isUtfGridRequest,

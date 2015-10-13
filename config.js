@@ -1,6 +1,7 @@
 module.exports = {
     "filterQueryArgumentName": "q",
     "displayQueryArgumentName": "show",
+    "restrictFeatureQueryArgumentName": "restrict",
     // This is the column name of the hstore column used for scalar udfs
     "scalar_udf_field": "udfs",
     "sqlForMapFeatures": {
