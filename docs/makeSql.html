@@ -24,6 +24,11 @@
               </a>
             
               
+              <a class="source" href="config.html">
+                config.js
+              </a>
+            
+              
               <a class="source" href="displayFiltersToWhere.html">
                 displayFiltersToWhere.js
               </a>
@@ -116,7 +121,8 @@ That particularly hurts in production where we have just one DB server and four 
 <span class="keyword">var</span> displayFiltersToWhere = require(<span class="string">'./displayFiltersToWhere'</span>);
 <span class="keyword">var</span> filtersToTables = require(<span class="string">'./filtersToTables'</span>);
 <span class="keyword">var</span> addDefaultsToFilter = require(<span class="string">'./addDefaultsToFilter'</span>);
-<span class="keyword">var</span> config = require(<span class="string">'./config.json'</span>);</pre></div></div>
+<span class="keyword">var</span> config = require(<span class="string">'./config'</span>);
+<span class="keyword">var</span> utils = require(<span class="string">'./filterObjectUtils'</span>);</pre></div></div>
             
         </li>
         
@@ -133,19 +139,21 @@ directly into SQL</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="function"><span class="keyword">function</span> <span class="title">makeSqlForMapFeatures</span><span class="params">(filterString, displayString, instanceid, zoom, isUtfGridRequest, isPolygonRequest)</span> {</span>
+            <div class="content"><div class='highlight'><pre><span class="function"><span class="keyword">function</span> <span class="title">makeSqlForMapFeatures</span><span class="params">(filterString, displayString, restrictFeatureString, instanceid,
+                               zoom, isUtfGridRequest, isPolygonRequest)</span> {</span>
     <span class="keyword">var</span> geom_spec = config.sqlForMapFeatures.fields.geom,
         geom_field = isPolygonRequest ? geom_spec.polygon : geom_spec.point,
         otherFields = (isUtfGridRequest ? config.sqlForMapFeatures.fields.utfGrid : config.sqlForMapFeatures.fields.base),
         parsedFilterObject = filterString ? JSON.parse(filterString) : {},
         displayFilters = displayString ? JSON.parse(displayString) : <span class="literal">undefined</span>,
+        restrictFeatureFilters = restrictFeatureString ? JSON.parse(restrictFeatureString) : <span class="literal">undefined</span>,
 
         filterObject = addDefaultsToFilter(parsedFilterObject, zoom, isPolygonRequest),
 
         tables = filtersToTables(filterObject, displayFilters, isPolygonRequest),
 
         where = <span class="string">''</span>,
-        displayClause = displayFiltersToWhere(displayFilters, tables.models),
+        displayClause = displayFiltersToWhere(displayFilters, restrictFeatureFilters, displayPlotsOnly(filterObject)),
         filterClause = filterObjectToWhere(filterObject),
         instanceClause = (instanceid ? _.template(config.sqlForMapFeatures.where.instance)({instanceid: instanceid}) : <span class="literal">null</span>);
 
@@ -198,6 +206,26 @@ add DISTINCT so we only get one row.</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <p>If there are trees referenced in the filter object, narrow the
+display filters to only tree display filters.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="function"><span class="keyword">function</span> <span class="title">displayPlotsOnly</span><span class="params">(filterObject)</span> {</span>
+    <span class="keyword">var</span> isTreeFilterObject = <span class="keyword">function</span>(s) {<span class="keyword">return</span> s.substring(<span class="number">0</span>, <span class="number">4</span>) === <span class="string">'tree'</span>; };
+    <span class="keyword">var</span> treeKeys = _.filter(utils.filterObjectKeys(filterObject), isTreeFilterObject);
+    <span class="keyword">return</span> treeKeys.length &gt; <span class="number">0</span>;
+}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
               </div>
               <p>Create a SQL query to return info about boundaries.
 Assumes that instanceid is an integer, ready to be plugged

@@ -36,19 +36,21 @@ var utils = require('./filterObjectUtils');
 // Create a SQL query to return info about map features.
 // Assumes that instanceid is an integer, ready to be plugged
 // directly into SQL
-function makeSqlForMapFeatures(filterString, displayString, instanceid, zoom, isUtfGridRequest, isPolygonRequest) {
+function makeSqlForMapFeatures(filterString, displayString, restrictFeatureString, instanceid,
+                               zoom, isUtfGridRequest, isPolygonRequest) {
     var geom_spec = config.sqlForMapFeatures.fields.geom,
         geom_field = isPolygonRequest ? geom_spec.polygon : geom_spec.point,
         otherFields = (isUtfGridRequest ? config.sqlForMapFeatures.fields.utfGrid : config.sqlForMapFeatures.fields.base),
         parsedFilterObject = filterString ? JSON.parse(filterString) : {},
         displayFilters = displayString ? JSON.parse(displayString) : undefined,
+        restrictFeatureFilters = restrictFeatureString ? JSON.parse(restrictFeatureString) : undefined,
 
         filterObject = addDefaultsToFilter(parsedFilterObject, zoom, isPolygonRequest),
 
         tables = filtersToTables(filterObject, displayFilters, isPolygonRequest),
 
         where = '',
-        displayClause = displayFiltersToWhere(displayFilters, displayPlotsOnly(filterObject)),
+        displayClause = displayFiltersToWhere(displayFilters, restrictFeatureFilters, displayPlotsOnly(filterObject)),
         filterClause = filterObjectToWhere(filterObject),
         instanceClause = (instanceid ? _.template(config.sqlForMapFeatures.where.instance)({instanceid: instanceid}) : null);
 

@@ -24,6 +24,11 @@
               </a>
             
               
+              <a class="source" href="config.html">
+                config.js
+              </a>
+            
+              
               <a class="source" href="displayFiltersToWhere.html">
                 displayFiltersToWhere.js
               </a>
@@ -81,14 +86,34 @@
 <span class="keyword">var</span> _ = require(<span class="string">'underscore'</span>),
     format = require(<span class="string">'util'</span>).format,
     utils = require(<span class="string">'./filterObjectUtils'</span>),
-    config = require(<span class="string">'./config.json'</span>);
+    config = require(<span class="string">'./config'</span>);
 
-module.exports = <span class="keyword">function</span>(displayFilters, models) {
-    <span class="keyword">var</span> featureTypes, inClause;
+module.exports = <span class="keyword">function</span>(displayFilters, restrictFeatureFilters, displayPlotsOnly) {
+    <span class="keyword">var</span> featureTypes, inClause,
+        plotFilters = [<span class="string">'Tree'</span>, <span class="string">'Plot'</span>, <span class="string">'EmptyPlot'</span>],
+        defaultPlotFilter = [<span class="string">'Plot'</span>];
 
-    <span class="keyword">if</span> ( ! _.isArray(models) || models.length === <span class="number">0</span>) {
-        <span class="keyword">throw</span> <span class="keyword">new</span> Error(<span class="string">'The models list must be a non-empty array.'</span>);
-    }</pre></div></div>
+    <span class="keyword">if</span> ( ! _.isBoolean(displayPlotsOnly)) {
+        <span class="keyword">throw</span> <span class="keyword">new</span> Error(<span class="string">'`displayPlotsOnly must be a boolean value.'</span>);
+    }
+
+    <span class="keyword">if</span> (displayPlotsOnly) {
+        <span class="keyword">if</span> (_.isArray(displayFilters) &amp;&amp; displayFilters.length &gt; <span class="number">0</span>) {
+            displayFilters = _.intersection(displayFilters, plotFilters);
+        } <span class="keyword">else</span> {
+            displayFilters = defaultPlotFilter;
+        }
+    }
+
+    <span class="keyword">if</span> (_.isArray(displayFilters)) {
+        displayFilters = _.intersection(
+            displayFilters,
+            _.union(restrictFeatureFilters || [], plotFilters));
+    } <span class="keyword">else</span> {
+        displayFilters = _.union(restrictFeatureFilters || [], defaultPlotFilter);
+    }
+
+    <span class="keyword">if</span> (_.isEmpty(displayFilters)) {</pre></div></div>
             
         </li>
         
@@ -98,51 +123,6 @@ module.exports = <span class="keyword">function</span>(displayFilters, models) {
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-2">&#182;</a>
-              </div>
-              <p>If there are trees referenced in the models list, narrow the display
-filters to only tree display filters.</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>    <span class="keyword">if</span> (_.contains(models, <span class="string">'tree'</span>)) {
-        <span class="keyword">if</span> (_.isArray(displayFilters) &amp;&amp; displayFilters.length &gt; <span class="number">0</span>) {
-            displayFilters = _.intersection(displayFilters, [<span class="string">'Tree'</span>, <span class="string">'Plot'</span>, <span class="string">'EmptyPlot'</span>]);
-        } <span class="keyword">else</span> {
-            displayFilters = [<span class="string">'Plot'</span>];
-        }
-    }</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-3">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-3">&#182;</a>
-              </div>
-              <p>If there are still no display filters (none from query args, and we&#39;re
-not filtering trees), return <code>null</code> to indicate that there is no SQL generated</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>    <span class="keyword">if</span> (_.isUndefined(displayFilters) || _.isNull(displayFilters)) {
-        <span class="keyword">return</span> <span class="literal">null</span>;
-    }
-
-    <span class="keyword">if</span> ( ! _.isArray(displayFilters)) {
-        <span class="keyword">throw</span> <span class="keyword">new</span> Error(<span class="string">'The display filter list must be a list to be converted to SQL'</span>);
-    }
-    <span class="keyword">if</span> (_.isEmpty(displayFilters)) {</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-4">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-4">&#182;</a>
               </div>
               <p>With empty display filters, nothing should ever be shown
 &#39;WHERE FALSE&#39; should override any other filters</p>
