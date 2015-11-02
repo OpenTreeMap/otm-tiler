@@ -8,7 +8,6 @@ var makeSql = require('./makeSql.js');
 var config = require('./config');
 var settings = require('./settings.json');
 
-var workerCount = process.env.WORKERS || require('os').cpus().length;
 var port = process.env.PORT || 4000;
 var ws;
 
@@ -116,26 +115,6 @@ var windshaftConfig = {
     }
 };
 
-// The global v8debug will be present if this is started via:
-//  'node debug', node-debug' or 'node --debug-brk' (but not 'node --debug' !?!)
-if (cluster.isMaster && typeof v8debug !== 'object') {
-    console.log("Map tiles will be served from http://localhost:" + port + windshaftConfig.base_url + '/:zoom/:x/:y');
-
-    console.log('Creating ' + workerCount + ' workers.');
-
-    cluster.on('online', function(worker) {
-        console.log('Worker process ' + worker.process.pid + ' started.');
-    });
-
-    for (var i = 0; i < workerCount; i++) {
-        cluster.fork();
-    }
-
-    cluster.on('exit', function(worker, code, signal) {
-        console.log('Worker process ' + worker.process.pid + ' has died. Starting another to replace it.');
-        cluster.fork();
-    });
-} else {
-    ws = new Windshaft.Server(windshaftConfig);
-    ws.listen(port);
-}
+ws = new Windshaft.Server(windshaftConfig);
+ws.listen(port);
+console.log("Map tiles will be served from http://localhost:" + port + windshaftConfig.base_url + '/:zoom/:x/:y');
