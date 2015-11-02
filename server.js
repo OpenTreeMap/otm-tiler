@@ -2,8 +2,8 @@
 
 var Windshaft = require('windshaft');
 var _ = require('underscore');
-var cluster = require('cluster');
 var fs = require('fs');
+var healthCheck = require('./healthCheck');
 var makeSql = require('./makeSql.js');
 var config = require('./config');
 var settings = require('./settings.json');
@@ -116,5 +116,6 @@ var windshaftConfig = {
 };
 
 ws = new Windshaft.Server(windshaftConfig);
+ws.get('/health-check', healthCheck(windshaftConfig));
 ws.listen(port);
 console.log("Map tiles will be served from http://localhost:" + port + windshaftConfig.base_url + '/:zoom/:x/:y');
