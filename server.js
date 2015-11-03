@@ -7,6 +7,7 @@ var healthCheck = require('./healthCheck');
 var makeSql = require('./makeSql');
 var config = require('./config');
 
+var dbname = process.env.OTM_DB_NAME || 'otm';
 var port = process.env.PORT || 4000;
 var ws;
 
@@ -47,7 +48,6 @@ var windshaftConfig = {
     },
 
     // How to access the database
-    postgres: { password: 'otm', user: 'otm' },
     grainstore: {
         datasource: {
             user: process.env.OTM_DB_USER || 'otm',
@@ -58,8 +58,8 @@ var windshaftConfig = {
     }, // See grainstore npm for other options
 
     // Parse params from the request URL
-    base_url: '/:cache_buster/database/:dbname/table/:table',
-    base_url_notable: '/:cache_buster/database/:dbname/table',
+    base_url: '/:cache_buster/table/:table',
+    base_url_notable: '/:cache_buster/table',
 
     // Tell server how to handle HTTP request 'req' (by specifying properties in req.params).
     req2params: function(req, callback) {
@@ -99,6 +99,8 @@ var windshaftConfig = {
         // streamlining client actions like clicking on or hovering over a feature.
         // "interactivity" specifies which fields from our SQL query should be returned for each feature.
         req.params.interactivity = (isUtfGridRequest ? config.interactivityForUtfGridRequests : null);
+
+        req.params.dbname = dbname;
 
         // Override request params with query params
         // Note that we *always* overwrite req.query.sql above
