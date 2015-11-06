@@ -24,6 +24,11 @@
               </a>
             
               
+              <a class="source" href="config.html">
+                config.js
+              </a>
+            
+              
               <a class="source" href="displayFiltersToWhere.html">
                 displayFiltersToWhere.js
               </a>
@@ -76,11 +81,11 @@
               
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="string">"use strict"</span>;
+            <div class="content"><div class='highlight'><pre><span class="hljs-pi">"use strict"</span>;
 
-<span class="keyword">var</span> _ = require(<span class="string">'underscore'</span>);
+<span class="hljs-keyword">var</span> _ = <span class="hljs-built_in">require</span>(<span class="hljs-string">'underscore'</span>);
 
-module.exports = <span class="keyword">function</span>(filterObject, zoom, isPolygonRequest) {</pre></div></div>
+<span class="hljs-built_in">module</span>.exports = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">filterObject, zoom, isPolygonRequest</span>) </span>{</pre></div></div>
             
         </li>
         
@@ -97,12 +102,12 @@ points, since we will be showing the polygon itself instead.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    <span class="keyword">if</span> (zoom &gt;= <span class="number">15</span> &amp;&amp; !isPolygonRequest) {
-        <span class="keyword">var</span> defaults = {<span class="string">'polygonalMapFeature.polygon'</span>: {<span class="string">'ISNULL'</span>: <span class="literal">true</span>}};
-        <span class="keyword">return</span> _.extend({}, defaults, filterObject);
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">if</span> (zoom &gt;= <span class="hljs-number">15</span> &amp;&amp; !isPolygonRequest) {
+        <span class="hljs-keyword">var</span> defaults = {<span class="hljs-string">'polygonalMapFeature.polygon'</span>: {<span class="hljs-string">'ISNULL'</span>: <span class="hljs-literal">true</span>}};
+        <span class="hljs-keyword">return</span> _.extend({}, defaults, filterObject);
     }
 
-    <span class="keyword">return</span> filterObject;
+    <span class="hljs-keyword">return</span> filterObject;
 };</pre></div></div>
             
         </li>

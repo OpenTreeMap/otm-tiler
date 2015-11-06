@@ -24,6 +24,11 @@
               </a>
             
               
+              <a class="source" href="config.html">
+                config.js
+              </a>
+            
+              
               <a class="source" href="displayFiltersToWhere.html">
                 displayFiltersToWhere.js
               </a>
@@ -76,27 +81,39 @@
               
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="string">"use strict"</span>;
+            <div class="content"><div class='highlight'><pre><span class="hljs-pi">"use strict"</span>;
 
-<span class="keyword">var</span> _ = require(<span class="string">'underscore'</span>),
-    format = require(<span class="string">'util'</span>).format,
-    utils = require(<span class="string">'./filterObjectUtils'</span>),
-    config = require(<span class="string">'./config.json'</span>);
+<span class="hljs-keyword">var</span> _ = <span class="hljs-built_in">require</span>(<span class="hljs-string">'underscore'</span>),
+    format = <span class="hljs-built_in">require</span>(<span class="hljs-string">'util'</span>).format,
+    utils = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./filterObjectUtils'</span>),
+    config = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./config'</span>);
 
-module.exports = <span class="keyword">function</span>(displayFilters, displayPlotsOnly) {
-    <span class="keyword">var</span> featureTypes, inClause;
+<span class="hljs-built_in">module</span>.exports = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">displayFilters, restrictFeatureFilters, displayPlotsOnly</span>) </span>{
+    <span class="hljs-keyword">var</span> featureTypes, inClause,
+        plotFilters = [<span class="hljs-string">'Tree'</span>, <span class="hljs-string">'Plot'</span>, <span class="hljs-string">'EmptyPlot'</span>],
+        defaultPlotFilter = [<span class="hljs-string">'Plot'</span>];
 
-    <span class="keyword">if</span> ( ! _.isBoolean(displayPlotsOnly)) {
-        <span class="keyword">throw</span> <span class="keyword">new</span> Error(<span class="string">'`displayPlotsOnly must be a boolean value.'</span>);
+    <span class="hljs-keyword">if</span> ( ! _.isBoolean(displayPlotsOnly)) {
+        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">'`displayPlotsOnly must be a boolean value.'</span>);
     }
 
-    <span class="keyword">if</span> (displayPlotsOnly) {
-        <span class="keyword">if</span> (_.isArray(displayFilters) &amp;&amp; displayFilters.length &gt; <span class="number">0</span>) {
-            displayFilters = _.intersection(displayFilters, [<span class="string">'Tree'</span>, <span class="string">'Plot'</span>, <span class="string">'EmptyPlot'</span>]);
-        } <span class="keyword">else</span> {
-            displayFilters = [<span class="string">'Plot'</span>];
+    <span class="hljs-keyword">if</span> (displayPlotsOnly) {
+        <span class="hljs-keyword">if</span> (_.isArray(displayFilters) &amp;&amp; displayFilters.length &gt; <span class="hljs-number">0</span>) {
+            displayFilters = _.intersection(displayFilters, plotFilters);
+        } <span class="hljs-keyword">else</span> {
+            displayFilters = defaultPlotFilter;
         }
-    }</pre></div></div>
+    }
+
+    <span class="hljs-keyword">if</span> (_.isArray(displayFilters)) {
+        displayFilters = _.intersection(
+            displayFilters,
+            _.union(restrictFeatureFilters || [], plotFilters));
+    } <span class="hljs-keyword">else</span> {
+        displayFilters = _.union(restrictFeatureFilters || [], defaultPlotFilter);
+    }
+
+    <span class="hljs-keyword">if</span> (_.isEmpty(displayFilters)) {</pre></div></div>
             
         </li>
         
@@ -107,62 +124,39 @@ module.exports = <span class="keyword">function</span>(displayFilters, displayPl
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-2">&#182;</a>
               </div>
-              <p>If there are still no display filters (none from query args, and we&#39;re
-not filtering trees), return <code>null</code> to indicate that there is no SQL generated</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>    <span class="keyword">if</span> (_.isUndefined(displayFilters) || _.isNull(displayFilters)) {
-        <span class="keyword">return</span> <span class="literal">null</span>;
-    }
-
-    <span class="keyword">if</span> ( ! _.isArray(displayFilters)) {
-        <span class="keyword">throw</span> <span class="keyword">new</span> Error(<span class="string">'The display filter list must be a list to be converted to SQL'</span>);
-    }
-    <span class="keyword">if</span> (_.isEmpty(displayFilters)) {</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-3">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-3">&#182;</a>
-              </div>
               <p>With empty display filters, nothing should ever be shown
-&#39;WHERE FALSE&#39; should override any other filters</p>
+‘WHERE FALSE’ should override any other filters</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        <span class="keyword">return</span> <span class="string">'FALSE'</span>;
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">return</span> <span class="hljs-string">'FALSE'</span>;
     }
 
-    <span class="keyword">if</span> ( ! utils.isTreeInDisplayFilters(displayFilters)) {
+    <span class="hljs-keyword">if</span> ( ! utils.isTreeInDisplayFilters(displayFilters)) {
         featureTypes = _.map(displayFilters, utils.convertValueToEscapedSqlLiteral);
-        inClause = featureTypes.join(<span class="string">', '</span>);
-        <span class="keyword">return</span> format(<span class="string">'"%s"."feature_type" IN ( %s )'</span>, config.modelMapping.mapFeature, inClause);
+        inClause = featureTypes.join(<span class="hljs-string">', '</span>);
+        <span class="hljs-keyword">return</span> format(<span class="hljs-string">'"%s"."feature_type" IN ( %s )'</span>, config.modelMapping.mapFeature, inClause);
     }
 
-    <span class="keyword">var</span> clauses = _.map(displayFilters, <span class="keyword">function</span>(filter) {
-        <span class="keyword">var</span> modelSql, treeSql, modelNameString;
-        <span class="keyword">if</span> (_.contains(config.treeDisplayFilters, filter)) {
-            <span class="keyword">if</span> (filter === <span class="string">'Tree'</span>) {
-                treeSql = format(<span class="string">'"%s"."id" IS NOT NULL'</span>, config.modelMapping.tree);
-            } <span class="keyword">else</span> {
-                treeSql = format(<span class="string">'"%s"."id" IS NULL'</span>, config.modelMapping.tree);
+    <span class="hljs-keyword">var</span> clauses = _.map(displayFilters, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">filter</span>) </span>{
+        <span class="hljs-keyword">var</span> modelSql, treeSql, modelNameString;
+        <span class="hljs-keyword">if</span> (_.contains(config.treeDisplayFilters, filter)) {
+            <span class="hljs-keyword">if</span> (filter === <span class="hljs-string">'Tree'</span>) {
+                treeSql = format(<span class="hljs-string">'"%s"."id" IS NOT NULL'</span>, config.modelMapping.tree);
+            } <span class="hljs-keyword">else</span> {
+                treeSql = format(<span class="hljs-string">'"%s"."id" IS NULL'</span>, config.modelMapping.tree);
             }
-            filter = <span class="string">'Plot'</span>;
+            filter = <span class="hljs-string">'Plot'</span>;
         }
         modelNameString = utils.convertValueToEscapedSqlLiteral(filter);
-        modelSql = format(<span class="string">'"%s"."feature_type" = %s'</span>, config.modelMapping.mapFeature, modelNameString);
-        <span class="keyword">if</span> (treeSql) {
-            <span class="keyword">return</span> format(<span class="string">"(%s) AND (%s)"</span>, treeSql, modelSql);
+        modelSql = format(<span class="hljs-string">'"%s"."feature_type" = %s'</span>, config.modelMapping.mapFeature, modelNameString);
+        <span class="hljs-keyword">if</span> (treeSql) {
+            <span class="hljs-keyword">return</span> format(<span class="hljs-string">"(%s) AND (%s)"</span>, treeSql, modelSql);
         }
-        <span class="keyword">return</span> modelSql;
+        <span class="hljs-keyword">return</span> modelSql;
     });
 
-    <span class="keyword">return</span> <span class="string">'('</span> + clauses.join(<span class="string">") OR ("</span>) + <span class="string">')'</span>;
+    <span class="hljs-keyword">return</span> <span class="hljs-string">'('</span> + clauses.join(<span class="hljs-string">") OR ("</span>) + <span class="hljs-string">')'</span>;
 };</pre></div></div>
             
         </li>

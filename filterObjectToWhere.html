@@ -24,6 +24,11 @@
               </a>
             
               
+              <a class="source" href="config.html">
+                config.js
+              </a>
+            
+              
               <a class="source" href="displayFiltersToWhere.html">
                 displayFiltersToWhere.js
               </a>
@@ -76,7 +81,7 @@
               
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="string">"use strict"</span>;</pre></div></div>
+            <div class="content"><div class='highlight'><pre><span class="hljs-pi">"use strict"</span>;</pre></div></div>
             
         </li>
         
@@ -89,31 +94,8 @@
               </div>
               <p>Convert an OpenTreeMap 2 filter string to a Postgres/PostGIS-compatible
 SQL WHERE clause.</p>
-<p>A filter string must be valid JSON and conform to the following grammar:</p>
-<pre><code>literal        = json literal | GMT date string in &#39;YYYY-MM-DD HH:mm:ss&#39;
-model-name     = &#39;mapFeature&#39; | &#39;tree&#39; | &#39;species&#39; | &#39;mapFeaturePhoto&#39;
-model          = &#39;udf:&#39;model-name | model-name
-value-property = &#39;MIN&#39;
-               | &#39;MAX&#39;
-               | &#39;EXCLUSIVE&#39;
-               | &#39;IN&#39;
-               | &#39;IS&#39;
-               | &#39;ISNULL&#39;
-               | &#39;LIKE&#39;
-               | &#39;WITHIN_RADIUS&#39;
-               | &#39;IN_BOUNDARY&#39;
-combinator     = &#39;AND&#39; | &#39;OR&#39;
-predicate      = { model.[&#39;udf:&#39;]field: literal }
-               | { model.[&#39;udf:&#39;]field: { (value-property: literal)* }}
-filter         = predicate
-               | [combinator, filter*]</code></pre>
 
             </div>
-            
-            <div class="content"><div class='highlight'><pre><span class="keyword">var</span> _ = require(<span class="string">'underscore'</span>),
-    config = require(<span class="string">'./config.json'</span>),
-    utils = require(<span class="string">'./filterObjectUtils'</span>),
-    format = require(<span class="string">'util'</span>).format;</pre></div></div>
             
         </li>
         
@@ -121,12 +103,35 @@ filter         = predicate
         <li id="section-3">
             <div class="annotation">
               
-              <div class="pilwrap for-h2">
+              <div class="pilwrap ">
                 <a class="pilcrow" href="#section-3">&#182;</a>
               </div>
-              <h2>Exports</h2>
-
+              <p>A filter string must be valid JSON and conform to the following grammar:</p>
+<pre><code>literal        = json literal | GMT date string <span class="hljs-keyword">in</span> <span class="hljs-string">'YYYY-MM-DD HH:mm:ss'</span>
+model-name     = <span class="hljs-string">'mapFeature'</span> | <span class="hljs-string">'tree'</span> | <span class="hljs-string">'species'</span> | <span class="hljs-string">'mapFeaturePhoto'</span>
+model          = <span class="hljs-string">'udf:'</span>model-name | model-name
+value-property = <span class="hljs-string">'MIN'</span>
+               | <span class="hljs-string">'MAX'</span>
+               | <span class="hljs-string">'EXCLUSIVE'</span>
+               | <span class="hljs-string">'IN'</span>
+               | <span class="hljs-string">'IS'</span>
+               | <span class="hljs-string">'ISNULL'</span>
+               | <span class="hljs-string">'LIKE'</span>
+               | <span class="hljs-string">'WITHIN_RADIUS'</span>
+               | <span class="hljs-string">'IN_BOUNDARY'</span>
+combinator     = <span class="hljs-string">'AND'</span> | <span class="hljs-string">'OR'</span>
+predicate      = { model.[<span class="hljs-string">'udf:'</span>]field: literal }
+               | { model.[<span class="hljs-string">'udf:'</span>]field: { (value-property: literal)* }}
+filter         = predicate
+               | [combinator, filter*]
+</code></pre>
             </div>
+            
+            <div class="content"><div class='highlight'><pre>
+<span class="hljs-keyword">var</span> _ = <span class="hljs-built_in">require</span>(<span class="hljs-string">'underscore'</span>),
+    config = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./config'</span>),
+    utils = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./filterObjectUtils'</span>),
+    format = <span class="hljs-built_in">require</span>(<span class="hljs-string">'util'</span>).format;</pre></div></div>
             
         </li>
         
@@ -137,17 +142,9 @@ filter         = predicate
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-4">&#182;</a>
               </div>
-              <p>This module exports a single conversion function that takes a JSON format
-string.</p>
+              <h2 id="exports">Exports</h2>
 
             </div>
-            
-            <div class="content"><div class='highlight'><pre>exports = module.exports = <span class="function"><span class="keyword">function</span> <span class="params">(object)</span> {</span>
-    <span class="keyword">if</span> (_.isUndefined(object) || _.isNull(object)) {
-        <span class="keyword">throw</span> <span class="keyword">new</span> Error(<span class="string">'A null or undefined filter object cannot be converted to SQL'</span>);
-    }
-    <span class="keyword">return</span> filterToSql(object);
-};</pre></div></div>
             
         </li>
         
@@ -155,11 +152,10 @@ string.</p>
         <li id="section-5">
             <div class="annotation">
               
-              <div class="pilwrap for-h2">
+              <div class="pilwrap ">
                 <a class="pilcrow" href="#section-5">&#182;</a>
               </div>
-              <h2>Constants</h2>
-
+              
             </div>
             
         </li>
@@ -171,52 +167,17 @@ string.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-6">&#182;</a>
               </div>
-              <p>The <code>PREDICATE_TYPES</code> dictionary is used for validating predicates and
-providing values and methods used to convert predicates into SQL strings.</p>
+              <p>This module exports a single conversion function that takes a JSON format
+string.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="keyword">var</span> PREDICATE_TYPES = {
-    IS: {
-        combinesWith: [],
-        matcher: <span class="string">'='</span>,
-        valueConverter: utils.convertValueToEscapedSqlLiteral
-    },
-    ISNULL: {
-        combinesWith: [],
-        matcher: <span class="string">'IS'</span>,
-        valueConverter: convertValueForIsNull
-    },
-    IN: {
-        combinesWith: [],
-        matcher: <span class="string">'IN'</span>,
-        valueConverter: convertArrayValueToEscapedSqlLiteral
-    },
-    LIKE: {
-        combinesWith: [],
-        matcher: <span class="string">'ILIKE'</span>,
-        valueConverter: utils.convertValueToEscapedSqlLiteral
-    },
-    MIN: {
-        combinesWith: [<span class="string">'MAX'</span>],
-        matcher: <span class="string">'&gt;='</span>,
-        exclusiveMatcher: <span class="string">'&gt;'</span>,
-        valueConverter: utils.convertValueToEscapedSqlLiteral
-    },
-    MAX: {
-        combinesWith: [<span class="string">'MIN'</span>],
-        matcher: <span class="string">'&lt;='</span>,
-        exclusiveMatcher: <span class="string">'&lt;'</span>,
-        valueConverter: utils.convertValueToEscapedSqlLiteral
-    },
-    IN_BOUNDARY: {
-        combinesWith: [<span class="string">'WITHIN_RADIUS'</span>],
-        predicateTransform: transformBoundaryPredicate
-    },
-    WITHIN_RADIUS: {
-        combinesWith: [<span class="string">'IN_BOUNDARY'</span>],
-        predicateTransform: transformWithinRadiusPredicate
+            <div class="content"><div class='highlight'><pre>
+exports = <span class="hljs-built_in">module</span>.exports = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">object</span>) </span>{
+    <span class="hljs-keyword">if</span> (_.isUndefined(object) || _.isNull(object)) {
+        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">'A null or undefined filter object cannot be converted to SQL'</span>);
     }
+    <span class="hljs-keyword">return</span> filterToSql(object);
 };</pre></div></div>
             
         </li>
@@ -228,17 +189,9 @@ providing values and methods used to convert predicates into SQL strings.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-7">&#182;</a>
               </div>
-              <p><code>transformBoundaryPredicate</code> transform a predicate that contains a single value
-representing a boundary. In particular, this is used with the IN_BOUNDARY</p>
+              <h2 id="constants">Constants</h2>
 
             </div>
-            
-            <div class="content"><div class='highlight'><pre><span class="function"><span class="keyword">function</span> <span class="title">transformBoundaryPredicate</span><span class="params">(boundaryId)</span> {</span>
-    <span class="keyword">var</span> selectTemplate = _.template(config.getBoundarySql),
-        selectStatement = selectTemplate({boundaryId: boundaryId});
-
-    <span class="keyword">return</span> <span class="string">'ST_Contains(('</span> + selectStatement + <span class="string">'), &lt;%= column %&gt;)'</span>;
-}</pre></div></div>
             
         </li>
         
@@ -249,21 +202,8 @@ representing a boundary. In particular, this is used with the IN_BOUNDARY</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-8">&#182;</a>
               </div>
-              <p><code>transformWithinRadiusPredicate</code> takes an object containing point and radius
-data. It returns an underscore template that is used to produce an SQL where
-clause.</p>
-
+              
             </div>
-            
-            <div class="content"><div class='highlight'><pre><span class="function"><span class="keyword">function</span> <span class="title">transformWithinRadiusPredicate</span><span class="params">(predicateValue)</span> {</span>
-    <span class="keyword">var</span> point = predicateValue.POINT,
-        radius = predicateValue.RADIUS,
-
-        template = <span class="string">"ST_DWithin(&lt;%= column %&gt;, ST_GeomFromEWKT('SRID=3587;POINT("</span> +
-            point.x + <span class="string">" "</span> + point.y + <span class="string">")'), "</span> + radius + <span class="string">")"</span>;
-
-    <span class="keyword">return</span> template;
-}</pre></div></div>
             
         </li>
         
@@ -274,14 +214,53 @@ clause.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-9">&#182;</a>
               </div>
-              <p><code>accessHstore</code> takes an HStore column name and a key for that collection and
-returns a sql escaped string for accessing that member in the SELECT clause
-of a SQL statement.
-accessHStore(&#39;grab_bag&#39;, &#39;is_valid&#39;) -&gt; &quot;grab_bag&quot;-&gt;&#39;is_valid&#39;</p>
+              <p>The <code>PREDICATE_TYPES</code> dictionary is used for validating predicates and
+providing values and methods used to convert predicates into SQL strings.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="function"><span class="keyword">function</span> <span class="title">accessHStore</span><span class="params">(hStoreColumn, accessor)</span> {</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">var</span> PREDICATE_TYPES = {
+    IS: {
+        combinesWith: [],
+        matcher: <span class="hljs-string">'='</span>,
+        valueConverter: utils.convertValueToEscapedSqlLiteral
+    },
+    ISNULL: {
+        combinesWith: [],
+        matcher: <span class="hljs-string">'IS'</span>,
+        valueConverter: convertValueForIsNull
+    },
+    IN: {
+        combinesWith: [],
+        matcher: <span class="hljs-string">'IN'</span>,
+        valueConverter: convertArrayValueToEscapedSqlLiteral
+    },
+    LIKE: {
+        combinesWith: [],
+        matcher: <span class="hljs-string">'ILIKE'</span>,
+        valueConverter: utils.convertValueToEscapedSqlLiteral
+    },
+    MIN: {
+        combinesWith: [<span class="hljs-string">'MAX'</span>],
+        matcher: <span class="hljs-string">'&gt;='</span>,
+        exclusiveMatcher: <span class="hljs-string">'&gt;'</span>,
+        valueConverter: utils.convertValueToEscapedSqlLiteral
+    },
+    MAX: {
+        combinesWith: [<span class="hljs-string">'MIN'</span>],
+        matcher: <span class="hljs-string">'&lt;='</span>,
+        exclusiveMatcher: <span class="hljs-string">'&lt;'</span>,
+        valueConverter: utils.convertValueToEscapedSqlLiteral
+    },
+    IN_BOUNDARY: {
+        combinesWith: [<span class="hljs-string">'WITHIN_RADIUS'</span>],
+        predicateTransform: transformBoundaryPredicate
+    },
+    WITHIN_RADIUS: {
+        combinesWith: [<span class="hljs-string">'IN_BOUNDARY'</span>],
+        predicateTransform: transformWithinRadiusPredicate
+    }
+};</pre></div></div>
             
         </li>
         
@@ -292,13 +271,16 @@ accessHStore(&#39;grab_bag&#39;, &#39;is_valid&#39;) -&gt; &quot;grab_bag&quot;-
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-10">&#182;</a>
               </div>
-              <p>TODO: sql injection? why don&#39;t we call sanitize?</p>
+              <p><code>transformBoundaryPredicate</code> transform a predicate that contains a single value
+representing a boundary. In particular, this is used with the IN_BOUNDARY</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    <span class="keyword">var</span> t = _.template(<span class="string">'"&lt;%= hStoreColumn %&gt;"-&gt;\'&lt;%= accessor %&gt;\''</span>);
-    <span class="keyword">return</span> t({hStoreColumn: hStoreColumn,
-              accessor: accessor.replace(<span class="string">"'"</span>,<span class="string">"''"</span>)});
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">transformBoundaryPredicate</span>(<span class="hljs-params">boundaryId</span>) </span>{
+    <span class="hljs-keyword">var</span> selectTemplate = _.template(config.getBoundarySql),
+        selectStatement = selectTemplate({boundaryId: boundaryId});
+
+    <span class="hljs-keyword">return</span> <span class="hljs-string">'ST_Contains(('</span> + selectStatement + <span class="hljs-string">'), &lt;%= column %&gt;)'</span>;
 }</pre></div></div>
             
         </li>
@@ -307,12 +289,24 @@ accessHStore(&#39;grab_bag&#39;, &#39;is_valid&#39;) -&gt; &quot;grab_bag&quot;-
         <li id="section-11">
             <div class="annotation">
               
-              <div class="pilwrap for-h2">
+              <div class="pilwrap ">
                 <a class="pilcrow" href="#section-11">&#182;</a>
               </div>
-              <h2>Internal Methods</h2>
+              <p><code>transformWithinRadiusPredicate</code> takes an object containing point and radius
+data. It returns an underscore template that is used to produce an SQL where
+clause.</p>
 
             </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">transformWithinRadiusPredicate</span>(<span class="hljs-params">predicateValue</span>) </span>{
+    <span class="hljs-keyword">var</span> point = predicateValue.POINT,
+        radius = predicateValue.RADIUS,
+
+        template = <span class="hljs-string">"ST_DWithin(&lt;%= column %&gt;, ST_GeomFromEWKT('SRID=3587;POINT("</span> +
+            point.x + <span class="hljs-string">" "</span> + point.y + <span class="hljs-string">")'), "</span> + radius + <span class="hljs-string">")"</span>;
+
+    <span class="hljs-keyword">return</span> template;
+}</pre></div></div>
             
         </li>
         
@@ -323,29 +317,14 @@ accessHStore(&#39;grab_bag&#39;, &#39;is_valid&#39;) -&gt; &quot;grab_bag&quot;-
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-12">&#182;</a>
               </div>
-              <p><code>fieldNameToColumnName</code> converts a string of the format model.column
-to &quot;physicalTableName&quot;.&quot;column&quot; for simple fieldNames. For udf scalar or collection
-fieldNames, the fieldName is converted to &quot;physicalTableName&quot;.&quot;column&quot;-&gt;&quot;hStoreMember&quot;.</p>
+              <p><code>accessHstore</code> takes an HStore column name and a key for that collection and
+returns a sql escaped string for accessing that member in the SELECT clause
+of a SQL statement.
+accessHStore(‘grab_bag’, ‘is_valid’) -&gt; “grab_bag”-&gt;’is_valid’</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="function"><span class="keyword">function</span> <span class="title">fieldNameToColumnName</span><span class="params">(fieldName)</span> {</span>
-    <span class="keyword">var</span> model, column, customColumnName, tableName, modelAndColumn, udfCollectionData;
-
-    <span class="keyword">if</span> (fieldName.indexOf(<span class="string">'udf:'</span>) === <span class="number">0</span>) {
-        udfCollectionData = utils.parseUdfCollectionFieldName(fieldName);
-        model = udfCollectionData.modelName;
-        column = accessHStore(<span class="string">'data'</span>, udfCollectionData.hStoreMember);
-    } <span class="keyword">else</span> {
-        modelAndColumn = fieldName.split(<span class="string">'.'</span>);
-
-        <span class="keyword">if</span> (modelAndColumn.length != <span class="number">2</span>) {
-            <span class="keyword">throw</span> <span class="keyword">new</span> Error(<span class="string">'Field names in predicate objects '</span> +
-                            <span class="string">'should be of the form "model.field", not "'</span> + fieldName + <span class="string">'"'</span>);
-        }
-
-        model = modelAndColumn[<span class="number">0</span>];
-        column = modelAndColumn[<span class="number">1</span>];</pre></div></div>
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">accessHStore</span>(<span class="hljs-params">hStoreColumn, accessor</span>) </span>{</pre></div></div>
             
         </li>
         
@@ -356,20 +335,14 @@ fieldNames, the fieldName is converted to &quot;physicalTableName&quot;.&quot;co
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-13">&#182;</a>
               </div>
-              <p>udf columns are prefixed by &#39;udf:&#39;</p>
+              <p>TODO: sql injection? why don’t we call sanitize?</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        <span class="keyword">if</span> (column.indexOf(<span class="string">'udf:'</span>) === <span class="number">0</span>) {
-            column = accessHStore(config.scalar_udf_field, column.substring(<span class="number">4</span>));
-        } <span class="keyword">else</span> {
-            column = utils.sanitizeSqlString(modelAndColumn[<span class="number">1</span>]);
-            customColumnName = config.customDbFieldNames[column];
-
-            column = customColumnName || column;
-            column = <span class="string">'"'</span> + column + <span class="string">'"'</span>;
-        }
-    }</pre></div></div>
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">var</span> t = _.template(<span class="hljs-string">'"&lt;%= hStoreColumn %&gt;"-&gt;\'&lt;%= accessor %&gt;\''</span>);
+    <span class="hljs-keyword">return</span> t({hStoreColumn: hStoreColumn,
+              accessor: accessor.replace(<span class="hljs-string">"'"</span>,<span class="hljs-string">"''"</span>)});
+}</pre></div></div>
             
         </li>
         
@@ -380,19 +353,9 @@ fieldNames, the fieldName is converted to &quot;physicalTableName&quot;.&quot;co
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-14">&#182;</a>
               </div>
-              <p>The <code>modelMapping</code> dictionary is used to convert a short model name to a
-physical table name.</p>
+              <h2 id="internal-methods">Internal Methods</h2>
 
             </div>
-            
-            <div class="content"><div class='highlight'><pre>    <span class="keyword">if</span> (!config.modelMapping[model]) {
-        <span class="keyword">throw</span> <span class="keyword">new</span> Error(<span class="string">'The model name must be one of the following: '</span> +
-                        Object.keys(config.modelMapping).join(<span class="string">', '</span>) + <span class="string">'. Not '</span> + model);
-    }
-    tableName = config.modelMapping[model]; <span class="comment">// model is not sanitized because there is a whitelist</span>
-
-    <span class="keyword">return</span> <span class="string">'"'</span> + tableName + <span class="string">'".'</span> + column;
-}</pre></div></div>
             
         </li>
         
@@ -403,23 +366,8 @@ physical table name.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-15">&#182;</a>
               </div>
-              <p><code>convertArrayValueToEscapedSqlLiteral</code> converts an array of string or number
-literals to be used as a SQL query values by wrapping each non-numeric value
-in single quotes, escaping single quotes within individual string
-literals by converting them into a pair of single quotes, and converting
-individual datetime string values matching the defined datetime format
-into the correct Postgres literal. Individual values are then joined into
-a CSV string wrapped with (), suitable for use in a SQL IN clause.</p>
-
+              
             </div>
-            
-            <div class="content"><div class='highlight'><pre><span class="function"><span class="keyword">function</span> <span class="title">convertArrayValueToEscapedSqlLiteral</span><span class="params">(arrayValue)</span> {</span>
-    <span class="keyword">if</span> (_.isArray(arrayValue)) {
-        <span class="keyword">return</span> <span class="string">'('</span> + convertValuesToEscapedSqlLiterals(arrayValue).join(<span class="string">','</span>) + <span class="string">')'</span>;
-    } <span class="keyword">else</span> {
-        <span class="keyword">throw</span> <span class="keyword">new</span> Error(<span class="string">"Non-array passed to convertArrayValueToEscapedSqlLiteral"</span>);
-    }
-}</pre></div></div>
             
         </li>
         
@@ -430,17 +378,30 @@ a CSV string wrapped with (), suitable for use in a SQL IN clause.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-16">&#182;</a>
               </div>
-              <p><code>convertValuesToEscapedSqlLiterals</code> converts an array of string or number literals
-to be used as SQL query values by wrapping non-numeric values in single quotes,
-escaping single quotes within string literals by converting them into
-a pair of single quotes, and converting YYYY-MM-DD HH:mm:ss datetime strings
-into the correct Postgres literal.</p>
+              <p><code>fieldNameToColumnName</code> converts a string of the format model.column
+to “physicalTableName”.”column” for simple fieldNames. For udf scalar or collection
+fieldNames, the fieldName is converted to “physicalTableName”.”column”-&gt;”hStoreMember”.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="function"><span class="keyword">function</span> <span class="title">convertValuesToEscapedSqlLiterals</span><span class="params">(values)</span> {</span>
-    <span class="keyword">return</span> _.map(values, utils.convertValueToEscapedSqlLiteral);
-}</pre></div></div>
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">fieldNameToColumnName</span>(<span class="hljs-params">fieldName</span>) </span>{
+    <span class="hljs-keyword">var</span> model, column, customColumnName, tableName, modelAndColumn, udfCollectionData;
+
+    <span class="hljs-keyword">if</span> (fieldName.indexOf(<span class="hljs-string">'udf:'</span>) === <span class="hljs-number">0</span>) {
+        udfCollectionData = utils.parseUdfCollectionFieldName(fieldName);
+        model = udfCollectionData.modelName;
+        column = accessHStore(<span class="hljs-string">'data'</span>, udfCollectionData.hStoreMember);
+        tableName = config.modelMapping.udf;
+    } <span class="hljs-keyword">else</span> {
+        modelAndColumn = fieldName.split(<span class="hljs-string">'.'</span>);
+
+        <span class="hljs-keyword">if</span> (modelAndColumn.length != <span class="hljs-number">2</span>) {
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">'Field names in predicate objects '</span> +
+                            <span class="hljs-string">'should be of the form "model.field", not "'</span> + fieldName + <span class="hljs-string">'"'</span>);
+        }
+
+        model = modelAndColumn[<span class="hljs-number">0</span>];
+        column = modelAndColumn[<span class="hljs-number">1</span>];</pre></div></div>
             
         </li>
         
@@ -451,14 +412,19 @@ into the correct Postgres literal.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-17">&#182;</a>
               </div>
-              <p><code>convertValueForIsNull</code> converts a literal to &quot;NULL&quot; or &quot;NOT NULL&quot; based on its
-truthiness.  Truthy values -&gt; &quot;NULL&quot;, falsey values -&gt; &quot;NOT NULL&quot;</p>
+              <p>udf columns are prefixed by ‘udf:’</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="function"><span class="keyword">function</span> <span class="title">convertValueForIsNull</span><span class="params">(value)</span> {</span>
-    <span class="keyword">return</span> !!value ? <span class="string">"NULL"</span> : <span class="string">"NOT NULL"</span>;
-}</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">if</span> (column.indexOf(<span class="hljs-string">'udf:'</span>) === <span class="hljs-number">0</span>) {
+            column = accessHStore(config.scalar_udf_field, column.substring(<span class="hljs-number">4</span>));
+        } <span class="hljs-keyword">else</span> {
+            column = utils.sanitizeSqlString(modelAndColumn[<span class="hljs-number">1</span>]);
+            customColumnName = config.customDbFieldNames[column];
+
+            column = customColumnName || column;
+            column = <span class="hljs-string">'"'</span> + column + <span class="hljs-string">'"'</span>;
+        }</pre></div></div>
             
         </li>
         
@@ -469,32 +435,20 @@ truthiness.  Truthy values -&gt; &quot;NULL&quot;, falsey values -&gt; &quot;NOT
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-18">&#182;</a>
               </div>
-              <p><code>validatePredicate</code> throws an error if the specified <code>predicate</code> object
-is not valid.</p>
+              <p>The <code>modelMapping</code> dictionary is used to convert a short model name to a
+physical table name.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="function"><span class="keyword">function</span> <span class="title">validatePredicate</span><span class="params">(predicate)</span> {</span>
-    <span class="keyword">var</span> keys;
-    <span class="keyword">if</span> (!_.isObject(predicate)) {
-        <span class="keyword">throw</span> <span class="keyword">new</span> Error(<span class="string">'Predicates must be objects'</span>);
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">if</span> (!config.modelMapping[model]) {
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">'The model name must be one of the following: '</span> +
+                            <span class="hljs-built_in">Object</span>.keys(config.modelMapping).join(<span class="hljs-string">', '</span>) + <span class="hljs-string">'. Not '</span> + model);
+        }
+
+        tableName = config.modelMapping[model]; <span class="hljs-comment">// model is not sanitized because there is a whitelist</span>
     }
-    keys = Object.keys(predicate);
-    _.each(keys, <span class="keyword">function</span>(key) {
-        <span class="keyword">if</span> (!PREDICATE_TYPES[key]) {
-            <span class="keyword">throw</span> <span class="keyword">new</span> Error(<span class="string">'Predicates support the following keys: '</span> +
-                Object.keys(PREDICATE_TYPES).join(<span class="string">','</span>) + <span class="string">' not '</span> + key);
-        }
-        <span class="keyword">if</span> (!_.all(keys, <span class="keyword">function</span>(otherKey) {
-            <span class="keyword">return</span> (key === otherKey ||
-                _.contains(PREDICATE_TYPES[key].combinesWith, otherKey));
-        })) {
-            <span class="keyword">throw</span> <span class="keyword">new</span> Error(<span class="string">'A predicate with keys '</span> + keys.join(<span class="string">','</span>) +
-                <span class="string">' is not valid because the predicate key '</span> + key +
-                <span class="string">' can only be combined with the following keys: '</span> +
-                PREDICATE_TYPES[key].combinesWith.join(<span class="string">','</span>));
-        }
-    });
+
+    <span class="hljs-keyword">return</span> <span class="hljs-string">'"'</span> + tableName + <span class="hljs-string">'".'</span> + column;
 }</pre></div></div>
             
         </li>
@@ -506,14 +460,23 @@ is not valid.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-19">&#182;</a>
               </div>
-              <p><code>predicateValueAndTypeToFilterObject</code> converts a value and type to</p>
+              <p><code>convertArrayValueToEscapedSqlLiteral</code> converts an array of string or number
+literals to be used as a SQL query values by wrapping each non-numeric value
+in single quotes, escaping single quotes within individual string
+literals by converting them into a pair of single quotes, and converting
+individual datetime string values matching the defined datetime format
+into the correct Postgres literal. Individual values are then joined into
+a CSV string wrapped with (), suitable for use in a SQL IN clause.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="function"><span class="keyword">function</span> <span class="title">predicateValueAndTypeToFilterObject</span><span class="params">(predicateValue, predicateType)</span> {</span>
-    <span class="keyword">var</span> matcher;
-    <span class="keyword">var</span> value;
-    <span class="keyword">var</span> t = PREDICATE_TYPES[predicateType];</pre></div></div>
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">convertArrayValueToEscapedSqlLiteral</span>(<span class="hljs-params">arrayValue</span>) </span>{
+    <span class="hljs-keyword">if</span> (_.isArray(arrayValue)) {
+        <span class="hljs-keyword">return</span> <span class="hljs-string">'('</span> + convertValuesToEscapedSqlLiterals(arrayValue).join(<span class="hljs-string">','</span>) + <span class="hljs-string">')'</span>;
+    } <span class="hljs-keyword">else</span> {
+        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">"Non-array passed to convertArrayValueToEscapedSqlLiteral"</span>);
+    }
+}</pre></div></div>
             
         </li>
         
@@ -524,14 +487,17 @@ is not valid.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-20">&#182;</a>
               </div>
-              <p>Predicate transforms override matchers and can return
-literal SQL</p>
+              <p><code>convertValuesToEscapedSqlLiterals</code> converts an array of string or number literals
+to be used as SQL query values by wrapping non-numeric values in single quotes,
+escaping single quotes within string literals by converting them into
+a pair of single quotes, and converting YYYY-MM-DD HH:mm:ss datetime strings
+into the correct Postgres literal.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    <span class="keyword">if</span> (t.predicateTransform) {
-        <span class="keyword">return</span> { sql_template: t.predicateTransform(predicateValue) };
-    } <span class="keyword">else</span> {</pre></div></div>
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">convertValuesToEscapedSqlLiterals</span>(<span class="hljs-params">values</span>) </span>{
+    <span class="hljs-keyword">return</span> _.map(values, utils.convertValueToEscapedSqlLiteral);
+}</pre></div></div>
             
         </li>
         
@@ -542,20 +508,13 @@ literal SQL</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-21">&#182;</a>
               </div>
-              <p>_.isObject can be truthy for arrays</p>
+              <p><code>convertValueForIsNull</code> converts a literal to “NULL” or “NOT NULL” based on its
+truthiness.  Truthy values -&gt; “NULL”, falsey values -&gt; “NOT NULL”</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        <span class="keyword">if</span> (_.isObject(predicateValue) &amp;&amp; !_.isArray(predicateValue)) {
-            matcher = predicateValue.EXCLUSIVE ? t.exclusiveMatcher : t.matcher;
-            value = predicateValue.value;
-        } <span class="keyword">else</span> {
-            matcher = t.matcher;
-            value = predicateValue;
-        }
-
-        <span class="keyword">return</span> { matcher: matcher, value: t.valueConverter(value) };
-    }
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">convertValueForIsNull</span>(<span class="hljs-params">value</span>) </span>{
+    <span class="hljs-keyword">return</span> !!value ? <span class="hljs-string">"NULL"</span> : <span class="hljs-string">"NOT NULL"</span>;
 }</pre></div></div>
             
         </li>
@@ -567,18 +526,32 @@ literal SQL</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-22">&#182;</a>
               </div>
-              <p><code>predicateToFilterObjects</code> converts the specified <code>predicate</code> object into
-an array of filter objects. Each element in the returned array will
-be an object with two keys, <code>matcher</code> and <code>value</code> e.g. {matcher: &quot;=&quot;, value: 4}
-or an object with a single key called <code>sql_template</code> that contains an
-underscore template that accepts a <code>column</code> parameter. If <code>sql_template</code> is
-provided, the template is evaluated and the result is used as the SQL.</p>
+              <p><code>validatePredicate</code> throws an error if the specified <code>predicate</code> object
+is not valid.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="function"><span class="keyword">function</span> <span class="title">predicateToFilterObjects</span><span class="params">(predicate)</span> {</span>
-    validatePredicate(predicate);
-    <span class="keyword">return</span> _.map(predicate, predicateValueAndTypeToFilterObject);
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">validatePredicate</span>(<span class="hljs-params">predicate</span>) </span>{
+    <span class="hljs-keyword">var</span> keys;
+    <span class="hljs-keyword">if</span> (!_.isObject(predicate)) {
+        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">'Predicates must be objects'</span>);
+    }
+    keys = <span class="hljs-built_in">Object</span>.keys(predicate);
+    _.each(keys, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">key</span>) </span>{
+        <span class="hljs-keyword">if</span> (!PREDICATE_TYPES[key]) {
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">'Predicates support the following keys: '</span> +
+                <span class="hljs-built_in">Object</span>.keys(PREDICATE_TYPES).join(<span class="hljs-string">','</span>) + <span class="hljs-string">' not '</span> + key);
+        }
+        <span class="hljs-keyword">if</span> (!_.all(keys, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">otherKey</span>) </span>{
+            <span class="hljs-keyword">return</span> (key === otherKey ||
+                _.contains(PREDICATE_TYPES[key].combinesWith, otherKey));
+        })) {
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">'A predicate with keys '</span> + keys.join(<span class="hljs-string">','</span>) +
+                <span class="hljs-string">' is not valid because the predicate key '</span> + key +
+                <span class="hljs-string">' can only be combined with the following keys: '</span> +
+                PREDICATE_TYPES[key].combinesWith.join(<span class="hljs-string">','</span>));
+        }
+    });
 }</pre></div></div>
             
         </li>
@@ -590,15 +563,14 @@ provided, the template is evaluated and the result is used as the SQL.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-23">&#182;</a>
               </div>
-              <p><code>fieldNameAndPredicateToSql</code> converts the specified <code>fieldName</code> and <code>predicate</code>
-object into a valid SQL WHERE clause.</p>
+              <p><code>predicateValueAndTypeToFilterObject</code> converts a value and type to</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="function"><span class="keyword">function</span> <span class="title">fieldNameAndPredicateToSql</span><span class="params">(fieldName, predicate)</span> {</span>
-    <span class="keyword">var</span> columnName = fieldNameToColumnName(fieldName);
-    <span class="keyword">var</span> filters = predicateToFilterObjects(predicate);
-    <span class="keyword">var</span> filterStatements = _.map(filters, <span class="keyword">function</span>(f) {</pre></div></div>
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">predicateValueAndTypeToFilterObject</span>(<span class="hljs-params">predicateValue, predicateType</span>) </span>{
+    <span class="hljs-keyword">var</span> matcher;
+    <span class="hljs-keyword">var</span> value;
+    <span class="hljs-keyword">var</span> t = PREDICATE_TYPES[predicateType];</pre></div></div>
             
         </li>
         
@@ -609,15 +581,14 @@ object into a valid SQL WHERE clause.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-24">&#182;</a>
               </div>
-              <p>If a literal value is found it probably needs the column
-name somewhere besides the LHS so we provide it via
-an underscore template</p>
+              <p>Predicate transforms override matchers and can return
+literal SQL</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        <span class="keyword">if</span> (f.sql_template) {
-            <span class="keyword">return</span> _.template(f.sql_template, { <span class="string">'column'</span>: columnName });
-        } <span class="keyword">else</span> {</pre></div></div>
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">if</span> (t.predicateTransform) {
+        <span class="hljs-keyword">return</span> { sql_template: t.predicateTransform(predicateValue) };
+    } <span class="hljs-keyword">else</span> {</pre></div></div>
             
         </li>
         
@@ -628,20 +599,21 @@ an underscore template</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-25">&#182;</a>
               </div>
-              <p>if the column is an hstore field and the value is a
-datestring literal the hstore field must be converted
-from text to date before comparsion</p>
+              <p>_.isObject can be truthy for arrays</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>            <span class="keyword">if</span> (columnName.indexOf(<span class="string">'-&gt;'</span>) !== -<span class="number">1</span> &amp;&amp; f.value.indexOf(<span class="string">'(DATE'</span>) === <span class="number">0</span>) {
-                columnName = format(
-                    <span class="string">"to_date(%s::text, '%s')"</span>,
-                    columnName, utils.DATETIME_FORMATS.date);
-            }
-            <span class="keyword">return</span> columnName + <span class="string">' '</span> + f.matcher + <span class="string">' '</span> + f.value;
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">if</span> (_.isObject(predicateValue) &amp;&amp; !_.isArray(predicateValue)) {
+            matcher = predicateValue.EXCLUSIVE ? t.exclusiveMatcher : t.matcher;
+            value = predicateValue.value;
+        } <span class="hljs-keyword">else</span> {
+            matcher = t.matcher;
+            value = predicateValue;
         }
-    });</pre></div></div>
+
+        <span class="hljs-keyword">return</span> { matcher: matcher, value: t.valueConverter(value) };
+    }
+}</pre></div></div>
             
         </li>
         
@@ -652,19 +624,18 @@ from text to date before comparsion</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-26">&#182;</a>
               </div>
-              <p>If this is a query for collection UDFs, we need extra information in the
-WHERE clause to act as a join criteria, since the table is CROSS JOINed</p>
+              <p><code>predicateToFilterObjects</code> converts the specified <code>predicate</code> object into
+an array of filter objects. Each element in the returned array will
+be an object with two keys, <code>matcher</code> and <code>value</code> e.g. {matcher: “=”, value: 4}
+or an object with a single key called <code>sql_template</code> that contains an
+underscore template that accepts a <code>column</code> parameter. If <code>sql_template</code> is
+provided, the template is evaluated and the result is used as the SQL.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    <span class="keyword">if</span> (fieldName.indexOf(<span class="string">'udf:'</span>) === <span class="number">0</span>) {
-        <span class="keyword">var</span> udfCollectionData = utils.parseUdfCollectionFieldName(fieldName);
-        <span class="keyword">var</span> model = udfCollectionData.modelName;
-        <span class="keyword">var</span> udfcTemplate = _.template(config.udfcTemplates[model]);
-
-        filterStatements.push(udfcTemplate({fieldDefId: udfCollectionData.fieldDefId}));
-    }
-    <span class="keyword">return</span> <span class="string">'('</span> + filterStatements.join(<span class="string">' AND '</span>) + <span class="string">')'</span> ;
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">predicateToFilterObjects</span>(<span class="hljs-params">predicate</span>) </span>{
+    validatePredicate(predicate);
+    <span class="hljs-keyword">return</span> _.map(predicate, predicateValueAndTypeToFilterObject);
 }</pre></div></div>
             
         </li>
@@ -676,26 +647,15 @@ WHERE clause to act as a join criteria, since the table is CROSS JOINed</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-27">&#182;</a>
               </div>
-              <p><code>objectToSql</code> converts a filter object to a valid SQL WHERE clause.</p>
+              <p><code>fieldNameAndPredicateToSql</code> converts the specified <code>fieldName</code> and <code>predicate</code>
+object into a valid SQL WHERE clause.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="function"><span class="keyword">function</span> <span class="title">objectToSql</span><span class="params">(o)</span> {</span>
-    <span class="keyword">var</span> statements = [];
-    <span class="keyword">if</span> (Object.keys(o).length === <span class="number">0</span>) {
-        <span class="keyword">return</span> <span class="string">''</span>;
-    }
-    _.each(o, <span class="function"><span class="keyword">function</span> <span class="params">(valueOrPredicate, fieldName)</span> {</span>
-        <span class="keyword">var</span> predicate;
-        <span class="keyword">if</span> (!_.isObject(valueOrPredicate)) {
-            predicate = {<span class="string">"IS"</span>: valueOrPredicate};
-        } <span class="keyword">else</span> {
-            predicate = valueOrPredicate;
-        }
-        statements.push(fieldNameAndPredicateToSql(fieldName, predicate));
-    });
-    <span class="keyword">return</span> statements.join(<span class="string">' AND '</span>);
-}</pre></div></div>
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">fieldNameAndPredicateToSql</span>(<span class="hljs-params">fieldName, predicate</span>) </span>{
+    <span class="hljs-keyword">var</span> columnName = fieldNameToColumnName(fieldName);
+    <span class="hljs-keyword">var</span> filters = predicateToFilterObjects(predicate);
+    <span class="hljs-keyword">var</span> filterStatements = _.map(filters, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">f</span>) </span>{</pre></div></div>
             
         </li>
         
@@ -706,17 +666,15 @@ WHERE clause to act as a join criteria, since the table is CROSS JOINed</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-28">&#182;</a>
               </div>
-              <p><code>arrayToSql</code> converts a combinator array into a valid SQL WHERE clause.</p>
+              <p>If a literal value is found it probably needs the column
+name somewhere besides the LHS so we provide it via
+an underscore template</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="function"><span class="keyword">function</span> <span class="title">arrayToSql</span><span class="params">(a)</span> {</span>
-    <span class="keyword">var</span> statements = [];
-    utils.traverseCombinator(a, <span class="keyword">function</span>(filter, index) {
-        statements.push(filterToSql(filter));
-    });
-    <span class="keyword">return</span> <span class="string">'('</span> + statements.join(<span class="string">' '</span> + a[<span class="number">0</span>] + <span class="string">' '</span>) + <span class="string">')'</span>;
-}</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">if</span> (f.sql_template) {
+            <span class="hljs-keyword">return</span> _.template(f.sql_template, { <span class="hljs-string">'column'</span>: columnName });
+        } <span class="hljs-keyword">else</span> {</pre></div></div>
             
         </li>
         
@@ -727,17 +685,130 @@ WHERE clause to act as a join criteria, since the table is CROSS JOINed</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-29">&#182;</a>
               </div>
+              <p>if the column is an hstore field and the value is a
+datestring literal the hstore field must be converted
+from text to date before comparsion</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">if</span> (columnName.indexOf(<span class="hljs-string">'-&gt;'</span>) !== -<span class="hljs-number">1</span> &amp;&amp; f.value.indexOf(<span class="hljs-string">'(DATE'</span>) === <span class="hljs-number">0</span>) {
+                columnName = format(
+                    <span class="hljs-string">"to_date(%s::text, '%s')"</span>,
+                    columnName, utils.DATETIME_FORMATS.date);
+            }
+            <span class="hljs-keyword">return</span> columnName + <span class="hljs-string">' '</span> + f.matcher + <span class="hljs-string">' '</span> + f.value;
+        }
+    });</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-30">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-30">&#182;</a>
+              </div>
+              <p>If this is a query for collection UDFs, we need extra information in the
+WHERE clause to act as a join criteria, since the table is CROSS JOINed</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">if</span> (fieldName.indexOf(<span class="hljs-string">'udf:'</span>) === <span class="hljs-number">0</span>) {
+        <span class="hljs-keyword">var</span> udfCollectionData = utils.parseUdfCollectionFieldName(fieldName);
+        <span class="hljs-keyword">var</span> model = udfCollectionData.modelName;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-31">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-31">&#182;</a>
+              </div>
+              <p>Most collection UDFs relate to MapFeatures.  The odd duck is Tree Collection UDFs</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">var</span> udfcTemplate = _.template(model === <span class="hljs-string">"tree"</span> ? config.udfcTemplates.tree : config.udfcTemplates.mapFeature);
+
+        filterStatements.push(udfcTemplate({fieldDefId: udfCollectionData.fieldDefId}));
+    }
+    <span class="hljs-keyword">return</span> <span class="hljs-string">'('</span> + filterStatements.join(<span class="hljs-string">' AND '</span>) + <span class="hljs-string">')'</span> ;
+}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-32">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-32">&#182;</a>
+              </div>
+              <p><code>objectToSql</code> converts a filter object to a valid SQL WHERE clause.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">objectToSql</span>(<span class="hljs-params">o</span>) </span>{
+    <span class="hljs-keyword">var</span> statements = [];
+    <span class="hljs-keyword">if</span> (<span class="hljs-built_in">Object</span>.keys(o).length === <span class="hljs-number">0</span>) {
+        <span class="hljs-keyword">return</span> <span class="hljs-string">''</span>;
+    }
+    _.each(o, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">valueOrPredicate, fieldName</span>) </span>{
+        <span class="hljs-keyword">var</span> predicate;
+        <span class="hljs-keyword">if</span> (!_.isObject(valueOrPredicate)) {
+            predicate = {<span class="hljs-string">"IS"</span>: valueOrPredicate};
+        } <span class="hljs-keyword">else</span> {
+            predicate = valueOrPredicate;
+        }
+        statements.push(fieldNameAndPredicateToSql(fieldName, predicate));
+    });
+    <span class="hljs-keyword">return</span> statements.join(<span class="hljs-string">' AND '</span>);
+}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-33">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-33">&#182;</a>
+              </div>
+              <p><code>arrayToSql</code> converts a combinator array into a valid SQL WHERE clause.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">arrayToSql</span>(<span class="hljs-params">a</span>) </span>{
+    <span class="hljs-keyword">var</span> statements = [];
+    utils.traverseCombinator(a, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">filter, index</span>) </span>{
+        statements.push(filterToSql(filter));
+    });
+    <span class="hljs-keyword">return</span> <span class="hljs-string">'('</span> + statements.join(<span class="hljs-string">' '</span> + a[<span class="hljs-number">0</span>] + <span class="hljs-string">' '</span>) + <span class="hljs-string">')'</span>;
+}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-34">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-34">&#182;</a>
+              </div>
               <p><code>filterToSql</code> converts any filter object or combinator array into a valid SQL WHERE clause.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="function"><span class="keyword">function</span> <span class="title">filterToSql</span><span class="params">(f)</span> {</span>
-    <span class="keyword">if</span> (_.isArray(f)) {
-        <span class="keyword">return</span> arrayToSql(f);
-    } <span class="keyword">else</span> <span class="keyword">if</span> (_.isObject(f)) {
-        <span class="keyword">return</span> objectToSql(f);
-    } <span class="keyword">else</span> {
-        <span class="keyword">throw</span> <span class="keyword">new</span> Error(<span class="string">'A filter must be an Object or an Array'</span>);
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">filterToSql</span>(<span class="hljs-params">f</span>) </span>{
+    <span class="hljs-keyword">if</span> (_.isArray(f)) {
+        <span class="hljs-keyword">return</span> arrayToSql(f);
+    } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (_.isObject(f)) {
+        <span class="hljs-keyword">return</span> objectToSql(f);
+    } <span class="hljs-keyword">else</span> {
+        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">'A filter must be an Object or an Array'</span>);
     }
 }</pre></div></div>
             

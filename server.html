@@ -24,6 +24,11 @@
               </a>
             
               
+              <a class="source" href="config.html">
+                config.js
+              </a>
+            
+              
               <a class="source" href="displayFiltersToWhere.html">
                 displayFiltersToWhere.js
               </a>
@@ -76,24 +81,24 @@
               
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="string">"use strict"</span>;
+            <div class="content"><div class='highlight'><pre><span class="hljs-pi">"use strict"</span>;
 
-<span class="keyword">var</span> Windshaft = require(<span class="string">'windshaft'</span>);
-<span class="keyword">var</span> _ = require(<span class="string">'underscore'</span>);
-<span class="keyword">var</span> cluster = require(<span class="string">'cluster'</span>);
-<span class="keyword">var</span> fs = require(<span class="string">'fs'</span>);
-<span class="keyword">var</span> makeSql = require(<span class="string">'./makeSql.js'</span>);
-<span class="keyword">var</span> config = require(<span class="string">'./config.json'</span>);
-<span class="keyword">var</span> settings = require(<span class="string">'./settings.json'</span>);
+<span class="hljs-keyword">var</span> Windshaft = <span class="hljs-built_in">require</span>(<span class="hljs-string">'windshaft'</span>);
+<span class="hljs-keyword">var</span> _ = <span class="hljs-built_in">require</span>(<span class="hljs-string">'underscore'</span>);
+<span class="hljs-keyword">var</span> cluster = <span class="hljs-built_in">require</span>(<span class="hljs-string">'cluster'</span>);
+<span class="hljs-keyword">var</span> fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">'fs'</span>);
+<span class="hljs-keyword">var</span> makeSql = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./makeSql.js'</span>);
+<span class="hljs-keyword">var</span> config = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./config'</span>);
+<span class="hljs-keyword">var</span> settings = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./settings.json'</span>);
 
-<span class="keyword">var</span> workerCount = process.env.WORKERS || require(<span class="string">'os'</span>).cpus().length;
-<span class="keyword">var</span> port = process.env.PORT || <span class="number">4000</span>;
-<span class="keyword">var</span> ws;
+<span class="hljs-keyword">var</span> workerCount = process.env.WORKERS || <span class="hljs-built_in">require</span>(<span class="hljs-string">'os'</span>).cpus().length;
+<span class="hljs-keyword">var</span> port = process.env.PORT || <span class="hljs-number">4000</span>;
+<span class="hljs-keyword">var</span> ws;
 
-<span class="keyword">var</span> styles = {
-    boundary: fs.readFileSync(<span class="string">'style/boundary.mms'</span>, {encoding: <span class="string">'utf-8'</span>}),
-    mapFeature: fs.readFileSync(<span class="string">'style/mapFeature.mms'</span>, {encoding: <span class="string">'utf-8'</span>}),
-    polygonalMapFeature: fs.readFileSync(<span class="string">'style/polygonalMapFeature.mms'</span>, {encoding: <span class="string">'utf-8'</span>})
+<span class="hljs-keyword">var</span> styles = {
+    boundary: fs.readFileSync(<span class="hljs-string">'style/boundary.mms'</span>, {encoding: <span class="hljs-string">'utf-8'</span>}),
+    mapFeature: fs.readFileSync(<span class="hljs-string">'style/mapFeature.mms'</span>, {encoding: <span class="hljs-string">'utf-8'</span>}),
+    polygonalMapFeature: fs.readFileSync(<span class="hljs-string">'style/polygonalMapFeature.mms'</span>, {encoding: <span class="hljs-string">'utf-8'</span>})
 };</pre></div></div>
             
         </li>
@@ -105,14 +110,15 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-2">&#182;</a>
               </div>
-              <p>Configure the Windshaft tile server to handle OTM&#39;s HTTP requests, which retrieve
+              <p>Configure the Windshaft tile server to handle OTM’s HTTP requests, which retrieve
 e.g. a map tile or UTF grid with map features like tree plots or boundaries.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="keyword">var</span> windshaftConfig = {
-    useProfiler: <span class="literal">false</span>,  <span class="comment">// if true, returns X-Tiler-Profiler header with rendering times</span>
-    enable_cors: <span class="literal">true</span>,
+            <div class="content"><div class='highlight'><pre>
+<span class="hljs-keyword">var</span> windshaftConfig = {
+    useProfiler: <span class="hljs-literal">false</span>,  <span class="hljs-comment">// if true, returns X-Tiler-Profiler header with rendering times</span>
+    enable_cors: <span class="hljs-literal">true</span>,
     mapnik: {</pre></div></div>
             
         </li>
@@ -127,12 +133,12 @@ e.g. a map tile or UTF grid with map features like tree plots or boundaries.</p>
               <p>When looking for objects to render on a tile, mapnik by default adds 64 pixels
 on all sides of a tile so if e.g. a label spans two tiles
 it will be rendered on both rather than getting cut off at the boundary.
-Because we&#39;re only rendering tree dots we can reduce the buffer based on our
+Because we’re only rendering tree dots we can reduce the buffer based on our
 biggest dot. This speeds up rendering by as much as 25%.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        bufferSize: Math.floor(config.treeMarkerMaxWidth / <span class="number">2</span>) + <span class="number">1</span>,</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        bufferSize: <span class="hljs-built_in">Math</span>.floor(config.treeMarkerMaxWidth / <span class="hljs-number">2</span>) + <span class="hljs-number">1</span>,</pre></div></div>
             
         </li>
         
@@ -143,22 +149,22 @@ biggest dot. This speeds up rendering by as much as 25%.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-4">&#182;</a>
               </div>
-              <p>Metatiles aren&#39;t a good fit for rendering tree dots using multiple servers and workers.
+              <p>Metatiles aren’t a good fit for rendering tree dots using multiple servers and workers.
 When you request a 256x256 tile, mapnik renders by default a 1024x1024 metatile,
-and caches the resulting 16 tiles. They&#39;re aiming at basemaps, where for example
-if a road segment crosses three tiles it&#39;s more efficient to render it once
-than three times since you&#39;ll often want all 3 tiles.
-That&#39;s a bad fit for OTM for two reasons. First, our tree dots are less likely
-to span multiple tiles. Second, since metatiles aren&#39;t shared across servers
+and caches the resulting 16 tiles. They’re aiming at basemaps, where for example
+if a road segment crosses three tiles it’s more efficient to render it once
+than three times since you’ll often want all 3 tiles.
+That’s a bad fit for OTM for two reasons. First, our tree dots are less likely
+to span multiple tiles. Second, since metatiles aren’t shared across servers
 or even across workers on the same server, our AWS tiler setup
 (currently two tile servers with two workers each) is likely to render
 each metatile multiple times, making things slower rather than faster.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        metatile: <span class="number">1</span>
+            <div class="content"><div class='highlight'><pre>        metatile: <span class="hljs-number">1</span>
     },
-    redis: {host: settings.redishost || <span class="string">'127.0.0.1'</span>, port: <span class="number">6379</span>},</pre></div></div>
+    redis: {host: settings.redishost || <span class="hljs-string">'127.0.0.1'</span>, port: <span class="hljs-number">6379</span>},</pre></div></div>
             
         </li>
         
@@ -173,15 +179,15 @@ each metatile multiple times, making things slower rather than faster.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    postgres: { password: <span class="string">'otm'</span>, user: <span class="string">'otm'</span> },
+            <div class="content"><div class='highlight'><pre>    postgres: { password: <span class="hljs-string">'otm'</span>, user: <span class="hljs-string">'otm'</span> },
     grainstore: {
         datasource: {
-            user: settings.username || <span class="string">'otm'</span>,
-            password: settings.password || <span class="string">'otm'</span>,
-            host: settings.host || <span class="string">'localhost'</span>,
-            port: settings.port || <span class="number">5432</span>
+            user: settings.username || <span class="hljs-string">'otm'</span>,
+            password: settings.password || <span class="hljs-string">'otm'</span>,
+            host: settings.host || <span class="hljs-string">'localhost'</span>,
+            port: settings.port || <span class="hljs-number">5432</span>
         }
-    }, <span class="comment">// See grainstore npm for other options</span></pre></div></div>
+    }, <span class="hljs-comment">// See grainstore npm for other options</span></pre></div></div>
             
         </li>
         
@@ -196,8 +202,8 @@ each metatile multiple times, making things slower rather than faster.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    base_url: <span class="string">'/:cache_buster/database/:dbname/table/:table'</span>,
-    base_url_notable: <span class="string">'/:cache_buster/database/:dbname/table'</span>,</pre></div></div>
+            <div class="content"><div class='highlight'><pre>    base_url: <span class="hljs-string">'/:cache_buster/database/:dbname/table/:table'</span>,
+    base_url_notable: <span class="hljs-string">'/:cache_buster/database/:dbname/table'</span>,</pre></div></div>
             
         </li>
         
@@ -208,12 +214,13 @@ each metatile multiple times, making things slower rather than faster.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-7">&#182;</a>
               </div>
-              <p>Tell server how to handle HTTP request &#39;req&#39; (by specifying properties in req.params).</p>
+              <p>Tell server how to handle HTTP request ‘req’ (by specifying properties in req.params).</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    req2params: <span class="keyword">function</span>(req, callback) {
-        <span class="keyword">var</span> instanceid, isUtfGridRequest, isPolygonRequest, table, zoom, filterString, displayString;</pre></div></div>
+            <div class="content"><div class='highlight'><pre>    req2params: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">req, callback</span>) </span>{
+        <span class="hljs-keyword">var</span> instanceid, isUtfGridRequest, isPolygonRequest, table,
+            zoom, filterString, displayString, restrictFeatureString;</pre></div></div>
             
         </li>
         
@@ -226,33 +233,35 @@ each metatile multiple times, making things slower rather than faster.</p>
               </div>
               <p>Specify SQL subquery to extract desired features from desired DB layer.
 (This will be wrapped in an outer query, in many cases extracting geometry
-using the magic column name &quot;the_geom_webmercator&quot;.)</p>
+using the magic column name “the_geom_webmercator”.)</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        <span class="keyword">try</span> {
-            instanceid = parseInt(req.query.instance_id, <span class="number">10</span>);
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">try</span> {
+            instanceid = <span class="hljs-built_in">parseInt</span>(req.query.instance_id, <span class="hljs-number">10</span>);
             table = req.params.table;
             zoom = req.params.z;
-            isPolygonRequest = (table === <span class="string">'stormwater_polygonalmapfeature'</span>);
-            <span class="keyword">if</span> (table === <span class="string">'treemap_mapfeature'</span> || isPolygonRequest) {
+            isPolygonRequest = (table === <span class="hljs-string">'stormwater_polygonalmapfeature'</span>);
+            <span class="hljs-keyword">if</span> (table === <span class="hljs-string">'treemap_mapfeature'</span> || isPolygonRequest) {
                 filterString = req.query[config.filterQueryArgumentName];
                 displayString = req.query[config.displayQueryArgumentName];
-                isUtfGridRequest = (req.params.format === <span class="string">'grid.json'</span>);
+                restrictFeatureString = req.query[config.restrictFeatureQueryArgumentName];
+                isUtfGridRequest = (req.params.format === <span class="hljs-string">'grid.json'</span>);
                 req.query.sql = makeSql.makeSqlForMapFeatures(filterString,
                                                               displayString,
+                                                              restrictFeatureString,
                                                               instanceid,
                                                               zoom,
                                                               isUtfGridRequest,
                                                               isPolygonRequest);
 
                 req.params.style = isPolygonRequest ? styles.polygonalMapFeature : styles.mapFeature;
-            } <span class="keyword">else</span> <span class="keyword">if</span> (table === <span class="string">'treemap_boundary'</span> &amp;&amp; instanceid) {
+            } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (table === <span class="hljs-string">'treemap_boundary'</span> &amp;&amp; instanceid) {
                 req.query.sql = makeSql.makeSqlForBoundaries(instanceid);
                 req.params.style = styles.boundary;
             }
-        } <span class="keyword">catch</span> (err) {
-            callback(err, <span class="literal">null</span>);
+        } <span class="hljs-keyword">catch</span> (err) {
+            callback(err, <span class="hljs-literal">null</span>);
         }</pre></div></div>
             
         </li>
@@ -266,11 +275,11 @@ using the magic column name &quot;the_geom_webmercator&quot;.)</p>
               </div>
               <p>A UTF grid request returns map feature data for each pixel in a tile,
 streamlining client actions like clicking on or hovering over a feature.
-&quot;interactivity&quot; specifies which fields from our SQL query should be returned for each feature.</p>
+“interactivity” specifies which fields from our SQL query should be returned for each feature.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        req.params.interactivity = (isUtfGridRequest ? config.interactivityForUtfGridRequests : <span class="literal">null</span>);</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        req.params.interactivity = (isUtfGridRequest ? config.interactivityForUtfGridRequests : <span class="hljs-literal">null</span>);</pre></div></div>
             
         </li>
         
@@ -302,14 +311,14 @@ Note that we <em>always</em> overwrite req.query.sql above</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        callback(<span class="literal">null</span>, req);
+            <div class="content"><div class='highlight'><pre>        callback(<span class="hljs-literal">null</span>, req);
     },
 
-    afterTileRender: <span class="keyword">function</span>(req, res, tile, headers, callback) {
-        headers[<span class="string">'Cache-Control'</span>] = <span class="string">'max-age=2592000'</span>;
-        console.log(<span class="string">"HEADERS:"</span>);
-        console.log(headers);
-        callback(<span class="literal">null</span>, tile, headers);
+    afterTileRender: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">req, res, tile, headers, callback</span>) </span>{
+        headers[<span class="hljs-string">'Cache-Control'</span>] = <span class="hljs-string">'max-age=2592000'</span>;
+        <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"HEADERS:"</span>);
+        <span class="hljs-built_in">console</span>.log(headers);
+        callback(<span class="hljs-literal">null</span>, tile, headers);
     }
 };</pre></div></div>
             
@@ -323,29 +332,29 @@ Note that we <em>always</em> overwrite req.query.sql above</p>
                 <a class="pilcrow" href="#section-12">&#182;</a>
               </div>
               <p>The global v8debug will be present if this is started via:
- &#39;node debug&#39;, node-debug&#39; or &#39;node --debug-brk&#39; (but not &#39;node --debug&#39; !?!)</p>
+ ‘node debug’, node-debug’ or ‘node –debug-brk’ (but not ‘node –debug’ !?!)</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="keyword">if</span> (cluster.isMaster &amp;&amp; <span class="keyword">typeof</span> v8debug !== <span class="string">'object'</span>) {
-    console.log(<span class="string">"Map tiles will be served from http://localhost:"</span> + port + windshaftConfig.base_url + <span class="string">'/:zoom/:x/:y'</span>);
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">if</span> (cluster.isMaster &amp;&amp; <span class="hljs-keyword">typeof</span> v8debug !== <span class="hljs-string">'object'</span>) {
+    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"Map tiles will be served from http://localhost:"</span> + port + windshaftConfig.base_url + <span class="hljs-string">'/:zoom/:x/:y'</span>);
 
-    console.log(<span class="string">'Creating '</span> + workerCount + <span class="string">' workers.'</span>);
+    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'Creating '</span> + workerCount + <span class="hljs-string">' workers.'</span>);
 
-    cluster.on(<span class="string">'online'</span>, <span class="keyword">function</span>(worker) {
-        console.log(<span class="string">'Worker process '</span> + worker.process.pid + <span class="string">' started.'</span>);
+    cluster.on(<span class="hljs-string">'online'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">worker</span>) </span>{
+        <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'Worker process '</span> + worker.process.pid + <span class="hljs-string">' started.'</span>);
     });
 
-    <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; workerCount; i++) {
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; workerCount; i++) {
         cluster.fork();
     }
 
-    cluster.on(<span class="string">'exit'</span>, <span class="keyword">function</span>(worker, code, signal) {
-        console.log(<span class="string">'Worker process '</span> + worker.process.pid + <span class="string">' has died. Starting another to replace it.'</span>);
+    cluster.on(<span class="hljs-string">'exit'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">worker, code, signal</span>) </span>{
+        <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'Worker process '</span> + worker.process.pid + <span class="hljs-string">' has died. Starting another to replace it.'</span>);
         cluster.fork();
     });
-} <span class="keyword">else</span> {
-    ws = <span class="keyword">new</span> Windshaft.Server(windshaftConfig);
+} <span class="hljs-keyword">else</span> {
+    ws = <span class="hljs-keyword">new</span> Windshaft.Server(windshaftConfig);
     ws.listen(port);
 }</pre></div></div>
             
