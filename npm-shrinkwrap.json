@@ -7,6 +7,33 @@
       "from": "moment@~2.1.0",
       "resolved": "https://registry.npmjs.org/moment/-/moment-2.1.0.tgz"
     },
+    "rollbar": {
+      "version": "0.5.9",
+      "from": "rollbar@",
+      "resolved": "https://registry.npmjs.org/rollbar/-/rollbar-0.5.9.tgz",
+      "dependencies": {
+        "node-uuid": {
+          "version": "1.4.3",
+          "from": "node-uuid@1.4.x",
+          "resolved": "https://registry.npmjs.org/node-uuid/-/node-uuid-1.4.3.tgz"
+        },
+        "lru-cache": {
+          "version": "2.2.4",
+          "from": "lru-cache@~2.2.1",
+          "resolved": "https://registry.npmjs.org/lru-cache/-/lru-cache-2.2.4.tgz"
+        },
+        "json-stringify-safe": {
+          "version": "5.0.1",
+          "from": "json-stringify-safe@~5.0.0",
+          "resolved": "https://registry.npmjs.org/json-stringify-safe/-/json-stringify-safe-5.0.1.tgz"
+        },
+        "async": {
+          "version": "1.2.1",
+          "from": "async@~1.2.1",
+          "resolved": "https://registry.npmjs.org/async/-/async-1.2.1.tgz"
+        }
+      }
+    },
     "semver": {
       "version": "1.1.4",
       "from": "semver@~1.1.0",

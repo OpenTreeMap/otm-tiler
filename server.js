@@ -3,9 +3,13 @@
 var Windshaft = require('windshaft');
 var _ = require('underscore');
 var fs = require('fs');
+var rollbar = require('rollbar');
 var healthCheck = require('./healthCheck');
 var makeSql = require('./makeSql');
 var config = require('./config');
+
+// Optional environment variable for reporting exceptions to rollbar.com
+var rollbarAccessToken = process.env.ROLLBAR_SERVER_SIDE_ACCESS_TOKEN;
 
 var dbname = process.env.OTM_DB_NAME || 'otm';
 var port = process.env.PORT || 4000;
@@ -65,6 +69,7 @@ var windshaftConfig = {
     req2params: function(req, callback) {
         var instanceid, isUtfGridRequest, isPolygonRequest, table,
             zoom, filterString, displayString, restrictFeatureString;
+
         // Specify SQL subquery to extract desired features from desired DB layer.
         // (This will be wrapped in an outer query, in many cases extracting geometry
         // using the magic column name "the_geom_webmercator".)
@@ -92,6 +97,9 @@ var windshaftConfig = {
                 req.params.style = styles.boundary;
             }
         } catch (err) {
+            if (rollbarAccessToken) {
+                rollbar.handleError(err, req);
+            }
             callback(err, null);
         }
 
@@ -121,5 +129,13 @@ var windshaftConfig = {
 
 ws = new Windshaft.Server(windshaftConfig);
 ws.get('/health-check', healthCheck(windshaftConfig));
+
+// If a rollbar API token was provided this will wire up the rollbar error handler
+if (rollbarAccessToken) {
+    ws.use(rollbar.errorHandler(rollbarAccessToken, {
+        'environment': process.env.OTM_STACK_TYPE || 'Unknown'
+    }));
+}
+
 ws.listen(port);
 console.log("Map tiles will be served from http://localhost:" + port + windshaftConfig.base_url + '/:zoom/:x/:y');
