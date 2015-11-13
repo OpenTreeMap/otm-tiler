@@ -2,13 +2,12 @@
 
 var Windshaft = require('windshaft');
 var _ = require('underscore');
-var cluster = require('cluster');
 var fs = require('fs');
-var makeSql = require('./makeSql.js');
+var healthCheck = require('./healthCheck');
+var makeSql = require('./makeSql');
 var config = require('./config');
-var settings = require('./settings.json');
 
-var workerCount = process.env.WORKERS || require('os').cpus().length;
+var dbname = process.env.OTM_DB_NAME || 'otm';
 var port = process.env.PORT || 4000;
 var ws;
 
@@ -43,22 +42,24 @@ var windshaftConfig = {
         // each metatile multiple times, making things slower rather than faster.
         metatile: 1
     },
-    redis: {host: settings.redishost || '127.0.0.1', port: 6379},
+    redis: {
+        host: process.env.OTM_CACHE_HOST || '127.0.0.1',
+        port: process.env.OTM_CACHE_PORT || 6379
+    },
 
     // How to access the database
-    postgres: { password: 'otm', user: 'otm' },
     grainstore: {
         datasource: {
-            user: settings.username || 'otm',
-            password: settings.password || 'otm',
-            host: settings.host || 'localhost',
-            port: settings.port || 5432
+            user: process.env.OTM_DB_USER || 'otm',
+            password: process.env.OTM_DB_PASSWORD || 'otm',
+            host: process.env.OTM_DB_HOST || 'localhost',
+            port: process.env.OTM_DB_PORT || 5432
         }
     }, // See grainstore npm for other options
 
     // Parse params from the request URL
-    base_url: '/:cache_buster/database/:dbname/table/:table',
-    base_url_notable: '/:cache_buster/database/:dbname/table',
+    base_url: '/:cache_buster/table/:table',
+    base_url_notable: '/:cache_buster/table',
 
     // Tell server how to handle HTTP request 'req' (by specifying properties in req.params).
     req2params: function(req, callback) {
@@ -99,6 +100,8 @@ var windshaftConfig = {
         // "interactivity" specifies which fields from our SQL query should be returned for each feature.
         req.params.interactivity = (isUtfGridRequest ? config.interactivityForUtfGridRequests : null);
 
+        req.params.dbname = dbname;
+
         // Override request params with query params
         // Note that we *always* overwrite req.query.sql above
         req.params =  _.extend({}, req.params);
@@ -116,26 +119,7 @@ var windshaftConfig = {
     }
 };
 
-// The global v8debug will be present if this is started via:
-//  'node debug', node-debug' or 'node --debug-brk' (but not 'node --debug' !?!)
-if (cluster.isMaster && typeof v8debug !== 'object') {
-    console.log("Map tiles will be served from http://localhost:" + port + windshaftConfig.base_url + '/:zoom/:x/:y');
-
-    console.log('Creating ' + workerCount + ' workers.');
-
-    cluster.on('online', function(worker) {
-        console.log('Worker process ' + worker.process.pid + ' started.');
-    });
-
-    for (var i = 0; i < workerCount; i++) {
-        cluster.fork();
-    }
-
-    cluster.on('exit', function(worker, code, signal) {
-        console.log('Worker process ' + worker.process.pid + ' has died. Starting another to replace it.');
-        cluster.fork();
-    });
-} else {
-    ws = new Windshaft.Server(windshaftConfig);
-    ws.listen(port);
-}
+ws = new Windshaft.Server(windshaftConfig);
+ws.get('/health-check', healthCheck(windshaftConfig));
+ws.listen(port);
+console.log("Map tiles will be served from http://localhost:" + port + windshaftConfig.base_url + '/:zoom/:x/:y');
