@@ -12,6 +12,13 @@ OTM_DB_PORT = 5432
 
 OTM_CACHE_HOST = '127.0.0.1',
 OTM_CACHE_PORT = 6379
+
+OTM_STACK_TYPE = 'development'
+```
+
+There is also an optional environment variable for reporting errors to [Rollbar](rollbar.com).
+```
+ROLLBAR_SERVER_SIDE_ACCESS_TOKEN=....
 ```
 
 Please view the [javascript documentation](http://opentreemap.github.io/otm-tiler/server.html).
