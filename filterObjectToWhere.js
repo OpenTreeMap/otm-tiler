@@ -65,7 +65,7 @@ var PREDICATE_TYPES = {
     LIKE: {
         combinesWith: [],
         matcher: 'ILIKE',
-        valueConverter: utils.convertValueToEscapedSqlLiteral
+        valueConverter: convertValueForLike
     },
     MIN: {
         combinesWith: ['MAX'],
@@ -199,6 +199,10 @@ function convertValuesToEscapedSqlLiterals(values) {
 // truthiness.  Truthy values -> "NULL", falsey values -> "NOT NULL"
 function convertValueForIsNull(value) {
     return !!value ? "NULL" : "NOT NULL";
+}
+
+function convertValueForLike(value) {
+    return "'%" + utils.sanitizeSqlString(value).replace("'", "''") + "%'";
 }
 
 // `validatePredicate` throws an error if the specified `predicate` object
