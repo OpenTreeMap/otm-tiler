@@ -5,12 +5,13 @@ This project requires several environment variables, containing connection infor
 
 They should be similar to:
 ```
-OTM_DB_USER = 'otm',
-OTM_DB_PASSWORD = 'otm',
-OTM_DB_HOST = 'localhost',
+OTM_DB_USER = 'otm'
+OTM_DB_PASSWORD = 'otm'
+OTM_DB_NAME = 'otm'
+OTM_DB_HOST = 'localhost'
 OTM_DB_PORT = 5432
 
-OTM_CACHE_HOST = '127.0.0.1',
+OTM_CACHE_HOST = '127.0.0.1'
 OTM_CACHE_PORT = 6379
 
 OTM_STACK_TYPE = 'development'
