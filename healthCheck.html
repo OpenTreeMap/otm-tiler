@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>healthCheck.js</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page">
+            
+              
+              <a class="source" href="addDefaultsToFilter.html">
+                addDefaultsToFilter.js
+              </a>
+            
+              
+              <a class="source" href="config.html">
+                config.js
+              </a>
+            
+              
+              <a class="source" href="displayFiltersToWhere.html">
+                displayFiltersToWhere.js
+              </a>
+            
+              
+              <a class="source" href="filterObjectToWhere.html">
+                filterObjectToWhere.js
+              </a>
+            
+              
+              <a class="source" href="filterObjectUtils.html">
+                filterObjectUtils.js
+              </a>
+            
+              
+              <a class="source" href="filtersToTables.html">
+                filtersToTables.js
+              </a>
+            
+              
+              <a class="source" href="healthCheck.html">
+                healthCheck.js
+              </a>
+            
+              
+              <a class="source" href="makeSql.html">
+                makeSql.js
+              </a>
+            
+              
+              <a class="source" href="server.html">
+                server.js
+              </a>
+            
+          </div>
+        </li>
+      </ul>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>healthCheck.js</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-pi">"use strict"</span>;
+
+<span class="hljs-keyword">var</span> Step = <span class="hljs-built_in">require</span>(<span class="hljs-string">'windshaft/node_modules/step'</span>);
+<span class="hljs-keyword">var</span> Pg = <span class="hljs-built_in">require</span>(<span class="hljs-string">'windshaft/node_modules/pg'</span>);
+<span class="hljs-keyword">var</span> Redis = <span class="hljs-built_in">require</span>(<span class="hljs-string">'windshaft/node_modules/redis-mpool/node_modules/redis'</span>);
+
+<span class="hljs-comment">/**
+ * Attempts to connect to a PostgreSQL database, providing the
+ * callback with the error object.
+ *
+ * The error object is the second callback argument because
+ * error objects in the first argument cause Step to short
+ * circuit. In the case of a health check, we want all
+ * errors.
+ *
+ * @param {string} host
+ * @param {string} port
+ * @param {string} user
+ * @param {string} password
+ * @param {string} database
+ * @param {function} callback
+ */</span>
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">checkPostgres</span>(<span class="hljs-params">host, port, user, password, database, callback</span>) </span>{
+    <span class="hljs-keyword">var</span> conString = [<span class="hljs-string">'postgres://'</span>, user, <span class="hljs-string">':'</span>, password, <span class="hljs-string">'@'</span>, host, <span class="hljs-string">'/'</span>, database].join(<span class="hljs-string">''</span>);
+    <span class="hljs-keyword">var</span> client = <span class="hljs-keyword">new</span> Pg.Client(conString);
+
+    client.connect(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err</span>) </span>{
+        client.end();
+        callback(<span class="hljs-literal">null</span>, err);
+    });
+}
+
+<span class="hljs-comment">/**
+ * Attempts to connect to a Redis data store, providing the
+ * callback with the error object.
+ *
+ * The error object is the second callback argument because
+ * error objects in the first argument cause Step to short
+ * circuit. In the case of a health check, we want all
+ * errors.
+ *
+ * @param {string} host
+ * @param {string} port
+ * @param {function} callback
+ */</span>
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">checkRedis</span>(<span class="hljs-params">host, port, callback</span>) </span>{
+    <span class="hljs-keyword">var</span> client = Redis.createClient(port, host);
+
+    client.on(<span class="hljs-string">'connect'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err</span>) </span>{
+        client.quit();
+        callback(<span class="hljs-literal">null</span>, err);
+    });
+
+    client.on(<span class="hljs-string">'error'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err</span>) </span>{
+        client.quit();
+        callback(<span class="hljs-literal">null</span>, err);
+    });
+}
+
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">buildPayload</span>(<span class="hljs-params">err</span>) </span>{
+    <span class="hljs-keyword">var</span> payload = {};
+
+    <span class="hljs-keyword">if</span> (err) {
+        payload = {<span class="hljs-string">'ok'</span>: !err, <span class="hljs-string">'msg'</span>: err.toString()};
+    } <span class="hljs-keyword">else</span> {
+        payload = {<span class="hljs-string">'ok'</span>: !err};
+    }
+
+    <span class="hljs-keyword">return</span> payload;
+}
+
+<span class="hljs-comment">/**
+ * Makes use of the PostgreSQL and Redis checks above to return
+ * a JSON object representing the health of both data stores:
+ *
+ * {
+ *   "databases": [
+ *     {
+ *       "default": {
+ *         "ok": true
+ *       }
+ *    }
+ *   ],
+ *   "caches": [
+ *     {
+ *       "default": {
+ *         "ok": true
+ *       }
+ *     }
+ *   ]
+ * }
+ *
+ * @param {object} config - The configuration object passed to Windshaft.Server()
+ */</span>
+<span class="hljs-built_in">module</span>.exports = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">createHealthCheckHandler</span>(<span class="hljs-params">config</span>) </span>{
+    <span class="hljs-keyword">var</span> pgConf = config.grainstore.datasource,
+
+        pgHost = pgConf.host,
+        pgPort = pgConf.port,
+        pgUser = pgConf.user,
+        pgPassword = pgConf.password,
+        pgDatabase = pgConf.dbname,
+
+        redisHost = config.redis.host,
+        redisPort = config.redis.port;
+
+    <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">req, res</span>) </span>{
+        <span class="hljs-keyword">var</span> status = {};
+
+        <span class="hljs-comment">/* jshint ignore:start */</span>
+        Step(
+            <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">executeChecks</span>(<span class="hljs-params"></span>) </span>{
+                checkPostgres(pgHost, pgPort, pgUser, pgPassword, pgDatabase, <span class="hljs-keyword">this</span>.parallel());
+                checkRedis(redisHost, redisPort, <span class="hljs-keyword">this</span>.parallel());
+            },
+            <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">sendResponse</span>(<span class="hljs-params">err, databaseError, cacheError</span>) </span>{
+                <span class="hljs-keyword">var</span> response = {},
+                    statusCode = <span class="hljs-number">503</span>;
+
+                response.databases = [{<span class="hljs-string">'default'</span>: buildPayload(databaseError)}];
+                response.caches = [{<span class="hljs-string">'default'</span>: buildPayload(cacheError)}];
+
+                <span class="hljs-keyword">if</span> (!databaseError &amp;&amp; !cacheError) {
+                    statusCode = <span class="hljs-number">200</span>;
+                }
+
+                res.send(response, statusCode);
+            }
+        );
+        <span class="hljs-comment">/* jshint ignore:end */</span>
+    };
+};</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>

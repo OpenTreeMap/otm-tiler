@@ -49,6 +49,11 @@
               </a>
             
               
+              <a class="source" href="healthCheck.html">
+                healthCheck.js
+              </a>
+            
+              
               <a class="source" href="makeSql.html">
                 makeSql.js
               </a>
@@ -238,7 +243,7 @@ providing values and methods used to convert predicates into SQL strings.</p>
     LIKE: {
         combinesWith: [],
         matcher: <span class="hljs-string">'ILIKE'</span>,
-        valueConverter: utils.convertValueToEscapedSqlLiteral
+        valueConverter: convertValueForLike
     },
     MIN: {
         combinesWith: [<span class="hljs-string">'MAX'</span>],
@@ -515,6 +520,10 @@ truthiness.  Truthy values -&gt; “NULL”, falsey values -&gt; “NOT NULL”<
             
             <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">convertValueForIsNull</span>(<span class="hljs-params">value</span>) </span>{
     <span class="hljs-keyword">return</span> !!value ? <span class="hljs-string">"NULL"</span> : <span class="hljs-string">"NOT NULL"</span>;
+}
+
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">convertValueForLike</span>(<span class="hljs-params">value</span>) </span>{
+    <span class="hljs-keyword">return</span> <span class="hljs-string">"'%"</span> + utils.sanitizeSqlString(value).replace(<span class="hljs-string">"'"</span>, <span class="hljs-string">"''"</span>) + <span class="hljs-string">"%'"</span>;
 }</pre></div></div>
             
         </li>
