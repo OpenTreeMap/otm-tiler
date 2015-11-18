@@ -81,27 +81,27 @@ describe('filterObjectToWhere', function() {
     // LIKE MATCHES
 
     it('returns a LIKE statement', function() {
-        assertSql({"mapFeature.address": {"LIKE": "%Market St%"}},
+        assertSql({"mapFeature.address": {"LIKE": "Market St"}},
                   "(\"treemap_mapfeature\".\"address\" ILIKE '%Market St%')");
     });
 
     // UDF MATCHES
     it('processes udf values', function() {
-        assertSql({"mapFeature.udf:Clever Name": {"LIKE": "%Market St%"}},
+        assertSql({"mapFeature.udf:Clever Name": {"LIKE": "Market St"}},
                   "(\"treemap_mapfeature\".\"udfs\"->'Clever Name' " +
                   "ILIKE '%Market St%')");
     });
 
     // UDF COLLECTION MATCHES
     it('processes udf values, includes JOIN criteria in WHERE clause', function() {
-        assertSql({"udf:tree:18.Action": {"LIKE": "%Watering%"}},
+        assertSql({"udf:tree:18.Action": {"LIKE": "Watering"}},
                   "(\"treemap_userdefinedcollectionvalue\".\"data\"->'Action' ILIKE '%Watering%'" +
                   " AND treemap_userdefinedcollectionvalue.field_definition_id=18" +
                   " AND treemap_userdefinedcollectionvalue.model_id=treemap_tree.id)");
     });
 
     it('processes allows multiple UDF collections to be searched', function() {
-        assertSql({"udf:tree:18.Action": {"LIKE": "%Watering%"}, "udf:plot:17.Action": {"LIKE": "%Destroying%"}},
+        assertSql({"udf:tree:18.Action": {"LIKE": "Watering"}, "udf:plot:17.Action": {"LIKE": "Destroying"}},
                   "(\"treemap_userdefinedcollectionvalue\".\"data\"->'Action' ILIKE '%Watering%'" +
                   " AND treemap_userdefinedcollectionvalue.field_definition_id=18" +
                   " AND treemap_userdefinedcollectionvalue.model_id=treemap_tree.id)" +

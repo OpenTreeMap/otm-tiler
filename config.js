@@ -1,3 +1,5 @@
+"use strict";
+
 module.exports = {
     "filterQueryArgumentName": "q",
     "displayQueryArgumentName": "show",
