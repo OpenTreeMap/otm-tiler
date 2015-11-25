@@ -27,6 +27,7 @@ var styles = {
 var windshaftConfig = {
     useProfiler: false,  // if true, returns X-Tiler-Profiler header with rendering times
     enable_cors: true,
+    log_format: null,
     mapnik: {
         // When looking for objects to render on a tile, mapnik by default adds 64 pixels
         // on all sides of a tile so if e.g. a label spans two tiles
@@ -121,8 +122,6 @@ var windshaftConfig = {
 
     afterTileRender: function(req, res, tile, headers, callback) {
         headers['Cache-Control'] = 'max-age=2592000';
-        console.log("HEADERS:");
-        console.log(headers);
         callback(null, tile, headers);
     }
 };
