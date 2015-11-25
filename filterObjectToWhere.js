@@ -142,7 +142,8 @@ function fieldNameToColumnName(fieldName) {
 
         if (modelAndColumn.length != 2) {
             throw new Error('Field names in predicate objects ' +
-                            'should be of the form "model.field", not "' + fieldName + '"');
+                            'should be of the form "model.field", not "' +
+                            fieldName + '"');
         }
 
         model = modelAndColumn[0];
@@ -294,10 +295,14 @@ function fieldNameAndPredicateToSql(fieldName, predicate) {
         var udfCollectionData = utils.parseUdfCollectionFieldName(fieldName);
         var model = udfCollectionData.modelName;
 
-        // Most collection UDFs relate to MapFeatures.  The odd duck is Tree Collection UDFs
-        var udfcTemplate = _.template(model === "tree" ? config.udfcTemplates.tree : config.udfcTemplates.mapFeature);
+        // Most collection UDFs relate to MapFeatures.  The odd duck
+        // is Tree Collection UDFs
+        var udfcTemplate = _.template(model === "tree" ?
+                                      config.udfcTemplates.tree :
+                                      config.udfcTemplates.mapFeature);
 
-        filterStatements.push(udfcTemplate({fieldDefId: udfCollectionData.fieldDefId}));
+        filterStatements.push(
+            udfcTemplate({fieldDefId: udfCollectionData.fieldDefId}));
     }
     return '(' + filterStatements.join(' AND ') + ')' ;
 }
