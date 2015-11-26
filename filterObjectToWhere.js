@@ -282,13 +282,16 @@ function fieldNameAndPredicateToSql(fieldName, predicate) {
         if (f.sql_template) {
             return _.template(f.sql_template, { 'column': columnName });
         } else {
-            // if the column is an hstore field and the value is a
-            // datestring literal the hstore field must be converted
-            // from text to date before comparsion
-            if (columnName.indexOf('->') !== -1 && f.value.indexOf('(DATE') === 0) {
-                columnName = format(
-                    "to_date(%s::text, '%s')",
-                    columnName, utils.DATETIME_FORMATS.date);
+            if (columnName.indexOf('->') !== -1) {
+                // if the column is an hstore field and the value is a
+                // datestring literal the hstore field must be converted
+                // from text to date before comparsion
+                if (_.isString(f.value) && f.value.indexOf('(DATE') === 0) {
+                    columnName = format("to_date(%s::text, '%s')",
+                                        columnName, utils.DATETIME_FORMATS.date);
+                } else if (_.isNumber(f.value)) {
+                    columnName = format("( %s )::float ", columnName);
+                }
             }
             return columnName + ' ' + f.matcher + ' ' + f.value;
         }

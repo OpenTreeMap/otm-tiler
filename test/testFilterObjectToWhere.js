@@ -329,4 +329,11 @@ describe('filterObjectToWhere', function() {
                   ">= (DATE '2014-03-02' + TIME '00:00:00'))");
     });
 
+    it('casts hstore values to float for numerical hstore searches', function () {
+        assertSql({"tree.udf:awesome": {"MIN": 1}},
+                  "(( \"treemap_tree\".\"udfs\"->'awesome' )::float  >= 1)");
+        assertSql({"tree.udf:awesome": {"MIN": 1.23}},
+                  "(( \"treemap_tree\".\"udfs\"->'awesome' )::float  >= 1.23)");
+    });
+
 });
