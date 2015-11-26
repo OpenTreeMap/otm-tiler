@@ -46,6 +46,10 @@ describe('filterObjectToWhere', function() {
         assertSql({"tree.id": {"IS": 1}}, '("treemap_tree"."id" = 1)');
     });
 
+    it('accepts plot as a valid model', function() {
+        assertSql({"plot.id": {"IS": 1}}, '("treemap_plot"."id" = 1)');
+    });
+
     it('accepts mapFeature as a valid model', function() {
         assertSql({"mapFeature.id": {"IS": 1}}, '("treemap_mapfeature"."id" = 1)');
     });
@@ -90,6 +94,18 @@ describe('filterObjectToWhere', function() {
         assertSql({"mapFeature.udf:Clever Name": {"LIKE": "Market St"}},
                   "(\"treemap_mapfeature\".\"udfs\"->'Clever Name' " +
                   "ILIKE '%Market St%')");
+    });
+
+    it('converts mf subclasses to mapfeature for scalar udf searches', function() {
+        assertSql({"plot.udf:Clever Name": {"LIKE": "Market St"}},
+                  "(\"treemap_mapfeature\".\"udfs\"->'Clever Name' " +
+                  "ILIKE '%Market St%')");
+        assertSql({"bioswale.udf:Clever Name": {"LIKE": "Market St"}},
+                  "(\"treemap_mapfeature\".\"udfs\"->'Clever Name' " +
+                  "ILIKE '%Market St%')");
+        assert.throws(function () {
+            filterObjectToWhere({"fool.udf:Clever Name": {"LIKE": "Market St"}});
+        }, Error);
     });
 
     // UDF COLLECTION MATCHES

@@ -28,6 +28,22 @@ module.exports = {
                 "depends": ["mapFeature"],
                 "sql": "LEFT OUTER JOIN stormwater_polygonalmapfeature ON stormwater_polygonalmapfeature.mapfeature_ptr_id = treemap_mapfeature.id"
             },
+            "plot": {
+                "depends": ["mapFeature"],
+                "sql": "JOIN treemap_plot ON treemap_mapfeature.id = treemap_plot.mapfeature_ptr_id"
+            },
+            "rainBarrel": {
+                "depends": ["mapFeature"],
+                "sql": "JOIN stormwater_rainbarrel ON treemap_mapfeature.id = stormwater_rainbarrel.mapfeature_ptr_id"
+            },
+            "rainGarden": {
+                "depends": ["mapFeature"],
+                "sql": "JOIN stormwater_raingarden ON treemap_mapfeature.id = stormwater_raingarden.mapfeature_ptr_id"
+            },
+            "bioswale": {
+                "depends": ["mapFeature"],
+                "sql": "JOIN stormwater_bioswale ON treemap_mapfeature.id = stormwater_bioswale.mapfeature_ptr_id"
+            },
             "tree": {
                 "depends": ["mapFeature"],
                 "sql": "LEFT OUTER JOIN treemap_tree ON treemap_mapfeature.id = treemap_tree.plot_id"
@@ -63,6 +79,10 @@ module.exports = {
         "mapFeature": "treemap_mapfeature",
         "polygonalMapFeature": "stormwater_polygonalmapfeature",
         "tree": "treemap_tree",
+        "plot": "treemap_plot",
+        "rainBarrel": "stormwater_rainbarrel",
+        "rainGarden": "stormwater_raingarden",
+        "bioswale": "stormwater_bioswale",
         "species": "treemap_species",
         "mapFeaturePhoto": "treemap_mapfeaturephoto",
         "udf": "treemap_userdefinedcollectionvalue"
