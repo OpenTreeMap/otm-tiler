@@ -86,7 +86,7 @@
               
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="hljs-pi">"use strict"</span>;
+            <div class="content"><div class='highlight'><pre><span class="hljs-meta">"use strict"</span>;
 
 <span class="hljs-built_in">module</span>.exports = {
     <span class="hljs-string">"filterQueryArgumentName"</span>: <span class="hljs-string">"q"</span>,
@@ -141,6 +141,22 @@ The “depends” property of each item should include any tables used in the �
             <span class="hljs-string">"polygonalMapFeature"</span>: {
                 <span class="hljs-string">"depends"</span>: [<span class="hljs-string">"mapFeature"</span>],
                 <span class="hljs-string">"sql"</span>: <span class="hljs-string">"LEFT OUTER JOIN stormwater_polygonalmapfeature ON stormwater_polygonalmapfeature.mapfeature_ptr_id = treemap_mapfeature.id"</span>
+            },
+            <span class="hljs-string">"plot"</span>: {
+                <span class="hljs-string">"depends"</span>: [<span class="hljs-string">"mapFeature"</span>],
+                <span class="hljs-string">"sql"</span>: <span class="hljs-string">"JOIN treemap_plot ON treemap_mapfeature.id = treemap_plot.mapfeature_ptr_id"</span>
+            },
+            <span class="hljs-string">"rainBarrel"</span>: {
+                <span class="hljs-string">"depends"</span>: [<span class="hljs-string">"mapFeature"</span>],
+                <span class="hljs-string">"sql"</span>: <span class="hljs-string">"JOIN stormwater_rainbarrel ON treemap_mapfeature.id = stormwater_rainbarrel.mapfeature_ptr_id"</span>
+            },
+            <span class="hljs-string">"rainGarden"</span>: {
+                <span class="hljs-string">"depends"</span>: [<span class="hljs-string">"mapFeature"</span>],
+                <span class="hljs-string">"sql"</span>: <span class="hljs-string">"JOIN stormwater_raingarden ON treemap_mapfeature.id = stormwater_raingarden.mapfeature_ptr_id"</span>
+            },
+            <span class="hljs-string">"bioswale"</span>: {
+                <span class="hljs-string">"depends"</span>: [<span class="hljs-string">"mapFeature"</span>],
+                <span class="hljs-string">"sql"</span>: <span class="hljs-string">"JOIN stormwater_bioswale ON treemap_mapfeature.id = stormwater_bioswale.mapfeature_ptr_id"</span>
             },
             <span class="hljs-string">"tree"</span>: {
                 <span class="hljs-string">"depends"</span>: [<span class="hljs-string">"mapFeature"</span>],
@@ -203,6 +219,10 @@ be used in the filter for udf and so it is required</p>
         <span class="hljs-string">"mapFeature"</span>: <span class="hljs-string">"treemap_mapfeature"</span>,
         <span class="hljs-string">"polygonalMapFeature"</span>: <span class="hljs-string">"stormwater_polygonalmapfeature"</span>,
         <span class="hljs-string">"tree"</span>: <span class="hljs-string">"treemap_tree"</span>,
+        <span class="hljs-string">"plot"</span>: <span class="hljs-string">"treemap_plot"</span>,
+        <span class="hljs-string">"rainBarrel"</span>: <span class="hljs-string">"stormwater_rainbarrel"</span>,
+        <span class="hljs-string">"rainGarden"</span>: <span class="hljs-string">"stormwater_raingarden"</span>,
+        <span class="hljs-string">"bioswale"</span>: <span class="hljs-string">"stormwater_bioswale"</span>,
         <span class="hljs-string">"species"</span>: <span class="hljs-string">"treemap_species"</span>,
         <span class="hljs-string">"mapFeaturePhoto"</span>: <span class="hljs-string">"treemap_mapfeaturephoto"</span>,
         <span class="hljs-string">"udf"</span>: <span class="hljs-string">"treemap_userdefinedcollectionvalue"</span>

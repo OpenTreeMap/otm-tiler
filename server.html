@@ -86,7 +86,7 @@
               
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="hljs-pi">"use strict"</span>;
+            <div class="content"><div class='highlight'><pre><span class="hljs-meta">"use strict"</span>;
 
 <span class="hljs-keyword">var</span> Windshaft = <span class="hljs-built_in">require</span>(<span class="hljs-string">'windshaft'</span>);
 <span class="hljs-keyword">var</span> _ = <span class="hljs-built_in">require</span>(<span class="hljs-string">'underscore'</span>);
@@ -139,6 +139,7 @@ e.g. a map tile or UTF grid with map features like tree plots or boundaries.</p>
 <span class="hljs-keyword">var</span> windshaftConfig = {
     useProfiler: <span class="hljs-literal">false</span>,  <span class="hljs-comment">// if true, returns X-Tiler-Profiler header with rendering times</span>
     enable_cors: <span class="hljs-literal">true</span>,
+    log_format: <span class="hljs-literal">null</span>,
     mapnik: {</pre></div></div>
             
         </li>
@@ -343,8 +344,6 @@ Note that we <em>always</em> overwrite req.query.sql above</p>
 
     afterTileRender: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">req, res, tile, headers, callback</span>) </span>{
         headers[<span class="hljs-string">'Cache-Control'</span>] = <span class="hljs-string">'max-age=2592000'</span>;
-        <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"HEADERS:"</span>);
-        <span class="hljs-built_in">console</span>.log(headers);
         callback(<span class="hljs-literal">null</span>, tile, headers);
     }
 };
