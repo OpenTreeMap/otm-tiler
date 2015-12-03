@@ -130,7 +130,8 @@ function accessHStore(hStoreColumn, accessor) {
 // to "physicalTableName"."column" for simple fieldNames. For udf scalar or collection
 // fieldNames, the fieldName is converted to "physicalTableName"."column"->"hStoreMember".
 function fieldNameToColumnName(fieldName) {
-    var model, column, customColumnName, tableName, modelAndColumn, udfCollectionData;
+    var concreteModel, model, column, customColumnName,
+        tableName, modelAndColumn, udfCollectionData;
 
     if (fieldName.indexOf('udf:') === 0) {
         udfCollectionData = utils.parseUdfCollectionFieldName(fieldName);
@@ -142,27 +143,31 @@ function fieldNameToColumnName(fieldName) {
 
         if (modelAndColumn.length != 2) {
             throw new Error('Field names in predicate objects ' +
-                            'should be of the form "model.field", not "' + fieldName + '"');
+                            'should be of the form "model.field", not "' +
+                            fieldName + '"');
         }
 
-        model = modelAndColumn[0];
+        concreteModel = modelAndColumn[0];
+
+        // The `modelMapping` dictionary is used to convert a short model name to a
+        // physical table name.
+        if (!config.modelMapping[concreteModel]) {
+            throw new Error('The model name must be one of the following: ' +
+                            Object.keys(config.modelMapping).join(', ') + '. Not ' + model);
+        }
+
         column = modelAndColumn[1];
         // udf columns are prefixed by 'udf:'
         if (column.indexOf('udf:') === 0) {
             column = accessHStore(config.scalar_udf_field, column.substring(4));
+            model = concreteModel === 'tree' ? 'tree' : 'mapFeature';
         } else {
             column = utils.sanitizeSqlString(modelAndColumn[1]);
             customColumnName = config.customDbFieldNames[column];
 
             column = customColumnName || column;
             column = '"' + column + '"';
-        }
-
-        // The `modelMapping` dictionary is used to convert a short model name to a
-        // physical table name.
-        if (!config.modelMapping[model]) {
-            throw new Error('The model name must be one of the following: ' +
-                            Object.keys(config.modelMapping).join(', ') + '. Not ' + model);
+            model = concreteModel;
         }
 
         tableName = config.modelMapping[model]; // model is not sanitized because there is a whitelist
@@ -277,13 +282,16 @@ function fieldNameAndPredicateToSql(fieldName, predicate) {
         if (f.sql_template) {
             return _.template(f.sql_template, { 'column': columnName });
         } else {
-            // if the column is an hstore field and the value is a
-            // datestring literal the hstore field must be converted
-            // from text to date before comparsion
-            if (columnName.indexOf('->') !== -1 && f.value.indexOf('(DATE') === 0) {
-                columnName = format(
-                    "to_date(%s::text, '%s')",
-                    columnName, utils.DATETIME_FORMATS.date);
+            if (columnName.indexOf('->') !== -1) {
+                // if the column is an hstore field and the value is a
+                // datestring literal the hstore field must be converted
+                // from text to date before comparsion
+                if (_.isString(f.value) && f.value.indexOf('(DATE') === 0) {
+                    columnName = format("to_date(%s::text, '%s')",
+                                        columnName, utils.DATETIME_FORMATS.date);
+                } else if (_.isNumber(f.value)) {
+                    columnName = format("( %s )::float ", columnName);
+                }
             }
             return columnName + ' ' + f.matcher + ' ' + f.value;
         }
@@ -294,10 +302,14 @@ function fieldNameAndPredicateToSql(fieldName, predicate) {
         var udfCollectionData = utils.parseUdfCollectionFieldName(fieldName);
         var model = udfCollectionData.modelName;
 
-        // Most collection UDFs relate to MapFeatures.  The odd duck is Tree Collection UDFs
-        var udfcTemplate = _.template(model === "tree" ? config.udfcTemplates.tree : config.udfcTemplates.mapFeature);
+        // Most collection UDFs relate to MapFeatures.  The odd duck
+        // is Tree Collection UDFs
+        var udfcTemplate = _.template(model === "tree" ?
+                                      config.udfcTemplates.tree :
+                                      config.udfcTemplates.mapFeature);
 
-        filterStatements.push(udfcTemplate({fieldDefId: udfCollectionData.fieldDefId}));
+        filterStatements.push(
+            udfcTemplate({fieldDefId: udfCollectionData.fieldDefId}));
     }
     return '(' + filterStatements.join(' AND ') + ')' ;
 }

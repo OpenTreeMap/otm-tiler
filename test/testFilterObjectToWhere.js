@@ -46,6 +46,10 @@ describe('filterObjectToWhere', function() {
         assertSql({"tree.id": {"IS": 1}}, '("treemap_tree"."id" = 1)');
     });
 
+    it('accepts plot as a valid model', function() {
+        assertSql({"plot.id": {"IS": 1}}, '("treemap_plot"."id" = 1)');
+    });
+
     it('accepts mapFeature as a valid model', function() {
         assertSql({"mapFeature.id": {"IS": 1}}, '("treemap_mapfeature"."id" = 1)');
     });
@@ -90,6 +94,18 @@ describe('filterObjectToWhere', function() {
         assertSql({"mapFeature.udf:Clever Name": {"LIKE": "Market St"}},
                   "(\"treemap_mapfeature\".\"udfs\"->'Clever Name' " +
                   "ILIKE '%Market St%')");
+    });
+
+    it('converts mf subclasses to mapfeature for scalar udf searches', function() {
+        assertSql({"plot.udf:Clever Name": {"LIKE": "Market St"}},
+                  "(\"treemap_mapfeature\".\"udfs\"->'Clever Name' " +
+                  "ILIKE '%Market St%')");
+        assertSql({"bioswale.udf:Clever Name": {"LIKE": "Market St"}},
+                  "(\"treemap_mapfeature\".\"udfs\"->'Clever Name' " +
+                  "ILIKE '%Market St%')");
+        assert.throws(function () {
+            filterObjectToWhere({"fool.udf:Clever Name": {"LIKE": "Market St"}});
+        }, Error);
     });
 
     // UDF COLLECTION MATCHES
@@ -311,6 +327,13 @@ describe('filterObjectToWhere', function() {
         assertSql({"tree.udf:Date": {"MIN": "2014-03-02 00:00:00"}},
                   "(to_date(\"treemap_tree\".\"udfs\"->'Date'::text, 'YYYY-MM-DD') " +
                   ">= (DATE '2014-03-02' + TIME '00:00:00'))");
+    });
+
+    it('casts hstore values to float for numerical hstore searches', function () {
+        assertSql({"tree.udf:awesome": {"MIN": 1}},
+                  "(( \"treemap_tree\".\"udfs\"->'awesome' )::float  >= 1)");
+        assertSql({"tree.udf:awesome": {"MIN": 1.23}},
+                  "(( \"treemap_tree\".\"udfs\"->'awesome' )::float  >= 1.23)");
     });
 
 });
