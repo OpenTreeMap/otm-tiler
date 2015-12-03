@@ -26,6 +26,10 @@ var styles = {
 
 var windshaftConfig = {
     useProfiler: false,  // if true, returns X-Tiler-Profiler header with rendering times
+    statsd: {
+        host: process.env.OTM_STATSD_HOST || '127.0.0.1',
+        port: process.env.OTM_STATSD_PORT || 8125
+    },
     enable_cors: true,
     log_format: null,
     mapnik: {
