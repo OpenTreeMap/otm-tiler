@@ -63,6 +63,9 @@ function makeSqlForMapFeatures(filterString, displayString, restrictFeatureStrin
         // Because some searches (e.g. on photos and udf's) join to other tables,
         // add DISTINCT so we only get one row.
         geom_field = 'DISTINCT(' + geom_field + ') AS ' + config.customDbFieldNames.geom;
+    } else if (showingPlotsAndTrees(displayFilters)) {
+        var showAtZoom = _.template(config.showAtZoomSql)({zoom: zoom});
+        where = addToWhere(showAtZoom);
     }
     if (displayClause) {
         where = addToWhere(displayClause);
@@ -88,6 +91,12 @@ function displayPlotsOnly(filterObject) {
     var isTreeFilterObject = function(s) {return s.substring(0, 4) === 'tree'; };
     var treeKeys = _.filter(utils.filterObjectKeys(filterObject), isTreeFilterObject);
     return treeKeys.length > 0;
+}
+
+function showingPlotsAndTrees(displayFilters) {
+    var isEmpty = (displayFilters === undefined || displayFilters === null),
+        hasPlotAndTree = _.contains(displayFilters, 'Plot') && _.contains(displayFilters, 'Tree');
+    return isEmpty || hasPlotAndTree;
 }
 
 // Create a SQL query to return info about boundaries.

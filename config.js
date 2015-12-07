@@ -71,6 +71,7 @@ module.exports = {
     "treeDisplayFilters": ["EmptyPlot", "Tree"],
     "boundaryGrainstoreSql": "(SELECT the_geom_webmercator FROM treemap_boundary JOIN treemap_instance_boundaries ON treemap_instance_boundaries.boundary_id = treemap_boundary.id WHERE treemap_instance_boundaries.instance_id=<%= instanceid %>) otmfiltersql",
     "getBoundarySql" : "SELECT the_geom_webmercator FROM treemap_boundary WHERE id=<%= boundaryId %>",
+    "showAtZoomSql": "(treemap_mapfeature.hide_at_zoom IS NULL OR treemap_mapfeature.hide_at_zoom < <%= zoom %>)",
     "customDbFieldNames": {
         "geom": "the_geom_webmercator"
     },
