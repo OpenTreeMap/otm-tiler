@@ -112,6 +112,19 @@ describe('makeSql', function() {
         });
     });
 
+    it('adds DISTINCT when filter string passed', function () {
+        assertSqlContains({
+            filter: filterString,
+            expected: 'DISTINCT'
+        });
+    });
+
+    it('omits DISTINCT when no filter string passed', function () {
+        assertSqlLacks({
+            expected: 'DISTINCT'
+        });
+    });
+
     it('has instance ID when one is passed', function() {
         assertSqlContains({
             instanceId: 2345,

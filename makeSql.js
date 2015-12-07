@@ -60,6 +60,9 @@ function makeSqlForMapFeatures(filterString, displayString, restrictFeatureStrin
 
     if (filterClause) {
         where = filterClause;
+        // Because some searches (e.g. on photos and udf's) join to other tables,
+        // add DISTINCT so we only get one row.
+        geom_field = 'DISTINCT(' + geom_field + ') AS ' + config.customDbFieldNames.geom;
     }
     if (displayClause) {
         where = addToWhere(displayClause);
@@ -69,9 +72,6 @@ function makeSqlForMapFeatures(filterString, displayString, restrictFeatureStrin
     }
     if (where) {
         where = 'WHERE ' + where;
-        // Because some searches (e.g. on photos and udf's) join to other tables,
-        // add DISTINCT so we only get one row.
-        geom_field = 'DISTINCT(' + geom_field + ') AS ' + config.customDbFieldNames.geom;
     }
     return _.template(
         '( SELECT <%= fields %> FROM <%= tables %> <%= where %> ) otmfiltersql '
