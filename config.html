@@ -211,6 +211,7 @@ be used in the filter for udf and so it is required</p>
     <span class="hljs-string">"treeDisplayFilters"</span>: [<span class="hljs-string">"EmptyPlot"</span>, <span class="hljs-string">"Tree"</span>],
     <span class="hljs-string">"boundaryGrainstoreSql"</span>: <span class="hljs-string">"(SELECT the_geom_webmercator FROM treemap_boundary JOIN treemap_instance_boundaries ON treemap_instance_boundaries.boundary_id = treemap_boundary.id WHERE treemap_instance_boundaries.instance_id=&lt;%= instanceid %&gt;) otmfiltersql"</span>,
     <span class="hljs-string">"getBoundarySql"</span> : <span class="hljs-string">"SELECT the_geom_webmercator FROM treemap_boundary WHERE id=&lt;%= boundaryId %&gt;"</span>,
+    <span class="hljs-string">"showAtZoomSql"</span>: <span class="hljs-string">"(treemap_mapfeature.hide_at_zoom IS NULL OR treemap_mapfeature.hide_at_zoom &lt; &lt;%= zoom %&gt;)"</span>,
     <span class="hljs-string">"customDbFieldNames"</span>: {
         <span class="hljs-string">"geom"</span>: <span class="hljs-string">"the_geom_webmercator"</span>
     },

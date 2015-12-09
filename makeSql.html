@@ -194,16 +194,7 @@ directly into SQL</p>
     }
 
     <span class="hljs-keyword">if</span> (filterClause) {
-        where = filterClause;
-    }
-    <span class="hljs-keyword">if</span> (displayClause) {
-        where = addToWhere(displayClause);
-    }
-    <span class="hljs-keyword">if</span> (instanceClause) {
-        where = addToWhere(instanceClause);
-    }
-    <span class="hljs-keyword">if</span> (where) {
-        where = <span class="hljs-string">'WHERE '</span> + where;</pre></div></div>
+        where = filterClause;</pre></div></div>
             
         </li>
         
@@ -220,6 +211,18 @@ add DISTINCT so we only get one row.</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>        geom_field = <span class="hljs-string">'DISTINCT('</span> + geom_field + <span class="hljs-string">') AS '</span> + config.customDbFieldNames.geom;
+    } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (showingPlotsAndTrees(displayFilters)) {
+        <span class="hljs-keyword">var</span> showAtZoom = _.template(config.showAtZoomSql)({zoom: zoom});
+        where = addToWhere(showAtZoom);
+    }
+    <span class="hljs-keyword">if</span> (displayClause) {
+        where = addToWhere(displayClause);
+    }
+    <span class="hljs-keyword">if</span> (instanceClause) {
+        where = addToWhere(instanceClause);
+    }
+    <span class="hljs-keyword">if</span> (where) {
+        where = <span class="hljs-string">'WHERE '</span> + where;
     }
     <span class="hljs-keyword">return</span> _.template(
         <span class="hljs-string">'( SELECT &lt;%= fields %&gt; FROM &lt;%= tables %&gt; &lt;%= where %&gt; ) otmfiltersql '</span>
@@ -248,6 +251,12 @@ display filters to only tree display filters.</p>
     <span class="hljs-keyword">var</span> isTreeFilterObject = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">s</span>) </span>{<span class="hljs-keyword">return</span> s.substring(<span class="hljs-number">0</span>, <span class="hljs-number">4</span>) === <span class="hljs-string">'tree'</span>; };
     <span class="hljs-keyword">var</span> treeKeys = _.filter(utils.filterObjectKeys(filterObject), isTreeFilterObject);
     <span class="hljs-keyword">return</span> treeKeys.length &gt; <span class="hljs-number">0</span>;
+}
+
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">showingPlotsAndTrees</span>(<span class="hljs-params">displayFilters</span>) </span>{
+    <span class="hljs-keyword">var</span> isEmpty = (displayFilters === <span class="hljs-literal">undefined</span> || displayFilters === <span class="hljs-literal">null</span>),
+        hasPlotAndTree = _.contains(displayFilters, <span class="hljs-string">'Plot'</span>) &amp;&amp; _.contains(displayFilters, <span class="hljs-string">'Tree'</span>);
+    <span class="hljs-keyword">return</span> isEmpty || hasPlotAndTree;
 }</pre></div></div>
             
         </li>
