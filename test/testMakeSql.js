@@ -112,6 +112,46 @@ describe('makeSql', function() {
         });
     });
 
+    it('adds DISTINCT when filter string passed', function () {
+        assertSqlContains({
+            filter: filterString,
+            expected: 'DISTINCT'
+        });
+    });
+
+    it('omits DISTINCT when no filter string passed', function () {
+        assertSqlLacks({
+            expected: 'DISTINCT'
+        });
+    });
+
+    it('uses hide_at_zoom when no display filter passed', function () {
+        assertSqlContains({
+            expected: 'hide_at_zoom'
+        });
+    });
+
+    it('uses hide_at_zoom when display filter contains "Plot" and "Tree"', function () {
+        assertSqlContains({
+            displayFilter: '["Plot", "Tree"]',
+            expected: 'hide_at_zoom'
+        });
+    });
+
+    it('omits hide_at_zoom when display doesnt contain "Plot" and "Tree"', function () {
+        assertSqlLacks({
+            displayFilter: '["Plot", "RainGarden"]',
+            expected: 'hide_at_zoom'
+        });
+    });
+
+    it('omits hide_at_zoom when filter string passed"', function () {
+        assertSqlLacks({
+            filter: filterString,
+            expected: 'hide_at_zoom'
+        });
+    });
+
     it('has instance ID when one is passed', function() {
         assertSqlContains({
             instanceId: 2345,
