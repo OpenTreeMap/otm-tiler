@@ -67,8 +67,11 @@ var windshaftConfig = {
     }, // See grainstore npm for other options
 
     // Parse params from the request URL
-    base_url: '/:cache_buster/table/:table',
-    base_url_notable: '/:cache_buster/table',
+    // The parameter after database is unused, but left in for legacy reasons
+    // so that older versions of the mobile apps will be able to continue to
+    // make tile requests
+    base_url: '/:cache_buster/database/:unused/table/:table',
+    base_url_notable: '/:cache_buster/database/:unused/table',
 
     // Tell server how to handle HTTP request 'req' (by specifying properties in req.params).
     req2params: function(req, callback) {
