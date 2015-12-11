@@ -225,12 +225,15 @@ each metatile multiple times, making things slower rather than faster.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-7">&#182;</a>
               </div>
-              <p>Parse params from the request URL</p>
+              <p>Parse params from the request URL
+The parameter after database is unused, but left in for legacy reasons
+so that older versions of the mobile apps will be able to continue to
+make tile requests</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    base_url: <span class="hljs-string">'/:cache_buster/table/:table'</span>,
-    base_url_notable: <span class="hljs-string">'/:cache_buster/table'</span>,</pre></div></div>
+            <div class="content"><div class='highlight'><pre>    base_url: <span class="hljs-string">'/:cache_buster/database/:unused/table/:table'</span>,
+    base_url_notable: <span class="hljs-string">'/:cache_buster/database/:unused/table'</span>,</pre></div></div>
             
         </li>
         
