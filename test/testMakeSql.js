@@ -199,7 +199,7 @@ describe('makeSql', function() {
                 'WHERE ( (("treemap_tree"."id" IS NOT NULL) AND ("treemap_mapfeature"."feature_type" = \'Plot\')) ) ' +
                 'AND (("treemap_tree"."diameter" >= 1 ' +
                 'AND "treemap_tree"."diameter" <= 100) ' +
-                'AND (("treemap_userdefinedcollectionvalue"."data"->\'Status\' = \'Unresolved\' ' +
+                'AND ((("treemap_userdefinedcollectionvalue"."data"::hstore->\'Status\') = \'Unresolved\' ' +
                 'AND treemap_userdefinedcollectionvalue.field_definition_id=198 ' +
                 'AND treemap_userdefinedcollectionvalue.model_id=treemap_tree.id))) ) otmfiltersql '
         });

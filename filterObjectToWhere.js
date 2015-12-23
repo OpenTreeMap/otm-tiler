@@ -117,7 +117,7 @@ function transformWithinRadiusPredicate(predicateValue) {
 // accessHStore('grab_bag', 'is_valid') -> "grab_bag"->'is_valid'
 function accessHStore(hStoreColumn, accessor) {
     // TODO: sql injection? why don't we call sanitize?
-    var t = _.template('"<%= hStoreColumn %>"->\'<%= accessor %>\'');
+    var t = _.template('"<%= hStoreColumn %>"::hstore->\'<%= accessor %>\'');
     return t({hStoreColumn: hStoreColumn,
               accessor: accessor.replace("'","''")});
 }
@@ -291,6 +291,8 @@ function fieldNameAndPredicateToSql(fieldName, predicate) {
                                         columnName, utils.DATETIME_FORMATS.date);
                 } else if (_.isNumber(f.value)) {
                     columnName = format("( %s )::float ", columnName);
+                } else {
+                    columnName = format("(%s)", columnName);
                 }
             }
             return columnName + ' ' + f.matcher + ' ' + f.value;
