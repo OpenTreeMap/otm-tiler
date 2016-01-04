@@ -25,6 +25,8 @@
 
 var _ = require('underscore');
 
+var util = require('util');
+
 var filterObjectToWhere = require('./filterObjectToWhere');
 var displayFiltersToWhere = require('./displayFiltersToWhere');
 var filtersToTables = require('./filtersToTables');
@@ -62,7 +64,7 @@ function makeSqlForMapFeatures(filterString, displayString, restrictFeatureStrin
         where = filterClause;
         // Because some searches (e.g. on photos and udf's) join to other tables,
         // add DISTINCT so we only get one row.
-        geom_field = 'DISTINCT(' + geom_field + ') AS ' + config.customDbFieldNames.geom;
+        geom_field = util.format('DISTINCT(%s)', geom_field);
     } else if (showingPlotsAndTrees(displayFilters)) {
         var showAtZoom = _.template(config.showAtZoomSql)({zoom: zoom});
         where = addToWhere(showAtZoom);
@@ -76,6 +78,9 @@ function makeSqlForMapFeatures(filterString, displayString, restrictFeatureStrin
     if (where) {
         where = 'WHERE ' + where;
     }
+
+    geom_field = util.format("%s AS %s",
+                             geom_field, config.customDbFieldNames.geom);
     return _.template(
         '( SELECT <%= fields %> FROM <%= tables %> <%= where %> ) otmfiltersql '
     )({
