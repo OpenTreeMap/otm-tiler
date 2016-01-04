@@ -149,6 +149,8 @@ That particularly hurts in production where we have just one DB server and four 
             <div class="content"><div class='highlight'><pre>
 <span class="hljs-keyword">var</span> _ = <span class="hljs-built_in">require</span>(<span class="hljs-string">'underscore'</span>);
 
+<span class="hljs-keyword">var</span> util = <span class="hljs-built_in">require</span>(<span class="hljs-string">'util'</span>);
+
 <span class="hljs-keyword">var</span> filterObjectToWhere = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./filterObjectToWhere'</span>);
 <span class="hljs-keyword">var</span> displayFiltersToWhere = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./displayFiltersToWhere'</span>);
 <span class="hljs-keyword">var</span> filtersToTables = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./filtersToTables'</span>);
@@ -210,7 +212,7 @@ add DISTINCT so we only get one row.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        geom_field = <span class="hljs-string">'DISTINCT('</span> + geom_field + <span class="hljs-string">') AS '</span> + config.customDbFieldNames.geom;
+            <div class="content"><div class='highlight'><pre>        geom_field = util.format(<span class="hljs-string">'DISTINCT(%s)'</span>, geom_field);
     } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (showingPlotsAndTrees(displayFilters)) {
         <span class="hljs-keyword">var</span> showAtZoom = _.template(config.showAtZoomSql)({zoom: zoom});
         where = addToWhere(showAtZoom);
@@ -224,6 +226,9 @@ add DISTINCT so we only get one row.</p>
     <span class="hljs-keyword">if</span> (where) {
         where = <span class="hljs-string">'WHERE '</span> + where;
     }
+
+    geom_field = util.format(<span class="hljs-string">"%s AS %s"</span>,
+                             geom_field, config.customDbFieldNames.geom);
     <span class="hljs-keyword">return</span> _.template(
         <span class="hljs-string">'( SELECT &lt;%= fields %&gt; FROM &lt;%= tables %&gt; &lt;%= where %&gt; ) otmfiltersql '</span>
     )({
