@@ -38,11 +38,11 @@ module.exports = {
             },
             "rainGarden": {
                 "depends": ["mapFeature"],
-                "sql": "JOIN stormwater_raingarden ON treemap_mapfeature.id = stormwater_raingarden.mapfeature_ptr_id"
+                "sql": "JOIN stormwater_raingarden ON treemap_mapfeature.id = stormwater_raingarden.polygonalmapfeature_ptr_id"
             },
             "bioswale": {
                 "depends": ["mapFeature"],
-                "sql": "JOIN stormwater_bioswale ON treemap_mapfeature.id = stormwater_bioswale.mapfeature_ptr_id"
+                "sql": "JOIN stormwater_bioswale ON treemap_mapfeature.id = stormwater_bioswale.polygonalmapfeature_ptr_id"
             },
             "tree": {
                 "depends": ["mapFeature"],
