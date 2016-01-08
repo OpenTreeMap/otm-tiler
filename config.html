@@ -152,11 +152,11 @@ The “depends” property of each item should include any tables used in the �
             },
             <span class="hljs-string">"rainGarden"</span>: {
                 <span class="hljs-string">"depends"</span>: [<span class="hljs-string">"mapFeature"</span>],
-                <span class="hljs-string">"sql"</span>: <span class="hljs-string">"JOIN stormwater_raingarden ON treemap_mapfeature.id = stormwater_raingarden.mapfeature_ptr_id"</span>
+                <span class="hljs-string">"sql"</span>: <span class="hljs-string">"JOIN stormwater_raingarden ON treemap_mapfeature.id = stormwater_raingarden.polygonalmapfeature_ptr_id"</span>
             },
             <span class="hljs-string">"bioswale"</span>: {
                 <span class="hljs-string">"depends"</span>: [<span class="hljs-string">"mapFeature"</span>],
-                <span class="hljs-string">"sql"</span>: <span class="hljs-string">"JOIN stormwater_bioswale ON treemap_mapfeature.id = stormwater_bioswale.mapfeature_ptr_id"</span>
+                <span class="hljs-string">"sql"</span>: <span class="hljs-string">"JOIN stormwater_bioswale ON treemap_mapfeature.id = stormwater_bioswale.polygonalmapfeature_ptr_id"</span>
             },
             <span class="hljs-string">"tree"</span>: {
                 <span class="hljs-string">"depends"</span>: [<span class="hljs-string">"mapFeature"</span>],

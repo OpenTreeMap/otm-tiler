@@ -344,7 +344,7 @@ accessHStore(‘grab_bag’, ‘is_valid’) -&gt; “grab_bag”-&gt;’is_vali
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">var</span> t = _.template(<span class="hljs-string">'"&lt;%= hStoreColumn %&gt;"-&gt;\'&lt;%= accessor %&gt;\''</span>);
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">var</span> t = _.template(<span class="hljs-string">'"&lt;%= hStoreColumn %&gt;"::hstore-&gt;\'&lt;%= accessor %&gt;\''</span>);
     <span class="hljs-keyword">return</span> t({hStoreColumn: hStoreColumn,
               accessor: accessor.replace(<span class="hljs-string">"'"</span>,<span class="hljs-string">"''"</span>)});
 }</pre></div></div>
@@ -711,6 +711,8 @@ from text to date before comparsion</p>
                                         columnName, utils.DATETIME_FORMATS.date);
                 } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (_.isNumber(f.value)) {
                     columnName = format(<span class="hljs-string">"( %s )::float "</span>, columnName);
+                } <span class="hljs-keyword">else</span> {
+                    columnName = format(<span class="hljs-string">"(%s)"</span>, columnName);
                 }
             }
             <span class="hljs-keyword">return</span> columnName + <span class="hljs-string">' '</span> + f.matcher + <span class="hljs-string">' '</span> + f.value;
