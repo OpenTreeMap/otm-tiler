@@ -92,16 +92,16 @@ describe('filterObjectToWhere', function() {
     // UDF MATCHES
     it('processes udf values', function() {
         assertSql({"mapFeature.udf:Clever Name": {"LIKE": "Market St"}},
-                  "(\"treemap_mapfeature\".\"udfs\"->'Clever Name' " +
+                  "((\"treemap_mapfeature\".\"udfs\"::hstore->'Clever Name') " +
                   "ILIKE '%Market St%')");
     });
 
     it('converts mf subclasses to mapfeature for scalar udf searches', function() {
         assertSql({"plot.udf:Clever Name": {"LIKE": "Market St"}},
-                  "(\"treemap_mapfeature\".\"udfs\"->'Clever Name' " +
+                  "((\"treemap_mapfeature\".\"udfs\"::hstore->'Clever Name') " +
                   "ILIKE '%Market St%')");
         assertSql({"bioswale.udf:Clever Name": {"LIKE": "Market St"}},
-                  "(\"treemap_mapfeature\".\"udfs\"->'Clever Name' " +
+                  "((\"treemap_mapfeature\".\"udfs\"::hstore->'Clever Name') " +
                   "ILIKE '%Market St%')");
         assert.throws(function () {
             filterObjectToWhere({"fool.udf:Clever Name": {"LIKE": "Market St"}});
@@ -111,17 +111,17 @@ describe('filterObjectToWhere', function() {
     // UDF COLLECTION MATCHES
     it('processes udf values, includes JOIN criteria in WHERE clause', function() {
         assertSql({"udf:tree:18.Action": {"LIKE": "Watering"}},
-                  "(\"treemap_userdefinedcollectionvalue\".\"data\"->'Action' ILIKE '%Watering%'" +
+                  "((\"treemap_userdefinedcollectionvalue\".\"data\"::hstore->'Action') ILIKE '%Watering%'" +
                   " AND treemap_userdefinedcollectionvalue.field_definition_id=18" +
                   " AND treemap_userdefinedcollectionvalue.model_id=treemap_tree.id)");
     });
 
     it('processes allows multiple UDF collections to be searched', function() {
         assertSql({"udf:tree:18.Action": {"LIKE": "Watering"}, "udf:plot:17.Action": {"LIKE": "Destroying"}},
-                  "(\"treemap_userdefinedcollectionvalue\".\"data\"->'Action' ILIKE '%Watering%'" +
+                  "((\"treemap_userdefinedcollectionvalue\".\"data\"::hstore->'Action') ILIKE '%Watering%'" +
                   " AND treemap_userdefinedcollectionvalue.field_definition_id=18" +
                   " AND treemap_userdefinedcollectionvalue.model_id=treemap_tree.id)" +
-                  " AND (\"treemap_userdefinedcollectionvalue\".\"data\"->'Action' ILIKE '%Destroying%'" +
+                  " AND ((\"treemap_userdefinedcollectionvalue\".\"data\"::hstore->'Action') ILIKE '%Destroying%'" +
                   " AND treemap_userdefinedcollectionvalue.field_definition_id=17" +
                   " AND treemap_userdefinedcollectionvalue.model_id=treemap_mapfeature.id)");
     });
@@ -325,15 +325,15 @@ describe('filterObjectToWhere', function() {
 
     it('converts hstore date fields from string to postgres date without timezone', function () {
         assertSql({"tree.udf:Date": {"MIN": "2014-03-02 00:00:00"}},
-                  "(to_date(\"treemap_tree\".\"udfs\"->'Date'::text, 'YYYY-MM-DD') " +
+                  "(to_date(\"treemap_tree\".\"udfs\"::hstore->'Date'::text, 'YYYY-MM-DD') " +
                   ">= (DATE '2014-03-02' + TIME '00:00:00'))");
     });
 
     it('casts hstore values to float for numerical hstore searches', function () {
         assertSql({"tree.udf:awesome": {"MIN": 1}},
-                  "(( \"treemap_tree\".\"udfs\"->'awesome' )::float  >= 1)");
+                  "(( \"treemap_tree\".\"udfs\"::hstore->'awesome' )::float  >= 1)");
         assertSql({"tree.udf:awesome": {"MIN": 1.23}},
-                  "(( \"treemap_tree\".\"udfs\"->'awesome' )::float  >= 1.23)");
+                  "(( \"treemap_tree\".\"udfs\"::hstore->'awesome' )::float  >= 1.23)");
     });
 
 });
