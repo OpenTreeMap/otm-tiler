@@ -9,7 +9,11 @@ module.exports = function(filterObject, zoom, isPolygonRequest) {
 
     if (zoom >= 15 && !isPolygonRequest) {
         var defaults = {'polygonalMapFeature.polygon': {'ISNULL': true}};
-        return _.extend({}, defaults, filterObject);
+        if (_.isArray(filterObject)) {
+            return ['AND', defaults, filterObject];
+        } else {
+            return _.extend({}, defaults, filterObject);
+        }
     }
 
     return filterObject;

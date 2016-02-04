@@ -204,4 +204,23 @@ describe('makeSql', function() {
                 'AND treemap_userdefinedcollectionvalue.model_id=treemap_tree.id))) ) otmfiltersql '
         });
     });
+
+    it('supports array syntax for non-polygon searches above zoom 14', function() {
+        assertSqlEqual({
+            zoom: 18,
+            isPolygonRequest: false,
+            displayFilter: '["Tree"]',
+            filter: '["AND",{"tree.diameter":{"MIN":1,"MAX":100}}]',
+            expected: '( SELECT DISTINCT(the_geom_webmercator) AS the_geom_webmercator, ' +
+                'feature_type FROM treemap_mapfeature LEFT OUTER JOIN ' +
+                'stormwater_polygonalmapfeature ON ' +
+                'stormwater_polygonalmapfeature.mapfeature_ptr_id = treemap_mapfeature.id ' +
+                'LEFT OUTER JOIN treemap_tree ON treemap_mapfeature.id = treemap_tree.plot_id ' +
+                'WHERE ( (("treemap_tree"."id" IS NOT NULL) ' +
+                'AND ("treemap_mapfeature"."feature_type" = \'Plot\')) ) ' +
+                'AND (("stormwater_polygonalmapfeature"."polygon" IS NULL) ' +
+                'AND (("treemap_tree"."diameter" >= 1 ' +
+                'AND "treemap_tree"."diameter" <= 100))) ) otmfiltersql '
+        });
+    });
 });
