@@ -110,7 +110,11 @@ points, since we will be showing the polygon itself instead.</p>
             <div class="content"><div class='highlight'><pre>
     <span class="hljs-keyword">if</span> (zoom &gt;= <span class="hljs-number">15</span> &amp;&amp; !isPolygonRequest) {
         <span class="hljs-keyword">var</span> defaults = {<span class="hljs-string">'polygonalMapFeature.polygon'</span>: {<span class="hljs-string">'ISNULL'</span>: <span class="hljs-literal">true</span>}};
-        <span class="hljs-keyword">return</span> _.extend({}, defaults, filterObject);
+        <span class="hljs-keyword">if</span> (_.isArray(filterObject)) {
+            <span class="hljs-keyword">return</span> [<span class="hljs-string">'AND'</span>, defaults, filterObject];
+        } <span class="hljs-keyword">else</span> {
+            <span class="hljs-keyword">return</span> _.extend({}, defaults, filterObject);
+        }
     }
 
     <span class="hljs-keyword">return</span> filterObject;
