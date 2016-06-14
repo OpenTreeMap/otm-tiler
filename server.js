@@ -17,9 +17,17 @@ var ws;
 
 var styles = {
     boundary: fs.readFileSync('style/boundary.mms', {encoding: 'utf-8'}),
+    canopy: fs.readFileSync('style/canopy.mms', {encoding: 'utf-8'}),
     mapFeature: fs.readFileSync('style/mapFeature.mms', {encoding: 'utf-8'}),
     polygonalMapFeature: fs.readFileSync('style/polygonalMapFeature.mms', {encoding: 'utf-8'})
 };
+
+function parseBoundaryCategory(category) {
+    if (/^[A-Za-z0-9 ]+$/.test(category)) {
+        return category;
+    }
+    return undefined;
+}
 
 // Configure the Windshaft tile server to handle OTM's HTTP requests, which retrieve
 // e.g. a map tile or UTF grid with map features like tree plots or boundaries.
@@ -103,6 +111,24 @@ var windshaftConfig = {
             } else if (table === 'treemap_boundary' && instanceid) {
                 req.query.sql = makeSql.makeSqlForBoundaries(instanceid);
                 req.params.style = styles.boundary;
+            } else if (table === 'treemap_canopy_boundary' && instanceid) {
+                var canopyMin = parseFloat(req.query.canopyMin),
+                    canopyMax = parseFloat(req.query.canopyMax),
+                    category = parseBoundaryCategory(req.query.category);
+
+                if (!category) {
+                    throw new Error('Invalid argument: category');
+                }
+                if (isNaN(canopyMin) || !isFinite(canopyMin)) {
+                    throw new Error('Invalid argument: canopyMin');
+                }
+                if (isNaN(canopyMax) || !isFinite(canopyMax)) {
+                    throw new Error('Invalid argument: canopyMax');
+                }
+
+                req.query.sql = makeSql.makeSqlForCanopyBoundaries(instanceid,
+                        canopyMin, canopyMax, category);
+                req.params.style = styles.canopy;
             }
         } catch (err) {
             if (rollbarAccessToken) {

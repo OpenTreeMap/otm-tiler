@@ -1,5 +1,23 @@
 "use strict";
 
+var canopyBoundarySql = [
+    "(SELECT the_geom_webmercator",
+    ", canopy_percent * 100 as percent",
+    ", FORMAT('%s (%s%%)',",
+    // Remove parent boundary name suffix.
+    // Ex. Pittsburgh (Allegheny) -> Pittsburgh
+    "    SPLIT_PART(name, ' (', 1),",
+    "    ROUND(CAST(canopy_percent * 100 AS numeric), 1)) as label",
+    " FROM treemap_boundary AS b",
+    " INNER JOIN treemap_instance_boundaries AS ib ON ib.boundary_id = b.id",
+    " WHERE ib.instance_id = <%= instanceid %>",
+    " AND b.category = '<%= category %>'",
+    " AND b.canopy_percent IS NOT NULL",
+    " AND b.canopy_percent >= <%= canopy_min %>",
+    " AND b.canopy_percent <= <%= canopy_max %>",
+    ") otmfiltersql"
+].join('');
+
 module.exports = {
     "filterQueryArgumentName": "q",
     "displayQueryArgumentName": "show",
@@ -71,6 +89,7 @@ module.exports = {
     "treeDisplayFilters": ["EmptyPlot", "Tree"],
     "boundaryGrainstoreSql": "(SELECT the_geom_webmercator FROM treemap_boundary JOIN treemap_instance_boundaries ON treemap_instance_boundaries.boundary_id = treemap_boundary.id WHERE treemap_instance_boundaries.instance_id=<%= instanceid %> AND treemap_boundary.searchable=true) otmfiltersql",
     "getBoundarySql" : "SELECT the_geom_webmercator FROM treemap_boundary WHERE id=<%= boundaryId %>",
+    "canopyBoundarySql": canopyBoundarySql,
     "showAtZoomSql": "(treemap_mapfeature.hide_at_zoom IS NULL OR treemap_mapfeature.hide_at_zoom < <%= zoom %>)",
     "customDbFieldNames": {
         "geom": "the_geom_webmercator"
