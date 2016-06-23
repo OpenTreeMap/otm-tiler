@@ -88,10 +88,10 @@
             
             <div class="content"><div class='highlight'><pre><span class="hljs-meta">"use strict"</span>;
 
-<span class="hljs-built_in">module</span>.exports = {
-    <span class="hljs-string">"filterQueryArgumentName"</span>: <span class="hljs-string">"q"</span>,
-    <span class="hljs-string">"displayQueryArgumentName"</span>: <span class="hljs-string">"show"</span>,
-    <span class="hljs-string">"restrictFeatureQueryArgumentName"</span>: <span class="hljs-string">"restrict"</span>,</pre></div></div>
+<span class="hljs-keyword">var</span> canopyBoundarySql = [
+    <span class="hljs-string">"(SELECT the_geom_webmercator"</span>,
+    <span class="hljs-string">", canopy_percent * 100 as percent"</span>,
+    <span class="hljs-string">", FORMAT('%s (%s%%)',"</span>,</pre></div></div>
             
         </li>
         
@@ -101,6 +101,37 @@
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p>Remove parent boundary name suffix.
+Ex. Pittsburgh (Allegheny) -&gt; Pittsburgh</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-string">"    SPLIT_PART(name, ' (', 1),"</span>,
+    <span class="hljs-string">"    ROUND(CAST(canopy_percent * 100 AS numeric), 1)) as label"</span>,
+    <span class="hljs-string">" FROM treemap_boundary AS b"</span>,
+    <span class="hljs-string">" INNER JOIN treemap_instance_boundaries AS ib ON ib.boundary_id = b.id"</span>,
+    <span class="hljs-string">" WHERE ib.instance_id = &lt;%= instanceid %&gt;"</span>,
+    <span class="hljs-string">" AND b.category = '&lt;%= category %&gt;'"</span>,
+    <span class="hljs-string">" AND b.canopy_percent IS NOT NULL"</span>,
+    <span class="hljs-string">" AND b.canopy_percent &gt;= &lt;%= canopy_min %&gt;"</span>,
+    <span class="hljs-string">" AND b.canopy_percent &lt;= &lt;%= canopy_max %&gt;"</span>,
+    <span class="hljs-string">") otmfiltersql"</span>
+].join(<span class="hljs-string">''</span>);
+
+<span class="hljs-built_in">module</span>.exports = {
+    <span class="hljs-string">"filterQueryArgumentName"</span>: <span class="hljs-string">"q"</span>,
+    <span class="hljs-string">"displayQueryArgumentName"</span>: <span class="hljs-string">"show"</span>,
+    <span class="hljs-string">"restrictFeatureQueryArgumentName"</span>: <span class="hljs-string">"restrict"</span>,</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
               </div>
               <p>This is the column name of the hstore column used for scalar udfs</p>
 
@@ -122,11 +153,11 @@
         </li>
         
         
-        <li id="section-3">
+        <li id="section-4">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-3">&#182;</a>
+                <a class="pilcrow" href="#section-4">&#182;</a>
               </div>
               <p>The tables object gets walked by filtersToTables to build the FROM and JOIN clauses of the SQL string.
 The “depends” property of each item should include any tables used in the “sql” property to JOIN to that table</p>
@@ -175,11 +206,11 @@ The “depends” property of each item should include any tables used in the �
         </li>
         
         
-        <li id="section-4">
+        <li id="section-5">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-4">&#182;</a>
+                <a class="pilcrow" href="#section-5">&#182;</a>
               </div>
               <p>Despite mapFeature not being referenced in the “sql” property it will
 be used in the filter for udf and so it is required</p>
@@ -191,11 +222,11 @@ be used in the filter for udf and so it is required</p>
         </li>
         
         
-        <li id="section-5">
+        <li id="section-6">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-5">&#182;</a>
+                <a class="pilcrow" href="#section-6">&#182;</a>
               </div>
               <p>udf uses a CROSS JOIN, but in filterObjectToWhere a restrictive WHERE clause is added</p>
 
@@ -211,6 +242,7 @@ be used in the filter for udf and so it is required</p>
     <span class="hljs-string">"treeDisplayFilters"</span>: [<span class="hljs-string">"EmptyPlot"</span>, <span class="hljs-string">"Tree"</span>],
     <span class="hljs-string">"boundaryGrainstoreSql"</span>: <span class="hljs-string">"(SELECT the_geom_webmercator FROM treemap_boundary JOIN treemap_instance_boundaries ON treemap_instance_boundaries.boundary_id = treemap_boundary.id WHERE treemap_instance_boundaries.instance_id=&lt;%= instanceid %&gt; AND treemap_boundary.searchable=true) otmfiltersql"</span>,
     <span class="hljs-string">"getBoundarySql"</span> : <span class="hljs-string">"SELECT the_geom_webmercator FROM treemap_boundary WHERE id=&lt;%= boundaryId %&gt;"</span>,
+    <span class="hljs-string">"canopyBoundarySql"</span>: canopyBoundarySql,
     <span class="hljs-string">"showAtZoomSql"</span>: <span class="hljs-string">"(treemap_mapfeature.hide_at_zoom IS NULL OR treemap_mapfeature.hide_at_zoom &lt; &lt;%= zoom %&gt;)"</span>,
     <span class="hljs-string">"customDbFieldNames"</span>: {
         <span class="hljs-string">"geom"</span>: <span class="hljs-string">"the_geom_webmercator"</span>

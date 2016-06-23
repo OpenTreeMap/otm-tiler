@@ -280,11 +280,23 @@ directly into SQL</p>
             </div>
             
             <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">makeSqlForBoundaries</span>(<span class="hljs-params">instanceid</span>) </span>{
-    <span class="hljs-keyword">return</span> _.template(config.boundaryGrainstoreSql) ({instanceid: instanceid});
+    <span class="hljs-keyword">return</span> _.template(config.boundaryGrainstoreSql)({
+        instanceid: instanceid
+    });
+}
+
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">makeSqlForCanopyBoundaries</span>(<span class="hljs-params">instanceid, canopy_min, canopy_max, category</span>) </span>{
+    <span class="hljs-keyword">return</span> _.template(config.canopyBoundarySql)({
+        instanceid: instanceid,
+        canopy_min: canopy_min,
+        canopy_max: canopy_max,
+        category: category
+    });
 }
 
 exports = <span class="hljs-built_in">module</span>.exports = {
     makeSqlForMapFeatures: makeSqlForMapFeatures,
+    makeSqlForCanopyBoundaries: makeSqlForCanopyBoundaries,
     makeSqlForBoundaries: makeSqlForBoundaries
 };</pre></div></div>
             

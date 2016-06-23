@@ -117,9 +117,17 @@
 
 <span class="hljs-keyword">var</span> styles = {
     boundary: fs.readFileSync(<span class="hljs-string">'style/boundary.mms'</span>, {encoding: <span class="hljs-string">'utf-8'</span>}),
+    canopy: fs.readFileSync(<span class="hljs-string">'style/canopy.mms'</span>, {encoding: <span class="hljs-string">'utf-8'</span>}),
     mapFeature: fs.readFileSync(<span class="hljs-string">'style/mapFeature.mms'</span>, {encoding: <span class="hljs-string">'utf-8'</span>}),
     polygonalMapFeature: fs.readFileSync(<span class="hljs-string">'style/polygonalMapFeature.mms'</span>, {encoding: <span class="hljs-string">'utf-8'</span>})
-};</pre></div></div>
+};
+
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">parseBoundaryCategory</span>(<span class="hljs-params">category</span>) </span>{
+    <span class="hljs-keyword">if</span> (<span class="hljs-regexp">/^[A-Za-z0-9 ]+$/</span>.test(category)) {
+        <span class="hljs-keyword">return</span> category;
+    }
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">undefined</span>;
+}</pre></div></div>
             
         </li>
         
@@ -289,6 +297,24 @@ using the magic column name “the_geom_webmercator”.)</p>
             } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (table === <span class="hljs-string">'treemap_boundary'</span> &amp;&amp; instanceid) {
                 req.query.sql = makeSql.makeSqlForBoundaries(instanceid);
                 req.params.style = styles.boundary;
+            } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (table === <span class="hljs-string">'treemap_canopy_boundary'</span> &amp;&amp; instanceid) {
+                <span class="hljs-keyword">var</span> canopyMin = <span class="hljs-built_in">parseFloat</span>(req.query.canopyMin),
+                    canopyMax = <span class="hljs-built_in">parseFloat</span>(req.query.canopyMax),
+                    category = parseBoundaryCategory(req.query.category);
+
+                <span class="hljs-keyword">if</span> (!category) {
+                    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">'Invalid argument: category'</span>);
+                }
+                <span class="hljs-keyword">if</span> (<span class="hljs-built_in">isNaN</span>(canopyMin) || !<span class="hljs-built_in">isFinite</span>(canopyMin)) {
+                    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">'Invalid argument: canopyMin'</span>);
+                }
+                <span class="hljs-keyword">if</span> (<span class="hljs-built_in">isNaN</span>(canopyMax) || !<span class="hljs-built_in">isFinite</span>(canopyMax)) {
+                    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">'Invalid argument: canopyMax'</span>);
+                }
+
+                req.query.sql = makeSql.makeSqlForCanopyBoundaries(instanceid,
+                        canopyMin, canopyMax, category);
+                req.params.style = styles.canopy;
             }
         } <span class="hljs-keyword">catch</span> (err) {
             <span class="hljs-keyword">if</span> (rollbarAccessToken) {
