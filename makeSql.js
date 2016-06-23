@@ -108,10 +108,22 @@ function showingPlotsAndTrees(displayFilters) {
 // Assumes that instanceid is an integer, ready to be plugged
 // directly into SQL
 function makeSqlForBoundaries(instanceid) {
-    return _.template(config.boundaryGrainstoreSql) ({instanceid: instanceid});
+    return _.template(config.boundaryGrainstoreSql)({
+        instanceid: instanceid
+    });
+}
+
+function makeSqlForCanopyBoundaries(instanceid, canopy_min, canopy_max, category) {
+    return _.template(config.canopyBoundarySql)({
+        instanceid: instanceid,
+        canopy_min: canopy_min,
+        canopy_max: canopy_max,
+        category: category
+    });
 }
 
 exports = module.exports = {
     makeSqlForMapFeatures: makeSqlForMapFeatures,
+    makeSqlForCanopyBoundaries: makeSqlForCanopyBoundaries,
     makeSqlForBoundaries: makeSqlForBoundaries
 };
