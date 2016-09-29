@@ -189,7 +189,7 @@ directly into SQL</p>
         where = <span class="hljs-string">''</span>,
         displayClause = displayFiltersToWhere(displayFilters, restrictFeatureFilters, displayPlotsOnly(filterObject)),
         filterClause = filterObjectToWhere(filterObject),
-        instanceClause = (instanceid ? _.template(config.sqlForMapFeatures.where.instance)({instanceid: instanceid}) : <span class="hljs-literal">null</span>);
+        instanceClause = (instanceid ? _.template(config.sqlForMapFeatures.where.instance)({<span class="hljs-attr">instanceid</span>: instanceid}) : <span class="hljs-literal">null</span>);
 
     <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">addToWhere</span>(<span class="hljs-params">clause</span>) </span>{
         <span class="hljs-keyword">return</span> where ? <span class="hljs-string">'( '</span> + clause + <span class="hljs-string">' ) AND '</span> + where : clause;
@@ -214,7 +214,7 @@ add DISTINCT so we only get one row.</p>
             
             <div class="content"><div class='highlight'><pre>        geom_field = util.format(<span class="hljs-string">'DISTINCT(%s)'</span>, geom_field);
     } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (showingPlotsAndTrees(displayFilters)) {
-        <span class="hljs-keyword">var</span> showAtZoom = _.template(config.showAtZoomSql)({zoom: zoom});
+        <span class="hljs-keyword">var</span> showAtZoom = _.template(config.showAtZoomSql)({<span class="hljs-attr">zoom</span>: zoom});
         where = addToWhere(showAtZoom);
     }
     <span class="hljs-keyword">if</span> (displayClause) {
@@ -232,9 +232,9 @@ add DISTINCT so we only get one row.</p>
     <span class="hljs-keyword">return</span> _.template(
         <span class="hljs-string">'( SELECT &lt;%= fields %&gt; FROM &lt;%= tables %&gt; &lt;%= where %&gt; ) otmfiltersql '</span>
     )({
-        fields: geom_field + <span class="hljs-string">', '</span> + otherFields,
-        tables: tables.sql,
-        where: where
+        <span class="hljs-attr">fields</span>: geom_field + <span class="hljs-string">', '</span> + otherFields,
+        <span class="hljs-attr">tables</span>: tables.sql,
+        <span class="hljs-attr">where</span>: where
     });
 }</pre></div></div>
             
@@ -281,23 +281,23 @@ directly into SQL</p>
             
             <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">makeSqlForBoundaries</span>(<span class="hljs-params">instanceid</span>) </span>{
     <span class="hljs-keyword">return</span> _.template(config.boundaryGrainstoreSql)({
-        instanceid: instanceid
+        <span class="hljs-attr">instanceid</span>: instanceid
     });
 }
 
 <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">makeSqlForCanopyBoundaries</span>(<span class="hljs-params">instanceid, canopy_min, canopy_max, category</span>) </span>{
     <span class="hljs-keyword">return</span> _.template(config.canopyBoundarySql)({
-        instanceid: instanceid,
-        canopy_min: canopy_min,
-        canopy_max: canopy_max,
-        category: category
+        <span class="hljs-attr">instanceid</span>: instanceid,
+        <span class="hljs-attr">canopy_min</span>: canopy_min,
+        <span class="hljs-attr">canopy_max</span>: canopy_max,
+        <span class="hljs-attr">category</span>: category
     });
 }
 
 exports = <span class="hljs-built_in">module</span>.exports = {
-    makeSqlForMapFeatures: makeSqlForMapFeatures,
-    makeSqlForCanopyBoundaries: makeSqlForCanopyBoundaries,
-    makeSqlForBoundaries: makeSqlForBoundaries
+    <span class="hljs-attr">makeSqlForMapFeatures</span>: makeSqlForMapFeatures,
+    <span class="hljs-attr">makeSqlForCanopyBoundaries</span>: makeSqlForCanopyBoundaries,
+    <span class="hljs-attr">makeSqlForBoundaries</span>: makeSqlForBoundaries
 };</pre></div></div>
             
         </li>

@@ -225,45 +225,45 @@ providing values and methods used to convert predicates into SQL strings.</p>
             </div>
             
             <div class="content"><div class='highlight'><pre><span class="hljs-keyword">var</span> PREDICATE_TYPES = {
-    IS: {
-        combinesWith: [],
-        matcher: <span class="hljs-string">'='</span>,
-        valueConverter: utils.convertValueToEscapedSqlLiteral
+    <span class="hljs-attr">IS</span>: {
+        <span class="hljs-attr">combinesWith</span>: [],
+        <span class="hljs-attr">matcher</span>: <span class="hljs-string">'='</span>,
+        <span class="hljs-attr">valueConverter</span>: utils.convertValueToEscapedSqlLiteral
     },
-    ISNULL: {
-        combinesWith: [],
-        matcher: <span class="hljs-string">'IS'</span>,
-        valueConverter: convertValueForIsNull
+    <span class="hljs-attr">ISNULL</span>: {
+        <span class="hljs-attr">combinesWith</span>: [],
+        <span class="hljs-attr">matcher</span>: <span class="hljs-string">'IS'</span>,
+        <span class="hljs-attr">valueConverter</span>: convertValueForIsNull
     },
-    IN: {
-        combinesWith: [],
-        matcher: <span class="hljs-string">'IN'</span>,
-        valueConverter: convertArrayValueToEscapedSqlLiteral
+    <span class="hljs-attr">IN</span>: {
+        <span class="hljs-attr">combinesWith</span>: [],
+        <span class="hljs-attr">matcher</span>: <span class="hljs-string">'IN'</span>,
+        <span class="hljs-attr">valueConverter</span>: convertArrayValueToEscapedSqlLiteral
     },
-    LIKE: {
-        combinesWith: [],
-        matcher: <span class="hljs-string">'ILIKE'</span>,
-        valueConverter: convertValueForLike
+    <span class="hljs-attr">LIKE</span>: {
+        <span class="hljs-attr">combinesWith</span>: [],
+        <span class="hljs-attr">matcher</span>: <span class="hljs-string">'ILIKE'</span>,
+        <span class="hljs-attr">valueConverter</span>: convertValueForLike
     },
-    MIN: {
-        combinesWith: [<span class="hljs-string">'MAX'</span>],
-        matcher: <span class="hljs-string">'&gt;='</span>,
-        exclusiveMatcher: <span class="hljs-string">'&gt;'</span>,
-        valueConverter: utils.convertValueToEscapedSqlLiteral
+    <span class="hljs-attr">MIN</span>: {
+        <span class="hljs-attr">combinesWith</span>: [<span class="hljs-string">'MAX'</span>],
+        <span class="hljs-attr">matcher</span>: <span class="hljs-string">'&gt;='</span>,
+        <span class="hljs-attr">exclusiveMatcher</span>: <span class="hljs-string">'&gt;'</span>,
+        <span class="hljs-attr">valueConverter</span>: utils.convertValueToEscapedSqlLiteral
     },
-    MAX: {
-        combinesWith: [<span class="hljs-string">'MIN'</span>],
-        matcher: <span class="hljs-string">'&lt;='</span>,
-        exclusiveMatcher: <span class="hljs-string">'&lt;'</span>,
-        valueConverter: utils.convertValueToEscapedSqlLiteral
+    <span class="hljs-attr">MAX</span>: {
+        <span class="hljs-attr">combinesWith</span>: [<span class="hljs-string">'MIN'</span>],
+        <span class="hljs-attr">matcher</span>: <span class="hljs-string">'&lt;='</span>,
+        <span class="hljs-attr">exclusiveMatcher</span>: <span class="hljs-string">'&lt;'</span>,
+        <span class="hljs-attr">valueConverter</span>: utils.convertValueToEscapedSqlLiteral
     },
-    IN_BOUNDARY: {
-        combinesWith: [<span class="hljs-string">'WITHIN_RADIUS'</span>],
-        predicateTransform: transformBoundaryPredicate
+    <span class="hljs-attr">IN_BOUNDARY</span>: {
+        <span class="hljs-attr">combinesWith</span>: [<span class="hljs-string">'WITHIN_RADIUS'</span>],
+        <span class="hljs-attr">predicateTransform</span>: transformBoundaryPredicate
     },
-    WITHIN_RADIUS: {
-        combinesWith: [<span class="hljs-string">'IN_BOUNDARY'</span>],
-        predicateTransform: transformWithinRadiusPredicate
+    <span class="hljs-attr">WITHIN_RADIUS</span>: {
+        <span class="hljs-attr">combinesWith</span>: [<span class="hljs-string">'IN_BOUNDARY'</span>],
+        <span class="hljs-attr">predicateTransform</span>: transformWithinRadiusPredicate
     }
 };</pre></div></div>
             
@@ -283,7 +283,7 @@ representing a boundary. In particular, this is used with the IN_BOUNDARY</p>
             
             <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">transformBoundaryPredicate</span>(<span class="hljs-params">boundaryId</span>) </span>{
     <span class="hljs-keyword">var</span> selectTemplate = _.template(config.getBoundarySql),
-        selectStatement = selectTemplate({boundaryId: boundaryId});
+        selectStatement = selectTemplate({<span class="hljs-attr">boundaryId</span>: boundaryId});
 
     <span class="hljs-keyword">return</span> <span class="hljs-string">'ST_Contains(('</span> + selectStatement + <span class="hljs-string">'), &lt;%= column %&gt;)'</span>;
 }</pre></div></div>
@@ -345,8 +345,8 @@ accessHStore(‘grab_bag’, ‘is_valid’) -&gt; “grab_bag”-&gt;’is_vali
             </div>
             
             <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">var</span> t = _.template(<span class="hljs-string">'"&lt;%= hStoreColumn %&gt;"::hstore-&gt;\'&lt;%= accessor %&gt;\''</span>);
-    <span class="hljs-keyword">return</span> t({hStoreColumn: hStoreColumn,
-              accessor: accessor.replace(<span class="hljs-string">"'"</span>,<span class="hljs-string">"''"</span>)});
+    <span class="hljs-keyword">return</span> t({<span class="hljs-attr">hStoreColumn</span>: hStoreColumn,
+              <span class="hljs-attr">accessor</span>: accessor.replace(<span class="hljs-string">"'"</span>,<span class="hljs-string">"''"</span>)});
 }</pre></div></div>
             
         </li>
@@ -601,7 +601,7 @@ literal SQL</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">if</span> (t.predicateTransform) {
-        <span class="hljs-keyword">return</span> { sql_template: t.predicateTransform(predicateValue) };
+        <span class="hljs-keyword">return</span> { <span class="hljs-attr">sql_template</span>: t.predicateTransform(predicateValue) };
     } <span class="hljs-keyword">else</span> {</pre></div></div>
             
         </li>
@@ -625,7 +625,7 @@ literal SQL</p>
             value = predicateValue;
         }
 
-        <span class="hljs-keyword">return</span> { matcher: matcher, value: t.valueConverter(value) };
+        <span class="hljs-keyword">return</span> { <span class="hljs-attr">matcher</span>: matcher, <span class="hljs-attr">value</span>: t.valueConverter(value) };
     }
 }</pre></div></div>
             
@@ -756,7 +756,7 @@ is Tree Collection UDFs</p>
                                       config.udfcTemplates.mapFeature);
 
         filterStatements.push(
-            udfcTemplate({fieldDefId: udfCollectionData.fieldDefId}));
+            udfcTemplate({<span class="hljs-attr">fieldDefId</span>: udfCollectionData.fieldDefId}));
     }
     <span class="hljs-keyword">return</span> <span class="hljs-string">'('</span> + filterStatements.join(<span class="hljs-string">' AND '</span>) + <span class="hljs-string">')'</span> ;
 }</pre></div></div>

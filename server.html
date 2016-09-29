@@ -116,10 +116,10 @@
 <span class="hljs-keyword">var</span> ws;
 
 <span class="hljs-keyword">var</span> styles = {
-    boundary: fs.readFileSync(<span class="hljs-string">'style/boundary.mms'</span>, {encoding: <span class="hljs-string">'utf-8'</span>}),
-    canopy: fs.readFileSync(<span class="hljs-string">'style/canopy.mms'</span>, {encoding: <span class="hljs-string">'utf-8'</span>}),
-    mapFeature: fs.readFileSync(<span class="hljs-string">'style/mapFeature.mms'</span>, {encoding: <span class="hljs-string">'utf-8'</span>}),
-    polygonalMapFeature: fs.readFileSync(<span class="hljs-string">'style/polygonalMapFeature.mms'</span>, {encoding: <span class="hljs-string">'utf-8'</span>})
+    <span class="hljs-attr">boundary</span>: fs.readFileSync(<span class="hljs-string">'style/boundary.mms'</span>, {<span class="hljs-attr">encoding</span>: <span class="hljs-string">'utf-8'</span>}),
+    <span class="hljs-attr">canopy</span>: fs.readFileSync(<span class="hljs-string">'style/canopy.mms'</span>, {<span class="hljs-attr">encoding</span>: <span class="hljs-string">'utf-8'</span>}),
+    <span class="hljs-attr">mapFeature</span>: fs.readFileSync(<span class="hljs-string">'style/mapFeature.mms'</span>, {<span class="hljs-attr">encoding</span>: <span class="hljs-string">'utf-8'</span>}),
+    <span class="hljs-attr">polygonalMapFeature</span>: fs.readFileSync(<span class="hljs-string">'style/polygonalMapFeature.mms'</span>, {<span class="hljs-attr">encoding</span>: <span class="hljs-string">'utf-8'</span>})
 };
 
 <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">parseBoundaryCategory</span>(<span class="hljs-params">category</span>) </span>{
@@ -145,14 +145,14 @@ e.g. a map tile or UTF grid with map features like tree plots or boundaries.</p>
             
             <div class="content"><div class='highlight'><pre>
 <span class="hljs-keyword">var</span> windshaftConfig = {
-    useProfiler: <span class="hljs-literal">false</span>,  <span class="hljs-comment">// if true, returns X-Tiler-Profiler header with rendering times</span>
+    <span class="hljs-attr">useProfiler</span>: <span class="hljs-literal">false</span>,  <span class="hljs-comment">// if true, returns X-Tiler-Profiler header with rendering times</span>
     statsd: {
-        host: process.env.OTM_STATSD_HOST || <span class="hljs-string">'127.0.0.1'</span>,
-        port: process.env.OTM_STATSD_PORT || <span class="hljs-number">8125</span>
+        <span class="hljs-attr">host</span>: process.env.OTM_STATSD_HOST || <span class="hljs-string">'127.0.0.1'</span>,
+        <span class="hljs-attr">port</span>: process.env.OTM_STATSD_PORT || <span class="hljs-number">8125</span>
     },
-    enable_cors: <span class="hljs-literal">true</span>,
-    log_format: <span class="hljs-literal">null</span>,
-    mapnik: {</pre></div></div>
+    <span class="hljs-attr">enable_cors</span>: <span class="hljs-literal">true</span>,
+    <span class="hljs-attr">log_format</span>: <span class="hljs-literal">null</span>,
+    <span class="hljs-attr">mapnik</span>: {</pre></div></div>
             
         </li>
         
@@ -197,9 +197,9 @@ each metatile multiple times, making things slower rather than faster.</p>
             
             <div class="content"><div class='highlight'><pre>        metatile: <span class="hljs-number">1</span>
     },
-    redis: {
-        host: process.env.OTM_CACHE_HOST || <span class="hljs-string">'127.0.0.1'</span>,
-        port: process.env.OTM_CACHE_PORT || <span class="hljs-number">6379</span>
+    <span class="hljs-attr">redis</span>: {
+        <span class="hljs-attr">host</span>: process.env.OTM_CACHE_HOST || <span class="hljs-string">'127.0.0.1'</span>,
+        <span class="hljs-attr">port</span>: process.env.OTM_CACHE_PORT || <span class="hljs-number">6379</span>
     },</pre></div></div>
             
         </li>
@@ -216,11 +216,11 @@ each metatile multiple times, making things slower rather than faster.</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>    grainstore: {
-        datasource: {
-            user: process.env.OTM_DB_USER || <span class="hljs-string">'otm'</span>,
-            password: process.env.OTM_DB_PASSWORD || <span class="hljs-string">'otm'</span>,
-            host: process.env.OTM_DB_HOST || <span class="hljs-string">'localhost'</span>,
-            port: process.env.OTM_DB_PORT || <span class="hljs-number">5432</span>
+        <span class="hljs-attr">datasource</span>: {
+            <span class="hljs-attr">user</span>: process.env.OTM_DB_USER || <span class="hljs-string">'otm'</span>,
+            <span class="hljs-attr">password</span>: process.env.OTM_DB_PASSWORD || <span class="hljs-string">'otm'</span>,
+            <span class="hljs-attr">host</span>: process.env.OTM_DB_HOST || <span class="hljs-string">'localhost'</span>,
+            <span class="hljs-attr">port</span>: process.env.OTM_DB_PORT || <span class="hljs-number">5432</span>
         }
     }, <span class="hljs-comment">// See grainstore npm for other options</span></pre></div></div>
             
@@ -241,7 +241,7 @@ make tile requests</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>    base_url: <span class="hljs-string">'/:cache_buster/database/:unused/table/:table'</span>,
-    base_url_notable: <span class="hljs-string">'/:cache_buster/database/:unused/table'</span>,</pre></div></div>
+    <span class="hljs-attr">base_url_notable</span>: <span class="hljs-string">'/:cache_buster/database/:unused/table'</span>,</pre></div></div>
             
         </li>
         
@@ -375,7 +375,7 @@ Note that we <em>always</em> overwrite req.query.sql above</p>
             <div class="content"><div class='highlight'><pre>        callback(<span class="hljs-literal">null</span>, req);
     },
 
-    afterTileRender: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">req, res, tile, headers, callback</span>) </span>{
+    <span class="hljs-attr">afterTileRender</span>: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">req, res, tile, headers, callback</span>) </span>{
         headers[<span class="hljs-string">'Cache-Control'</span>] = <span class="hljs-string">'max-age=2592000'</span>;
         callback(<span class="hljs-literal">null</span>, tile, headers);
     }

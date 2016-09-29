@@ -107,9 +107,9 @@ and format date and datetime strings.</p>
             </div>
             
             <div class="content"><div class='highlight'><pre><span class="hljs-keyword">var</span> DATETIME_FORMATS = {
-    full: <span class="hljs-string">'YYYY-MM-DD HH:mm:ss'</span>,
-    date: <span class="hljs-string">'YYYY-MM-DD'</span>,
-    time: <span class="hljs-string">'HH:mm:ss'</span>
+    <span class="hljs-attr">full</span>: <span class="hljs-string">'YYYY-MM-DD HH:mm:ss'</span>,
+    <span class="hljs-attr">date</span>: <span class="hljs-string">'YYYY-MM-DD'</span>,
+    <span class="hljs-attr">time</span>: <span class="hljs-string">'HH:mm:ss'</span>
 };</pre></div></div>
             
         </li>
@@ -274,9 +274,9 @@ syntax into an object of the relevant components.</p>
     fieldDefIdAndHStoreMember = tokens[<span class="hljs-number">2</span>].split(<span class="hljs-string">'.'</span>);
 
     <span class="hljs-keyword">return</span> {
-        modelName: tokens[<span class="hljs-number">1</span>],
-        fieldDefId: fieldDefIdAndHStoreMember[<span class="hljs-number">0</span>],
-        hStoreMember: fieldDefIdAndHStoreMember[<span class="hljs-number">1</span>]
+        <span class="hljs-attr">modelName</span>: tokens[<span class="hljs-number">1</span>],
+        <span class="hljs-attr">fieldDefId</span>: fieldDefIdAndHStoreMember[<span class="hljs-number">0</span>],
+        <span class="hljs-attr">hStoreMember</span>: fieldDefIdAndHStoreMember[<span class="hljs-number">1</span>]
     };
 }
 
@@ -293,19 +293,19 @@ syntax into an object of the relevant components.</p>
 }
 
 <span class="hljs-built_in">module</span>.exports = {
-    traverseCombinator: traverseCombinator,
+    <span class="hljs-attr">traverseCombinator</span>: traverseCombinator,
 
-    filterObjectKeys: filterObjectKeys,
+    <span class="hljs-attr">filterObjectKeys</span>: filterObjectKeys,
 
-    isTreeInDisplayFilters: isTreeInDisplayFilters,
+    <span class="hljs-attr">isTreeInDisplayFilters</span>: isTreeInDisplayFilters,
 
-    convertValueToEscapedSqlLiteral: convertValueToEscapedSqlLiteral,
+    <span class="hljs-attr">convertValueToEscapedSqlLiteral</span>: convertValueToEscapedSqlLiteral,
 
-    sanitizeSqlString: sanitizeSqlString,
+    <span class="hljs-attr">sanitizeSqlString</span>: sanitizeSqlString,
 
-    parseUdfCollectionFieldName: parseUdfCollectionFieldName,
+    <span class="hljs-attr">parseUdfCollectionFieldName</span>: parseUdfCollectionFieldName,
 
-    DATETIME_FORMATS: DATETIME_FORMATS
+    <span class="hljs-attr">DATETIME_FORMATS</span>: DATETIME_FORMATS
 };</pre></div></div>
             
         </li>
