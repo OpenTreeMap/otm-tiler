@@ -4,12 +4,14 @@ var _ = require('underscore');
 var config = require('./config');
 var utils = require("./filterObjectUtils");
 
-exports = module.exports = function (filterObject, displayFilters, isPolygonRequest) {
+exports = module.exports = function (filterObject, displayFilters, isPolygonRequest, isUtfGridRequest) {
     if (_.isUndefined(filterObject) || _.isNull(filterObject)) {
         throw new Error('A null or undefined filter object cannot be converted to SQL');
     }
     var models = getModelsForFilterObject(filterObject);
-    if (displayFilters && utils.isTreeInDisplayFilters(displayFilters)) {
+
+    if ((!isPolygonRequest && !isUtfGridRequest) ||
+        (displayFilters && utils.isTreeInDisplayFilters(displayFilters))) {
         models = _.union(models, ['tree']);
     }
     if (models.length === 0) {
