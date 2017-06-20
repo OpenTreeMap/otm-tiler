@@ -212,7 +212,8 @@ describe('makeSql', function() {
             displayFilter: '["Tree"]',
             filter: '["AND",{"tree.diameter":{"MIN":1,"MAX":100}}]',
             expected: '( SELECT DISTINCT(the_geom_webmercator) AS the_geom_webmercator, ' +
-                'feature_type FROM treemap_mapfeature LEFT OUTER JOIN ' +
+                'feature_type, treemap_tree.id AS tree_id ' +
+                'FROM treemap_mapfeature LEFT OUTER JOIN ' +
                 'stormwater_polygonalmapfeature ON ' +
                 'stormwater_polygonalmapfeature.mapfeature_ptr_id = treemap_mapfeature.id ' +
                 'LEFT OUTER JOIN treemap_tree ON treemap_mapfeature.id = treemap_tree.plot_id ' +

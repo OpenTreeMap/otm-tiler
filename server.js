@@ -19,6 +19,7 @@ var styles = {
     boundary: fs.readFileSync('style/boundary.mms', {encoding: 'utf-8'}),
     canopy: fs.readFileSync('style/canopy.mms', {encoding: 'utf-8'}),
     mapFeature: fs.readFileSync('style/mapFeature.mms', {encoding: 'utf-8'}),
+    uncoloredMapFeature: fs.readFileSync('style/uncoloredMapFeature.mms', {encoding: 'utf-8'}),
     polygonalMapFeature: fs.readFileSync('style/polygonalMapFeature.mms', {encoding: 'utf-8'})
 };
 
@@ -106,8 +107,13 @@ var windshaftConfig = {
                                                               zoom,
                                                               isUtfGridRequest,
                                                               isPolygonRequest);
-
-                req.params.style = isPolygonRequest ? styles.polygonalMapFeature : styles.mapFeature;
+                if (isPolygonRequest) {
+                    req.params.style = styles.polygonalMapFeature;
+                } else if (isUtfGridRequest) {
+                    req.params.style = styles.uncoloredMapFeature;
+                } else {
+                    req.params.style = styles.mapFeature;
+                }
             } else if (table === 'treemap_boundary' && instanceid) {
                 req.query.sql = makeSql.makeSqlForBoundaries(instanceid);
                 req.params.style = styles.boundary;
