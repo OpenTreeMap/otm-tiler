@@ -42,14 +42,13 @@ function makeSqlForMapFeatures(filterString, displayString, restrictFeatureStrin
                                zoom, isUtfGridRequest, isPolygonRequest) {
     var geom_spec = config.sqlForMapFeatures.fields.geom,
         geom_field = isPolygonRequest ? geom_spec.polygon : geom_spec.point,
-        otherFields = (isUtfGridRequest ? config.sqlForMapFeatures.fields.utfGrid : config.sqlForMapFeatures.fields.base),
         parsedFilterObject = filterString ? JSON.parse(filterString) : {},
         displayFilters = displayString ? JSON.parse(displayString) : undefined,
         restrictFeatureFilters = restrictFeatureString ? JSON.parse(restrictFeatureString) : undefined,
 
         filterObject = addDefaultsToFilter(parsedFilterObject, zoom, isPolygonRequest),
 
-        tables = filtersToTables(filterObject, displayFilters, isPolygonRequest),
+        tables = filtersToTables(filterObject, displayFilters, isPolygonRequest, isUtfGridRequest),
 
         where = '',
         displayClause = displayFiltersToWhere(displayFilters, restrictFeatureFilters, displayPlotsOnly(filterObject)),
@@ -77,6 +76,15 @@ function makeSqlForMapFeatures(filterString, displayString, restrictFeatureStrin
     }
     if (where) {
         where = 'WHERE ' + where;
+    }
+
+    var otherFields;
+    if (isUtfGridRequest) {
+        otherFields = config.sqlForMapFeatures.fields.utfGrid;
+    } else if (isPolygonRequest) {
+        otherFields = config.sqlForMapFeatures.fields.polygon;
+    } else {
+        otherFields = config.sqlForMapFeatures.fields.base;
     }
 
     geom_field = util.format("%s AS %s",

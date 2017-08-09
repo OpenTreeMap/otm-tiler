@@ -30,7 +30,8 @@ module.exports = {
                 "point": "the_geom_webmercator",
                 "polygon": "stormwater_polygonalmapfeature.polygon"
             },
-            "base": "feature_type",
+            "base": "feature_type, treemap_tree.id AS tree_id",
+            "polygon": "feature_type",
             "utfGrid": "feature_type, treemap_mapfeature.id AS id"
         },
         "basePointModel": "mapFeature",
