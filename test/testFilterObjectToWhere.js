@@ -214,6 +214,16 @@ describe('filterObjectToWhere', function() {
                   "(\"treemap_tree\".\"height\" > 2 AND \"treemap_tree\".\"height\" < 3)");
     });
 
+    it('ignores empty min or max predicate values', function () {
+        assertSql({"tree.height": {"MIN": 0, "MAX": ""}}, "(\"treemap_tree\".\"height\" >= 0)");
+        assertSql({"tree.height": {"MIN": 0, "MAX": undefined}}, "(\"treemap_tree\".\"height\" >= 0)");
+        assertSql({"tree.height": {"MIN": 0, "MAX": null}}, "(\"treemap_tree\".\"height\" >= 0)");
+
+        assertSql({"tree.height": {"MIN": "", "MAX": 2}}, "(\"treemap_tree\".\"height\" <= 2)");
+        assertSql({"tree.height": {"MIN": undefined, "MAX": 2}}, "(\"treemap_tree\".\"height\" <= 2)");
+        assertSql({"tree.height": {"MIN": null, "MAX": 2}}, "(\"treemap_tree\".\"height\" <= 2)");
+    });
+
     it('raises an error when MIN is mixed with IN', function() {
         assert.throws(function() {
             filterObjectToWhere({"tree.height": {"MIN": 1, "IN": [1]}});
