@@ -61,7 +61,7 @@ function convertValueToEscapedSqlLiteral (value) {
     } else if (isDateTimeString(value)) {
         return dateTimeStringToSqlValue(value);
     } else {
-        return "'" + sanitizeSqlString(value).replace("'", "''") + "'";
+        return "'" + sanitizeSqlString(value).replace(/'/g, "''") + "'";
     }
 }
 
