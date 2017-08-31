@@ -119,7 +119,7 @@ function accessHStore(hStoreColumn, accessor) {
     // TODO: sql injection? why don't we call sanitize?
     var t = _.template('"<%= hStoreColumn %>"::hstore->\'<%= accessor %>\'');
     return t({hStoreColumn: hStoreColumn,
-              accessor: accessor.replace("'","''")});
+              accessor: accessor.replace(/'/g, "''")});
 }
 
 
@@ -207,7 +207,7 @@ function convertValueForIsNull(value) {
 }
 
 function convertValueForLike(value) {
-    return "'%" + utils.sanitizeSqlString(value).replace("'", "''") + "%'";
+    return "'%" + utils.sanitizeSqlString(value).replace(/'/g, "''") + "%'";
 }
 
 // `validatePredicate` throws an error if the specified `predicate` object

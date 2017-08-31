@@ -89,6 +89,11 @@ describe('filterObjectToWhere', function() {
                   "(\"treemap_mapfeature\".\"address\" ILIKE '%Market St%')");
     });
 
+    it('escapes interior quotes in Hstore LIKE', function () {
+        assertSql({"tree.udf:Dimensions": {"LIKE": "\"8'' x 10'\""}},
+                  "((\"treemap_tree\".\"udfs\"::hstore->'Dimensions') ILIKE '%\"8'''' x 10''\"%')");
+    });
+
     // UDF MATCHES
     it('processes udf values', function() {
         assertSql({"mapFeature.udf:Clever Name": {"LIKE": "Market St"}},
