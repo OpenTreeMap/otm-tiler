@@ -250,6 +250,9 @@ function predicateValueAndTypeToFilterObject(predicateValue, predicateType) {
         if (_.isObject(predicateValue) && !_.isArray(predicateValue)) {
             matcher = predicateValue.EXCLUSIVE ? t.exclusiveMatcher : t.matcher;
             value = predicateValue.value;
+        } else if (_.contains(['MAX', 'MIN'], predicateType) &&
+                   _.contains([undefined, null, ""], predicateValue)) {
+            return null;
         } else {
             matcher = t.matcher;
             value = predicateValue;
@@ -267,7 +270,7 @@ function predicateValueAndTypeToFilterObject(predicateValue, predicateType) {
 // provided, the template is evaluated and the result is used as the SQL.
 function predicateToFilterObjects(predicate) {
     validatePredicate(predicate);
-    return _.map(predicate, predicateValueAndTypeToFilterObject);
+    return _.reject(_.map(predicate, predicateValueAndTypeToFilterObject), _.isNull);
 }
 
 // `fieldNameAndPredicateToSql` converts the specified `fieldName` and `predicate`
