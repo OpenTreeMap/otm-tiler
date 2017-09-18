@@ -1,22 +1,22 @@
 .PHONY: all clean lint check test coverage docs
 
 all:
-	npm install
+	yarn install
 
 clean:
 	rm -rf node_modules/*
 	rm -rf coverage
 
 lint:
-	npm run lint
+	yarn run lint
 
 check:
-	npm test
+	yarn test
 
 test: check
 
 coverage:
-	npm run coverage
+	yarn run coverage
 
 docs:
 	docco ./*.js

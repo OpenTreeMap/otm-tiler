@@ -1,15 +1,15 @@
 language: node_js
 node_js:
-  - '0.10'
+  - '6'
 
 env:
   global:
     secure: ik/JY6nr4qCza3wKROQy/cCiP82r6tsMyPwJP2v1AbyfplVM25EQ6WCRuJOKM5zmciewoVm6YWTz7ficoX+Fgs8CKnHVL/uRhQFr1HjbuVviL8kHqwKtxB64Rh40Tf0Wzu7Vdn27SKAOGMR2q24LIU95X4C+avbtUbpe+b72UA0=
 
 before_install:
-  - sudo add-apt-repository -y ppa:mapnik/v2.2.0
+  - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
   - sudo apt-get update -y
-  - sudo apt-get install libboost-dev libgdal1h libgdal-dev libmapnik libmapnik-dev
+  - sudo apt-get install checkinstall g++ libstdc++-5-dev pkg-config libcairo2-dev libjpeg8-dev libgif-dev libpango1.0-dev
 
 install: make all
 script: make lint coverage
