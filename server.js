@@ -148,13 +148,7 @@ var windshaftConfig = {
         // streamlining client actions like clicking on or hovering over a feature.
         // "interactivity" specifies which fields from our SQL query should be returned for each feature.
         req.params.interactivity = (isUtfGridRequest ? config.interactivityForUtfGridRequests : null);
-
         req.params.dbname = dbname;
-
-        // Override request params with query params
-        // Note that we *always* overwrite req.query.sql above
-        req.params =  _.extend({}, req.params);
-        _.extend(req.params, req.query);
 
         // Send the finished req object on
         callback(null, req);
