@@ -1,15 +1,21 @@
 "use strict";
 
-var Windshaft = require('windshaft');
 var _ = require('underscore');
 var fs = require('fs');
-var rollbar = require('rollbar');
+var Rollbar = require('rollbar');
+var WindshaftServer = require('./http/windshaftServer.js');
 var healthCheck = require('./healthCheck');
 var makeSql = require('./makeSql');
 var config = require('./config');
 
 // Optional environment variable for reporting exceptions to rollbar.com
 var rollbarAccessToken = process.env.ROLLBAR_SERVER_SIDE_ACCESS_TOKEN;
+if (rollbarAccessToken) {
+    var rollbar = new Rollbar({
+        accessToken: rollbarAccessToken,
+        environment: process.env.OTM_STACK_TYPE || 'Unknown'
+    });
+}
 
 var dbname = process.env.OTM_DB_NAME || 'otm';
 var port = process.env.PORT || 4000;
@@ -35,10 +41,6 @@ function parseBoundaryCategory(category) {
 
 var windshaftConfig = {
     useProfiler: false,  // if true, returns X-Tiler-Profiler header with rendering times
-    statsd: {
-        host: process.env.OTM_STATSD_HOST || '127.0.0.1',
-        port: process.env.OTM_STATSD_PORT || 8125
-    },
     enable_cors: true,
     log_format: null,
     mapnik: {
@@ -80,7 +82,6 @@ var windshaftConfig = {
     // so that older versions of the mobile apps will be able to continue to
     // make tile requests
     base_url: '/:cache_buster/database/:unused/table/:table',
-    base_url_notable: '/:cache_buster/database/:unused/table',
 
     // Tell server how to handle HTTP request 'req' (by specifying properties in req.params).
     req2params: function(req, callback) {
@@ -100,13 +101,13 @@ var windshaftConfig = {
                 displayString = req.query[config.displayQueryArgumentName];
                 restrictFeatureString = req.query[config.restrictFeatureQueryArgumentName];
                 isUtfGridRequest = (req.params.format === 'grid.json');
-                req.query.sql = makeSql.makeSqlForMapFeatures(filterString,
-                                                              displayString,
-                                                              restrictFeatureString,
-                                                              instanceid,
-                                                              zoom,
-                                                              isUtfGridRequest,
-                                                              isPolygonRequest);
+                req.params.sql = makeSql.makeSqlForMapFeatures(filterString,
+                                                               displayString,
+                                                               restrictFeatureString,
+                                                               instanceid,
+                                                               zoom,
+                                                               isUtfGridRequest,
+                                                               isPolygonRequest);
                 if (isPolygonRequest) {
                     req.params.style = styles.polygonalMapFeature;
                 } else if (isUtfGridRequest) {
@@ -115,7 +116,7 @@ var windshaftConfig = {
                     req.params.style = styles.mapFeature;
                 }
             } else if (table === 'treemap_boundary' && instanceid) {
-                req.query.sql = makeSql.makeSqlForBoundaries(instanceid);
+                req.params.sql = makeSql.makeSqlForBoundaries(instanceid);
                 req.params.style = styles.boundary;
             } else if (table === 'treemap_canopy_boundary' && instanceid) {
                 var canopyMin = parseFloat(req.query.canopyMin),
@@ -132,13 +133,13 @@ var windshaftConfig = {
                     throw new Error('Invalid argument: canopyMax');
                 }
 
-                req.query.sql = makeSql.makeSqlForCanopyBoundaries(instanceid,
+                req.params.sql = makeSql.makeSqlForCanopyBoundaries(instanceid,
                         canopyMin, canopyMax, category);
                 req.params.style = styles.canopy;
             }
         } catch (err) {
             if (rollbarAccessToken) {
-                rollbar.handleError(err, req);
+                rollbar.error(err, req);
             }
             callback(err, null);
         }
@@ -165,14 +166,12 @@ var windshaftConfig = {
     }
 };
 
-ws = new Windshaft.Server(windshaftConfig);
+ws = new WindshaftServer(windshaftConfig);
 ws.get('/health-check', healthCheck(windshaftConfig));
 
 // If a rollbar API token was provided this will wire up the rollbar error handler
 if (rollbarAccessToken) {
-    ws.use(rollbar.errorHandler(rollbarAccessToken, {
-        'environment': process.env.OTM_STACK_TYPE || 'Unknown'
-    }));
+    ws.use(rollbar.errorHandler());
 }
 
 ws.listen(port);

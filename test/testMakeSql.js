@@ -174,15 +174,14 @@ describe('makeSql', function() {
             displayFilter: '["Tree", "FireHydrant"]',
             restrictFeatureFilter: undefined,
             filter: '{"tree.diameter":{"MIN":1,"MAX":100}}',
-            expected: '( SELECT DISTINCT(stormwater_polygonalmapfeature.polygon) AS the_geom_webmercator, ' +
+            expected: 'SELECT DISTINCT(stormwater_polygonalmapfeature.polygon) AS the_geom_webmercator, ' +
                 'feature_type FROM treemap_mapfeature LEFT OUTER JOIN treemap_tree ON ' +
                 'treemap_mapfeature.id = treemap_tree.plot_id ' +
                 'LEFT OUTER JOIN stormwater_polygonalmapfeature ' +
                 'ON stormwater_polygonalmapfeature.mapfeature_ptr_id = treemap_mapfeature.id ' +
                 'WHERE ( (("treemap_tree"."id" IS NOT NULL) AND ("treemap_mapfeature"."feature_type" = \'Plot\')) ) ' +
                 'AND ("treemap_tree"."diameter" >= 1 ' +
-                'AND "treemap_tree"."diameter" <= 100) ' +
-                ') otmfiltersql '
+                'AND "treemap_tree"."diameter" <= 100)'
         });
     });
 
@@ -191,7 +190,7 @@ describe('makeSql', function() {
             isPolygonRequest: true,
             displayFilter: '["Tree", "FireHydrant"]',
             filter: '["AND",{"tree.diameter":{"MIN":1,"MAX":100}},["OR",{"udf:tree:198.Status":{"IS":"Unresolved"}}]]',
-            expected: '( SELECT DISTINCT(stormwater_polygonalmapfeature.polygon) AS the_geom_webmercator, ' +
+            expected: 'SELECT DISTINCT(stormwater_polygonalmapfeature.polygon) AS the_geom_webmercator, ' +
                 'feature_type FROM treemap_mapfeature LEFT OUTER JOIN treemap_tree ON ' +
                 'treemap_mapfeature.id = treemap_tree.plot_id CROSS JOIN treemap_userdefinedcollectionvalue ' +
                 'LEFT OUTER JOIN stormwater_polygonalmapfeature ' +
@@ -201,7 +200,7 @@ describe('makeSql', function() {
                 'AND "treemap_tree"."diameter" <= 100) ' +
                 'AND ((("treemap_userdefinedcollectionvalue"."data"::hstore->\'Status\') = \'Unresolved\' ' +
                 'AND treemap_userdefinedcollectionvalue.field_definition_id=198 ' +
-                'AND treemap_userdefinedcollectionvalue.model_id=treemap_tree.id))) ) otmfiltersql '
+                'AND treemap_userdefinedcollectionvalue.model_id=treemap_tree.id)))'
         });
     });
 
@@ -211,7 +210,7 @@ describe('makeSql', function() {
             isPolygonRequest: false,
             displayFilter: '["Tree"]',
             filter: '["AND",{"tree.diameter":{"MIN":1,"MAX":100}}]',
-            expected: '( SELECT DISTINCT(the_geom_webmercator) AS the_geom_webmercator, ' +
+            expected: 'SELECT DISTINCT(the_geom_webmercator) AS the_geom_webmercator, ' +
                 'feature_type, treemap_tree.id AS tree_id ' +
                 'FROM treemap_mapfeature LEFT OUTER JOIN ' +
                 'stormwater_polygonalmapfeature ON ' +
@@ -221,7 +220,7 @@ describe('makeSql', function() {
                 'AND ("treemap_mapfeature"."feature_type" = \'Plot\')) ) ' +
                 'AND (("stormwater_polygonalmapfeature"."polygon" IS NULL) ' +
                 'AND (("treemap_tree"."diameter" >= 1 ' +
-                'AND "treemap_tree"."diameter" <= 100))) ) otmfiltersql '
+                'AND "treemap_tree"."diameter" <= 100)))'
         });
     });
 });

@@ -283,7 +283,7 @@ function fieldNameAndPredicateToSql(fieldName, predicate) {
         // name somewhere besides the LHS so we provide it via
         // an underscore template
         if (f.sql_template) {
-            return _.template(f.sql_template, { 'column': columnName });
+            return _.template(f.sql_template)({ 'column': columnName });
         } else {
             if (columnName.indexOf('->') !== -1) {
                 // if the column is an hstore field and the value is a
