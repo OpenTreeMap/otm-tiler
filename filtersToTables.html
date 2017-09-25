@@ -16,53 +16,55 @@
           <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
           <a class="small" href="javascript:void(0);">+</a>
           <div id="jump_wrapper">
-          <div id="jump_page">
-            
+          <div id="jump_page_wrapper">
+            <div id="jump_page">
               
-              <a class="source" href="addDefaultsToFilter.html">
-                addDefaultsToFilter.js
-              </a>
-            
+                
+                <a class="source" href="addDefaultsToFilter.html">
+                  addDefaultsToFilter.js
+                </a>
               
-              <a class="source" href="config.html">
-                config.js
-              </a>
-            
+                
+                <a class="source" href="config.html">
+                  config.js
+                </a>
               
-              <a class="source" href="displayFiltersToWhere.html">
-                displayFiltersToWhere.js
-              </a>
-            
+                
+                <a class="source" href="displayFiltersToWhere.html">
+                  displayFiltersToWhere.js
+                </a>
               
-              <a class="source" href="filterObjectToWhere.html">
-                filterObjectToWhere.js
-              </a>
-            
+                
+                <a class="source" href="filterObjectToWhere.html">
+                  filterObjectToWhere.js
+                </a>
               
-              <a class="source" href="filterObjectUtils.html">
-                filterObjectUtils.js
-              </a>
-            
+                
+                <a class="source" href="filterObjectUtils.html">
+                  filterObjectUtils.js
+                </a>
               
-              <a class="source" href="filtersToTables.html">
-                filtersToTables.js
-              </a>
-            
+                
+                <a class="source" href="filtersToTables.html">
+                  filtersToTables.js
+                </a>
               
-              <a class="source" href="healthCheck.html">
-                healthCheck.js
-              </a>
-            
+                
+                <a class="source" href="healthCheck.html">
+                  healthCheck.js
+                </a>
               
-              <a class="source" href="makeSql.html">
-                makeSql.js
-              </a>
-            
+                
+                <a class="source" href="makeSql.html">
+                  makeSql.js
+                </a>
               
-              <a class="source" href="server.html">
-                server.js
-              </a>
-            
+                
+                <a class="source" href="server.html">
+                  server.js
+                </a>
+              
+            </div>
           </div>
         </li>
       </ul>
@@ -92,12 +94,14 @@
 <span class="hljs-keyword">var</span> config = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./config'</span>);
 <span class="hljs-keyword">var</span> utils = <span class="hljs-built_in">require</span>(<span class="hljs-string">"./filterObjectUtils"</span>);
 
-exports = <span class="hljs-built_in">module</span>.exports = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">filterObject, displayFilters, isPolygonRequest</span>) </span>{
+exports = <span class="hljs-built_in">module</span>.exports = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">filterObject, displayFilters, isPolygonRequest, isUtfGridRequest</span>) </span>{
     <span class="hljs-keyword">if</span> (_.isUndefined(filterObject) || _.isNull(filterObject)) {
         <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">'A null or undefined filter object cannot be converted to SQL'</span>);
     }
     <span class="hljs-keyword">var</span> models = getModelsForFilterObject(filterObject);
-    <span class="hljs-keyword">if</span> (displayFilters &amp;&amp; utils.isTreeInDisplayFilters(displayFilters)) {
+
+    <span class="hljs-keyword">if</span> ((!isPolygonRequest &amp;&amp; !isUtfGridRequest) ||
+        (displayFilters &amp;&amp; utils.isTreeInDisplayFilters(displayFilters))) {
         models = _.union(models, [<span class="hljs-string">'tree'</span>]);
     }
     <span class="hljs-keyword">if</span> (models.length === <span class="hljs-number">0</span>) {

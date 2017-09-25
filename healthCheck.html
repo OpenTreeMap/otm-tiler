@@ -16,53 +16,55 @@
           <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
           <a class="small" href="javascript:void(0);">+</a>
           <div id="jump_wrapper">
-          <div id="jump_page">
-            
+          <div id="jump_page_wrapper">
+            <div id="jump_page">
               
-              <a class="source" href="addDefaultsToFilter.html">
-                addDefaultsToFilter.js
-              </a>
-            
+                
+                <a class="source" href="addDefaultsToFilter.html">
+                  addDefaultsToFilter.js
+                </a>
               
-              <a class="source" href="config.html">
-                config.js
-              </a>
-            
+                
+                <a class="source" href="config.html">
+                  config.js
+                </a>
               
-              <a class="source" href="displayFiltersToWhere.html">
-                displayFiltersToWhere.js
-              </a>
-            
+                
+                <a class="source" href="displayFiltersToWhere.html">
+                  displayFiltersToWhere.js
+                </a>
               
-              <a class="source" href="filterObjectToWhere.html">
-                filterObjectToWhere.js
-              </a>
-            
+                
+                <a class="source" href="filterObjectToWhere.html">
+                  filterObjectToWhere.js
+                </a>
               
-              <a class="source" href="filterObjectUtils.html">
-                filterObjectUtils.js
-              </a>
-            
+                
+                <a class="source" href="filterObjectUtils.html">
+                  filterObjectUtils.js
+                </a>
               
-              <a class="source" href="filtersToTables.html">
-                filtersToTables.js
-              </a>
-            
+                
+                <a class="source" href="filtersToTables.html">
+                  filtersToTables.js
+                </a>
               
-              <a class="source" href="healthCheck.html">
-                healthCheck.js
-              </a>
-            
+                
+                <a class="source" href="healthCheck.html">
+                  healthCheck.js
+                </a>
               
-              <a class="source" href="makeSql.html">
-                makeSql.js
-              </a>
-            
+                
+                <a class="source" href="makeSql.html">
+                  makeSql.js
+                </a>
               
-              <a class="source" href="server.html">
-                server.js
-              </a>
-            
+                
+                <a class="source" href="server.html">
+                  server.js
+                </a>
+              
+            </div>
           </div>
         </li>
       </ul>
@@ -88,9 +90,9 @@
             
             <div class="content"><div class='highlight'><pre><span class="hljs-meta">"use strict"</span>;
 
-<span class="hljs-keyword">var</span> Step = <span class="hljs-built_in">require</span>(<span class="hljs-string">'windshaft/node_modules/step'</span>);
-<span class="hljs-keyword">var</span> Pg = <span class="hljs-built_in">require</span>(<span class="hljs-string">'windshaft/node_modules/pg'</span>);
-<span class="hljs-keyword">var</span> Redis = <span class="hljs-built_in">require</span>(<span class="hljs-string">'windshaft/node_modules/redis-mpool/node_modules/redis'</span>);
+<span class="hljs-keyword">var</span> Step = <span class="hljs-built_in">require</span>(<span class="hljs-string">'step'</span>);
+<span class="hljs-keyword">var</span> Pg = <span class="hljs-built_in">require</span>(<span class="hljs-string">'pg'</span>);
+<span class="hljs-keyword">var</span> Redis = <span class="hljs-built_in">require</span>(<span class="hljs-string">'redis'</span>);
 
 <span class="hljs-comment">/**
  * Attempts to connect to a PostgreSQL database, providing the

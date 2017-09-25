@@ -16,53 +16,55 @@
           <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
           <a class="small" href="javascript:void(0);">+</a>
           <div id="jump_wrapper">
-          <div id="jump_page">
-            
+          <div id="jump_page_wrapper">
+            <div id="jump_page">
               
-              <a class="source" href="addDefaultsToFilter.html">
-                addDefaultsToFilter.js
-              </a>
-            
+                
+                <a class="source" href="addDefaultsToFilter.html">
+                  addDefaultsToFilter.js
+                </a>
               
-              <a class="source" href="config.html">
-                config.js
-              </a>
-            
+                
+                <a class="source" href="config.html">
+                  config.js
+                </a>
               
-              <a class="source" href="displayFiltersToWhere.html">
-                displayFiltersToWhere.js
-              </a>
-            
+                
+                <a class="source" href="displayFiltersToWhere.html">
+                  displayFiltersToWhere.js
+                </a>
               
-              <a class="source" href="filterObjectToWhere.html">
-                filterObjectToWhere.js
-              </a>
-            
+                
+                <a class="source" href="filterObjectToWhere.html">
+                  filterObjectToWhere.js
+                </a>
               
-              <a class="source" href="filterObjectUtils.html">
-                filterObjectUtils.js
-              </a>
-            
+                
+                <a class="source" href="filterObjectUtils.html">
+                  filterObjectUtils.js
+                </a>
               
-              <a class="source" href="filtersToTables.html">
-                filtersToTables.js
-              </a>
-            
+                
+                <a class="source" href="filtersToTables.html">
+                  filtersToTables.js
+                </a>
               
-              <a class="source" href="healthCheck.html">
-                healthCheck.js
-              </a>
-            
+                
+                <a class="source" href="healthCheck.html">
+                  healthCheck.js
+                </a>
               
-              <a class="source" href="makeSql.html">
-                makeSql.js
-              </a>
-            
+                
+                <a class="source" href="makeSql.html">
+                  makeSql.js
+                </a>
               
-              <a class="source" href="server.html">
-                server.js
-              </a>
-            
+                
+                <a class="source" href="server.html">
+                  server.js
+                </a>
+              
+            </div>
           </div>
         </li>
       </ul>
@@ -88,10 +90,10 @@
             
             <div class="content"><div class='highlight'><pre><span class="hljs-meta">"use strict"</span>;
 
-<span class="hljs-keyword">var</span> Windshaft = <span class="hljs-built_in">require</span>(<span class="hljs-string">'windshaft'</span>);
 <span class="hljs-keyword">var</span> _ = <span class="hljs-built_in">require</span>(<span class="hljs-string">'underscore'</span>);
 <span class="hljs-keyword">var</span> fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">'fs'</span>);
-<span class="hljs-keyword">var</span> rollbar = <span class="hljs-built_in">require</span>(<span class="hljs-string">'rollbar'</span>);
+<span class="hljs-keyword">var</span> Rollbar = <span class="hljs-built_in">require</span>(<span class="hljs-string">'rollbar'</span>);
+<span class="hljs-keyword">var</span> WindshaftServer = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./http/windshaftServer.js'</span>);
 <span class="hljs-keyword">var</span> healthCheck = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./healthCheck'</span>);
 <span class="hljs-keyword">var</span> makeSql = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./makeSql'</span>);
 <span class="hljs-keyword">var</span> config = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./config'</span>);</pre></div></div>
@@ -110,6 +112,12 @@
             </div>
             
             <div class="content"><div class='highlight'><pre><span class="hljs-keyword">var</span> rollbarAccessToken = process.env.ROLLBAR_SERVER_SIDE_ACCESS_TOKEN;
+<span class="hljs-keyword">if</span> (rollbarAccessToken) {
+    <span class="hljs-keyword">var</span> rollbar = <span class="hljs-keyword">new</span> Rollbar({
+        <span class="hljs-attr">accessToken</span>: rollbarAccessToken,
+        <span class="hljs-attr">environment</span>: process.env.OTM_STACK_TYPE || <span class="hljs-string">'Unknown'</span>
+    });
+}
 
 <span class="hljs-keyword">var</span> dbname = process.env.OTM_DB_NAME || <span class="hljs-string">'otm'</span>;
 <span class="hljs-keyword">var</span> port = process.env.PORT || <span class="hljs-number">4000</span>;
@@ -119,6 +127,7 @@
     <span class="hljs-attr">boundary</span>: fs.readFileSync(<span class="hljs-string">'style/boundary.mms'</span>, {<span class="hljs-attr">encoding</span>: <span class="hljs-string">'utf-8'</span>}),
     <span class="hljs-attr">canopy</span>: fs.readFileSync(<span class="hljs-string">'style/canopy.mms'</span>, {<span class="hljs-attr">encoding</span>: <span class="hljs-string">'utf-8'</span>}),
     <span class="hljs-attr">mapFeature</span>: fs.readFileSync(<span class="hljs-string">'style/mapFeature.mms'</span>, {<span class="hljs-attr">encoding</span>: <span class="hljs-string">'utf-8'</span>}),
+    <span class="hljs-attr">uncoloredMapFeature</span>: fs.readFileSync(<span class="hljs-string">'style/uncoloredMapFeature.mms'</span>, {<span class="hljs-attr">encoding</span>: <span class="hljs-string">'utf-8'</span>}),
     <span class="hljs-attr">polygonalMapFeature</span>: fs.readFileSync(<span class="hljs-string">'style/polygonalMapFeature.mms'</span>, {<span class="hljs-attr">encoding</span>: <span class="hljs-string">'utf-8'</span>})
 };
 
@@ -146,11 +155,7 @@ e.g. a map tile or UTF grid with map features like tree plots or boundaries.</p>
             <div class="content"><div class='highlight'><pre>
 <span class="hljs-keyword">var</span> windshaftConfig = {
     <span class="hljs-attr">useProfiler</span>: <span class="hljs-literal">false</span>,  <span class="hljs-comment">// if true, returns X-Tiler-Profiler header with rendering times</span>
-    statsd: {
-        <span class="hljs-attr">host</span>: process.env.OTM_STATSD_HOST || <span class="hljs-string">'127.0.0.1'</span>,
-        <span class="hljs-attr">port</span>: process.env.OTM_STATSD_PORT || <span class="hljs-number">8125</span>
-    },
-    <span class="hljs-attr">enable_cors</span>: <span class="hljs-literal">true</span>,
+    enable_cors: <span class="hljs-literal">true</span>,
     <span class="hljs-attr">log_format</span>: <span class="hljs-literal">null</span>,
     <span class="hljs-attr">mapnik</span>: {</pre></div></div>
             
@@ -240,8 +245,7 @@ make tile requests</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    base_url: <span class="hljs-string">'/:cache_buster/database/:unused/table/:table'</span>,
-    <span class="hljs-attr">base_url_notable</span>: <span class="hljs-string">'/:cache_buster/database/:unused/table'</span>,</pre></div></div>
+            <div class="content"><div class='highlight'><pre>    base_url: <span class="hljs-string">'/:cache_buster/database/:unused/table/:table'</span>,</pre></div></div>
             
         </li>
         
@@ -285,17 +289,22 @@ using the magic column name “the_geom_webmercator”.)</p>
                 displayString = req.query[config.displayQueryArgumentName];
                 restrictFeatureString = req.query[config.restrictFeatureQueryArgumentName];
                 isUtfGridRequest = (req.params.format === <span class="hljs-string">'grid.json'</span>);
-                req.query.sql = makeSql.makeSqlForMapFeatures(filterString,
-                                                              displayString,
-                                                              restrictFeatureString,
-                                                              instanceid,
-                                                              zoom,
-                                                              isUtfGridRequest,
-                                                              isPolygonRequest);
-
-                req.params.style = isPolygonRequest ? styles.polygonalMapFeature : styles.mapFeature;
+                req.params.sql = makeSql.makeSqlForMapFeatures(filterString,
+                                                               displayString,
+                                                               restrictFeatureString,
+                                                               instanceid,
+                                                               zoom,
+                                                               isUtfGridRequest,
+                                                               isPolygonRequest);
+                <span class="hljs-keyword">if</span> (isPolygonRequest) {
+                    req.params.style = styles.polygonalMapFeature;
+                } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (isUtfGridRequest) {
+                    req.params.style = styles.uncoloredMapFeature;
+                } <span class="hljs-keyword">else</span> {
+                    req.params.style = styles.mapFeature;
+                }
             } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (table === <span class="hljs-string">'treemap_boundary'</span> &amp;&amp; instanceid) {
-                req.query.sql = makeSql.makeSqlForBoundaries(instanceid);
+                req.params.sql = makeSql.makeSqlForBoundaries(instanceid);
                 req.params.style = styles.boundary;
             } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (table === <span class="hljs-string">'treemap_canopy_boundary'</span> &amp;&amp; instanceid) {
                 <span class="hljs-keyword">var</span> canopyMin = <span class="hljs-built_in">parseFloat</span>(req.query.canopyMin),
@@ -312,13 +321,13 @@ using the magic column name “the_geom_webmercator”.)</p>
                     <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">'Invalid argument: canopyMax'</span>);
                 }
 
-                req.query.sql = makeSql.makeSqlForCanopyBoundaries(instanceid,
+                req.params.sql = makeSql.makeSqlForCanopyBoundaries(instanceid,
                         canopyMin, canopyMax, category);
                 req.params.style = styles.canopy;
             }
         } <span class="hljs-keyword">catch</span> (err) {
             <span class="hljs-keyword">if</span> (rollbarAccessToken) {
-                rollbar.handleError(err, req);
+                rollbar.error(err, req);
             }
             callback(err, <span class="hljs-literal">null</span>);
         }</pre></div></div>
@@ -339,7 +348,6 @@ streamlining client actions like clicking on or hovering over a feature.
             </div>
             
             <div class="content"><div class='highlight'><pre>        req.params.interactivity = (isUtfGridRequest ? config.interactivityForUtfGridRequests : <span class="hljs-literal">null</span>);
-
         req.params.dbname = dbname;</pre></div></div>
             
         </li>
@@ -350,23 +358,6 @@ streamlining client actions like clicking on or hovering over a feature.
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-11">&#182;</a>
-              </div>
-              <p>Override request params with query params
-Note that we <em>always</em> overwrite req.query.sql above</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>        req.params =  _.extend({}, req.params);
-        _.extend(req.params, req.query);</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-12">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-12">&#182;</a>
               </div>
               <p>Send the finished req object on</p>
 
@@ -381,26 +372,24 @@ Note that we <em>always</em> overwrite req.query.sql above</p>
     }
 };
 
-ws = <span class="hljs-keyword">new</span> Windshaft.Server(windshaftConfig);
+ws = <span class="hljs-keyword">new</span> WindshaftServer(windshaftConfig);
 ws.get(<span class="hljs-string">'/health-check'</span>, healthCheck(windshaftConfig));</pre></div></div>
             
         </li>
         
         
-        <li id="section-13">
+        <li id="section-12">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-13">&#182;</a>
+                <a class="pilcrow" href="#section-12">&#182;</a>
               </div>
               <p>If a rollbar API token was provided this will wire up the rollbar error handler</p>
 
             </div>
             
             <div class="content"><div class='highlight'><pre><span class="hljs-keyword">if</span> (rollbarAccessToken) {
-    ws.use(rollbar.errorHandler(rollbarAccessToken, {
-        <span class="hljs-string">'environment'</span>: process.env.OTM_STACK_TYPE || <span class="hljs-string">'Unknown'</span>
-    }));
+    ws.use(rollbar.errorHandler());
 }
 
 ws.listen(port);

@@ -16,53 +16,55 @@
           <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
           <a class="small" href="javascript:void(0);">+</a>
           <div id="jump_wrapper">
-          <div id="jump_page">
-            
+          <div id="jump_page_wrapper">
+            <div id="jump_page">
               
-              <a class="source" href="addDefaultsToFilter.html">
-                addDefaultsToFilter.js
-              </a>
-            
+                
+                <a class="source" href="addDefaultsToFilter.html">
+                  addDefaultsToFilter.js
+                </a>
               
-              <a class="source" href="config.html">
-                config.js
-              </a>
-            
+                
+                <a class="source" href="config.html">
+                  config.js
+                </a>
               
-              <a class="source" href="displayFiltersToWhere.html">
-                displayFiltersToWhere.js
-              </a>
-            
+                
+                <a class="source" href="displayFiltersToWhere.html">
+                  displayFiltersToWhere.js
+                </a>
               
-              <a class="source" href="filterObjectToWhere.html">
-                filterObjectToWhere.js
-              </a>
-            
+                
+                <a class="source" href="filterObjectToWhere.html">
+                  filterObjectToWhere.js
+                </a>
               
-              <a class="source" href="filterObjectUtils.html">
-                filterObjectUtils.js
-              </a>
-            
+                
+                <a class="source" href="filterObjectUtils.html">
+                  filterObjectUtils.js
+                </a>
               
-              <a class="source" href="filtersToTables.html">
-                filtersToTables.js
-              </a>
-            
+                
+                <a class="source" href="filtersToTables.html">
+                  filtersToTables.js
+                </a>
               
-              <a class="source" href="healthCheck.html">
-                healthCheck.js
-              </a>
-            
+                
+                <a class="source" href="healthCheck.html">
+                  healthCheck.js
+                </a>
               
-              <a class="source" href="makeSql.html">
-                makeSql.js
-              </a>
-            
+                
+                <a class="source" href="makeSql.html">
+                  makeSql.js
+                </a>
               
-              <a class="source" href="server.html">
-                server.js
-              </a>
-            
+                
+                <a class="source" href="server.html">
+                  server.js
+                </a>
+              
+            </div>
           </div>
         </li>
       </ul>
@@ -346,7 +348,7 @@ accessHStore(‘grab_bag’, ‘is_valid’) -&gt; “grab_bag”-&gt;’is_vali
             
             <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">var</span> t = _.template(<span class="hljs-string">'"&lt;%= hStoreColumn %&gt;"::hstore-&gt;\'&lt;%= accessor %&gt;\''</span>);
     <span class="hljs-keyword">return</span> t({<span class="hljs-attr">hStoreColumn</span>: hStoreColumn,
-              <span class="hljs-attr">accessor</span>: accessor.replace(<span class="hljs-string">"'"</span>,<span class="hljs-string">"''"</span>)});
+              <span class="hljs-attr">accessor</span>: accessor.replace(<span class="hljs-regexp">/'/g</span>, <span class="hljs-string">"''"</span>)});
 }</pre></div></div>
             
         </li>
@@ -528,7 +530,7 @@ truthiness.  Truthy values -&gt; “NULL”, falsey values -&gt; “NOT NULL”<
 }
 
 <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">convertValueForLike</span>(<span class="hljs-params">value</span>) </span>{
-    <span class="hljs-keyword">return</span> <span class="hljs-string">"'%"</span> + utils.sanitizeSqlString(value).replace(<span class="hljs-string">"'"</span>, <span class="hljs-string">"''"</span>) + <span class="hljs-string">"%'"</span>;
+    <span class="hljs-keyword">return</span> <span class="hljs-string">"'%"</span> + utils.sanitizeSqlString(value).replace(<span class="hljs-regexp">/'/g</span>, <span class="hljs-string">"''"</span>) + <span class="hljs-string">"%'"</span>;
 }</pre></div></div>
             
         </li>
@@ -620,6 +622,9 @@ literal SQL</p>
             <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">if</span> (_.isObject(predicateValue) &amp;&amp; !_.isArray(predicateValue)) {
             matcher = predicateValue.EXCLUSIVE ? t.exclusiveMatcher : t.matcher;
             value = predicateValue.value;
+        } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (_.contains([<span class="hljs-string">'MAX'</span>, <span class="hljs-string">'MIN'</span>], predicateType) &amp;&amp;
+                   _.contains([<span class="hljs-literal">undefined</span>, <span class="hljs-literal">null</span>, <span class="hljs-string">""</span>], predicateValue)) {
+            <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;
         } <span class="hljs-keyword">else</span> {
             matcher = t.matcher;
             value = predicateValue;
@@ -649,7 +654,7 @@ provided, the template is evaluated and the result is used as the SQL.</p>
             
             <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">predicateToFilterObjects</span>(<span class="hljs-params">predicate</span>) </span>{
     validatePredicate(predicate);
-    <span class="hljs-keyword">return</span> _.map(predicate, predicateValueAndTypeToFilterObject);
+    <span class="hljs-keyword">return</span> _.reject(_.map(predicate, predicateValueAndTypeToFilterObject), _.isNull);
 }</pre></div></div>
             
         </li>
@@ -687,7 +692,7 @@ an underscore template</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">if</span> (f.sql_template) {
-            <span class="hljs-keyword">return</span> _.template(f.sql_template, { <span class="hljs-string">'column'</span>: columnName });
+            <span class="hljs-keyword">return</span> _.template(f.sql_template)({ <span class="hljs-string">'column'</span>: columnName });
         } <span class="hljs-keyword">else</span> {
             <span class="hljs-keyword">if</span> (columnName.indexOf(<span class="hljs-string">'-&gt;'</span>) !== <span class="hljs-number">-1</span>) {</pre></div></div>
             

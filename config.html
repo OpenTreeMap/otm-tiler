@@ -16,53 +16,55 @@
           <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
           <a class="small" href="javascript:void(0);">+</a>
           <div id="jump_wrapper">
-          <div id="jump_page">
-            
+          <div id="jump_page_wrapper">
+            <div id="jump_page">
               
-              <a class="source" href="addDefaultsToFilter.html">
-                addDefaultsToFilter.js
-              </a>
-            
+                
+                <a class="source" href="addDefaultsToFilter.html">
+                  addDefaultsToFilter.js
+                </a>
               
-              <a class="source" href="config.html">
-                config.js
-              </a>
-            
+                
+                <a class="source" href="config.html">
+                  config.js
+                </a>
               
-              <a class="source" href="displayFiltersToWhere.html">
-                displayFiltersToWhere.js
-              </a>
-            
+                
+                <a class="source" href="displayFiltersToWhere.html">
+                  displayFiltersToWhere.js
+                </a>
               
-              <a class="source" href="filterObjectToWhere.html">
-                filterObjectToWhere.js
-              </a>
-            
+                
+                <a class="source" href="filterObjectToWhere.html">
+                  filterObjectToWhere.js
+                </a>
               
-              <a class="source" href="filterObjectUtils.html">
-                filterObjectUtils.js
-              </a>
-            
+                
+                <a class="source" href="filterObjectUtils.html">
+                  filterObjectUtils.js
+                </a>
               
-              <a class="source" href="filtersToTables.html">
-                filtersToTables.js
-              </a>
-            
+                
+                <a class="source" href="filtersToTables.html">
+                  filtersToTables.js
+                </a>
               
-              <a class="source" href="healthCheck.html">
-                healthCheck.js
-              </a>
-            
+                
+                <a class="source" href="healthCheck.html">
+                  healthCheck.js
+                </a>
               
-              <a class="source" href="makeSql.html">
-                makeSql.js
-              </a>
-            
+                
+                <a class="source" href="makeSql.html">
+                  makeSql.js
+                </a>
               
-              <a class="source" href="server.html">
-                server.js
-              </a>
-            
+                
+                <a class="source" href="server.html">
+                  server.js
+                </a>
+              
+            </div>
           </div>
         </li>
       </ul>
@@ -89,7 +91,7 @@
             <div class="content"><div class='highlight'><pre><span class="hljs-meta">"use strict"</span>;
 
 <span class="hljs-keyword">var</span> canopyBoundarySql = [
-    <span class="hljs-string">"(SELECT the_geom_webmercator"</span>,
+    <span class="hljs-string">"SELECT the_geom_webmercator"</span>,
     <span class="hljs-string">", canopy_percent * 100 as percent"</span>,
     <span class="hljs-string">", FORMAT('%s (%s%%)',"</span>,</pre></div></div>
             
@@ -116,7 +118,6 @@ Ex. Pittsburgh (Allegheny) -&gt; Pittsburgh</p>
     <span class="hljs-string">" AND b.canopy_percent IS NOT NULL"</span>,
     <span class="hljs-string">" AND b.canopy_percent &gt;= &lt;%= canopy_min %&gt;"</span>,
     <span class="hljs-string">" AND b.canopy_percent &lt;= &lt;%= canopy_max %&gt;"</span>,
-    <span class="hljs-string">") otmfiltersql"</span>
 ].join(<span class="hljs-string">''</span>);
 
 <span class="hljs-built_in">module</span>.exports = {
@@ -144,7 +145,8 @@ Ex. Pittsburgh (Allegheny) -&gt; Pittsburgh</p>
                 <span class="hljs-string">"point"</span>: <span class="hljs-string">"the_geom_webmercator"</span>,
                 <span class="hljs-string">"polygon"</span>: <span class="hljs-string">"stormwater_polygonalmapfeature.polygon"</span>
             },
-            <span class="hljs-string">"base"</span>: <span class="hljs-string">"feature_type"</span>,
+            <span class="hljs-string">"base"</span>: <span class="hljs-string">"feature_type, treemap_tree.id AS tree_id"</span>,
+            <span class="hljs-string">"polygon"</span>: <span class="hljs-string">"feature_type"</span>,
             <span class="hljs-string">"utfGrid"</span>: <span class="hljs-string">"feature_type, treemap_mapfeature.id AS id"</span>
         },
         <span class="hljs-string">"basePointModel"</span>: <span class="hljs-string">"mapFeature"</span>,
@@ -240,7 +242,7 @@ be used in the filter for udf and so it is required</p>
         }
     },
     <span class="hljs-string">"treeDisplayFilters"</span>: [<span class="hljs-string">"EmptyPlot"</span>, <span class="hljs-string">"Tree"</span>],
-    <span class="hljs-string">"boundaryGrainstoreSql"</span>: <span class="hljs-string">"(SELECT the_geom_webmercator FROM treemap_boundary JOIN treemap_instance_boundaries ON treemap_instance_boundaries.boundary_id = treemap_boundary.id WHERE treemap_instance_boundaries.instance_id=&lt;%= instanceid %&gt; AND treemap_boundary.searchable=true) otmfiltersql"</span>,
+    <span class="hljs-string">"boundaryGrainstoreSql"</span>: <span class="hljs-string">"SELECT the_geom_webmercator FROM treemap_boundary JOIN treemap_instance_boundaries ON treemap_instance_boundaries.boundary_id = treemap_boundary.id WHERE treemap_instance_boundaries.instance_id=&lt;%= instanceid %&gt; AND treemap_boundary.searchable=true"</span>,
     <span class="hljs-string">"getBoundarySql"</span> : <span class="hljs-string">"SELECT the_geom_webmercator FROM treemap_boundary WHERE id=&lt;%= boundaryId %&gt;"</span>,
     <span class="hljs-string">"canopyBoundarySql"</span>: canopyBoundarySql,
     <span class="hljs-string">"showAtZoomSql"</span>: <span class="hljs-string">"(treemap_mapfeature.hide_at_zoom IS NULL OR treemap_mapfeature.hide_at_zoom &lt; &lt;%= zoom %&gt;)"</span>,
