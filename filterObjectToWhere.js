@@ -119,7 +119,7 @@ function accessHStore(hStoreColumn, accessor) {
     // TODO: sql injection? why don't we call sanitize?
     var t = _.template('"<%= hStoreColumn %>"::hstore->\'<%= accessor %>\'');
     return t({hStoreColumn: hStoreColumn,
-              accessor: accessor.replace("'","''")});
+              accessor: accessor.replace(/'/g, "''")});
 }
 
 
@@ -207,7 +207,7 @@ function convertValueForIsNull(value) {
 }
 
 function convertValueForLike(value) {
-    return "'%" + utils.sanitizeSqlString(value).replace("'", "''") + "%'";
+    return "'%" + utils.sanitizeSqlString(value).replace(/'/g, "''") + "%'";
 }
 
 // `validatePredicate` throws an error if the specified `predicate` object
@@ -250,6 +250,9 @@ function predicateValueAndTypeToFilterObject(predicateValue, predicateType) {
         if (_.isObject(predicateValue) && !_.isArray(predicateValue)) {
             matcher = predicateValue.EXCLUSIVE ? t.exclusiveMatcher : t.matcher;
             value = predicateValue.value;
+        } else if (_.contains(['MAX', 'MIN'], predicateType) &&
+                   _.contains([undefined, null, ""], predicateValue)) {
+            return null;
         } else {
             matcher = t.matcher;
             value = predicateValue;
@@ -267,7 +270,7 @@ function predicateValueAndTypeToFilterObject(predicateValue, predicateType) {
 // provided, the template is evaluated and the result is used as the SQL.
 function predicateToFilterObjects(predicate) {
     validatePredicate(predicate);
-    return _.map(predicate, predicateValueAndTypeToFilterObject);
+    return _.reject(_.map(predicate, predicateValueAndTypeToFilterObject), _.isNull);
 }
 
 // `fieldNameAndPredicateToSql` converts the specified `fieldName` and `predicate`
@@ -280,7 +283,7 @@ function fieldNameAndPredicateToSql(fieldName, predicate) {
         // name somewhere besides the LHS so we provide it via
         // an underscore template
         if (f.sql_template) {
-            return _.template(f.sql_template, { 'column': columnName });
+            return _.template(f.sql_template)({ 'column': columnName });
         } else {
             if (columnName.indexOf('->') !== -1) {
                 // if the column is an hstore field and the value is a

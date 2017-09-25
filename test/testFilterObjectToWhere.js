@@ -89,6 +89,11 @@ describe('filterObjectToWhere', function() {
                   "(\"treemap_mapfeature\".\"address\" ILIKE '%Market St%')");
     });
 
+    it('escapes interior quotes in Hstore LIKE', function () {
+        assertSql({"tree.udf:Dimensions": {"LIKE": "\"8'' x 10'\""}},
+                  "((\"treemap_tree\".\"udfs\"::hstore->'Dimensions') ILIKE '%\"8'''' x 10''\"%')");
+    });
+
     // UDF MATCHES
     it('processes udf values', function() {
         assertSql({"mapFeature.udf:Clever Name": {"LIKE": "Market St"}},
@@ -212,6 +217,16 @@ describe('filterObjectToWhere', function() {
     it('return an exclusive min and max clause', function () {
         assertSql({"tree.height": {"MIN": {"value": 2, "EXCLUSIVE": true}, "MAX": {"value": 3, "EXCLUSIVE": true}}},
                   "(\"treemap_tree\".\"height\" > 2 AND \"treemap_tree\".\"height\" < 3)");
+    });
+
+    it('ignores empty min or max predicate values', function () {
+        assertSql({"tree.height": {"MIN": 0, "MAX": ""}}, "(\"treemap_tree\".\"height\" >= 0)");
+        assertSql({"tree.height": {"MIN": 0, "MAX": undefined}}, "(\"treemap_tree\".\"height\" >= 0)");
+        assertSql({"tree.height": {"MIN": 0, "MAX": null}}, "(\"treemap_tree\".\"height\" >= 0)");
+
+        assertSql({"tree.height": {"MIN": "", "MAX": 2}}, "(\"treemap_tree\".\"height\" <= 2)");
+        assertSql({"tree.height": {"MIN": undefined, "MAX": 2}}, "(\"treemap_tree\".\"height\" <= 2)");
+        assertSql({"tree.height": {"MIN": null, "MAX": 2}}, "(\"treemap_tree\".\"height\" <= 2)");
     });
 
     it('raises an error when MIN is mixed with IN', function() {

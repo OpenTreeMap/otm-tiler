@@ -90,7 +90,7 @@ function makeSqlForMapFeatures(filterString, displayString, restrictFeatureStrin
     geom_field = util.format("%s AS %s",
                              geom_field, config.customDbFieldNames.geom);
     return _.template(
-        '( SELECT <%= fields %> FROM <%= tables %> <%= where %> ) otmfiltersql '
+        'SELECT <%= fields %> FROM <%= tables %> <%= where %>'
     )({
         fields: geom_field + ', ' + otherFields,
         tables: tables.sql,
