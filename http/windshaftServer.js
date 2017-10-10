@@ -6,13 +6,22 @@
 var debug = require('debug')('windshaft:server');
 var express = require('express');
 var RedisPool = require('redis-mpool');
+var Pg = require('pg');
 var _ = require('underscore');
 var mapnik = require('mapnik');
 
 var windshaft = require('windshaft');
 
 var MapController = require('./mapController.js');
+var middleware = require('./middleware.js');
 
+var dbPool = new Pg.Pool({
+    user: process.env.OTM_DB_USER || 'otm',
+    password: process.env.OTM_DB_PASSWORD || 'otm',
+    host: process.env.OTM_DB_HOST || 'localhost',
+    port: process.env.OTM_DB_PORT || 5432,
+    database: process.env.OTM_DB_NAME || 'otm'
+});
 //
 // @param opts server options object. Example value:
 //     {
@@ -73,6 +82,8 @@ module.exports = function(opts) {
     // initialize express server
     var app = bootstrap(opts);
     addFilters(app, opts);
+
+    app.use(middleware.instanceConfig({dbPool: dbPool}));
 
     var redisPool = makeRedisPool(opts.redis);
 
