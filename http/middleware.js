@@ -1,7 +1,14 @@
 module.exports = {
     instanceConfig: function(opts) {
         return function (req, res, next) {
-            var start = Date.now();
+            var start = Date.now(),
+                hasInstance = !!req.query.instance_id;
+            if (!hasInstance) {
+                // If we don't have an instance_id (e.g. a health-check request)
+                // skip this middleware.
+                next();
+                return;
+            }
             req.instanceConfig = {};
             opts.dbPool.connect(function(err, client, done) {
                 if (!err) {
