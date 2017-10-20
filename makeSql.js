@@ -32,6 +32,7 @@ var displayFiltersToWhere = require('./displayFiltersToWhere');
 var filtersToTables = require('./filtersToTables');
 var addDefaultsToFilter = require('./addDefaultsToFilter');
 var config = require('./config');
+var units = require('./units');
 var utils = require('./filterObjectUtils');
 
 
@@ -39,15 +40,15 @@ var utils = require('./filterObjectUtils');
 // Assumes that instanceid is an integer, ready to be plugged
 // directly into SQL
 function makeSqlForMapFeatures(filterString, displayString, restrictFeatureString, instanceid,
-                               zoom, isUtfGridRequest, isPolygonRequest) {
+                               zoom, isUtfGridRequest, isPolygonRequest, instanceConfig) {
     var geom_spec = config.sqlForMapFeatures.fields.geom,
         geom_field = isPolygonRequest ? geom_spec.polygon : geom_spec.point,
         parsedFilterObject = filterString ? JSON.parse(filterString) : {},
         displayFilters = displayString ? JSON.parse(displayString) : undefined,
         restrictFeatureFilters = restrictFeatureString ? JSON.parse(restrictFeatureString) : undefined,
 
-        filterObject = addDefaultsToFilter(parsedFilterObject, zoom, isPolygonRequest),
-
+        filterObjectWithDefaults = addDefaultsToFilter(parsedFilterObject, zoom, isPolygonRequest),
+        filterObject = units.convertFilterUnits(filterObjectWithDefaults, instanceConfig),
         tables = filtersToTables(filterObject, displayFilters, isPolygonRequest, isUtfGridRequest),
 
         where = '',
