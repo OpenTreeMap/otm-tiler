@@ -107,7 +107,8 @@ var windshaftConfig = {
                                                                instanceid,
                                                                zoom,
                                                                isUtfGridRequest,
-                                                               isPolygonRequest);
+                                                               isPolygonRequest,
+                                                               req.instanceConfig);
                 if (isPolygonRequest) {
                     req.params.style = styles.polygonalMapFeature;
                 } else if (isUtfGridRequest) {
