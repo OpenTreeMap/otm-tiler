@@ -64,6 +64,11 @@
                   server.js
                 </a>
               
+                
+                <a class="source" href="units.html">
+                  units.js
+                </a>
+              
             </div>
           </div>
         </li>
@@ -158,6 +163,7 @@ That particularly hurts in production where we have just one DB server and four 
 <span class="hljs-keyword">var</span> filtersToTables = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./filtersToTables'</span>);
 <span class="hljs-keyword">var</span> addDefaultsToFilter = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./addDefaultsToFilter'</span>);
 <span class="hljs-keyword">var</span> config = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./config'</span>);
+<span class="hljs-keyword">var</span> units = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./units'</span>);
 <span class="hljs-keyword">var</span> utils = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./filterObjectUtils'</span>);</pre></div></div>
             
         </li>
@@ -176,15 +182,15 @@ directly into SQL</p>
             </div>
             
             <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">makeSqlForMapFeatures</span>(<span class="hljs-params">filterString, displayString, restrictFeatureString, instanceid,
-                               zoom, isUtfGridRequest, isPolygonRequest</span>) </span>{
+                               zoom, isUtfGridRequest, isPolygonRequest, instanceConfig</span>) </span>{
     <span class="hljs-keyword">var</span> geom_spec = config.sqlForMapFeatures.fields.geom,
         geom_field = isPolygonRequest ? geom_spec.polygon : geom_spec.point,
         parsedFilterObject = filterString ? <span class="hljs-built_in">JSON</span>.parse(filterString) : {},
         displayFilters = displayString ? <span class="hljs-built_in">JSON</span>.parse(displayString) : <span class="hljs-literal">undefined</span>,
         restrictFeatureFilters = restrictFeatureString ? <span class="hljs-built_in">JSON</span>.parse(restrictFeatureString) : <span class="hljs-literal">undefined</span>,
 
-        filterObject = addDefaultsToFilter(parsedFilterObject, zoom, isPolygonRequest),
-
+        filterObjectWithDefaults = addDefaultsToFilter(parsedFilterObject, zoom, isPolygonRequest),
+        filterObject = units.convertFilterUnits(filterObjectWithDefaults, instanceConfig),
         tables = filtersToTables(filterObject, displayFilters, isPolygonRequest, isUtfGridRequest),
 
         where = <span class="hljs-string">''</span>,

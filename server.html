@@ -64,6 +64,11 @@
                   server.js
                 </a>
               
+                
+                <a class="source" href="units.html">
+                  units.js
+                </a>
+              
             </div>
           </div>
         </li>
@@ -295,7 +300,8 @@ using the magic column name “the_geom_webmercator”.)</p>
                                                                instanceid,
                                                                zoom,
                                                                isUtfGridRequest,
-                                                               isPolygonRequest);
+                                                               isPolygonRequest,
+                                                               req.instanceConfig);
                 <span class="hljs-keyword">if</span> (isPolygonRequest) {
                     req.params.style = styles.polygonalMapFeature;
                 } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (isUtfGridRequest) {
