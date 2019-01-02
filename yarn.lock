@@ -1498,9 +1498,9 @@ mocha@^3.5.2:
     mkdirp "0.5.1"
     supports-color "3.1.2"
 
-moment@2.1.0:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/moment/-/moment-2.1.0.tgz#1fd7b1134029a953c6ea371dbaee37598ac03567"
+moment@2.19.3:
+  version "2.19.3"
+  resolved "https://registry.yarnpkg.com/moment/-/moment-2.19.3.tgz#bdb99d270d6d7fda78cc0fbace855e27fe7da69f"
 
 morgan@~1.6.1:
   version "1.6.1"
