@@ -8,20 +8,28 @@ var config = require('./config');
 // and format date and datetime strings.
 var DATETIME_FORMATS = {
     full: 'YYYY-MM-DD HH:mm:ss',
+    fullWithT: 'YYYY-MM-DDTHH:mm:ss',
     date: 'YYYY-MM-DD',
     time: 'HH:mm:ss'
 };
 
+// We always want to use strict mode for our date parsing. Defining a boolean
+// constant makes the moment constructor calls more self documenting.
+var STRICT = true;
+
 // `isDateString` returns a boolean indicating whether or not the string value
 // should be treated as datetime.
 function isDateTimeString(value) {
-    return moment(value, DATETIME_FORMATS.full).isValid();
+    return moment(value, DATETIME_FORMATS.full, STRICT).isValid() ||
+        moment(value, DATETIME_FORMATS.fullWithT, STRICT).isValid();
 }
 
 // `dateTimeStringToSqlValue` converts a datetime string into a Postgres
 // compatible literal date and time value.
 function dateTimeStringToSqlValue(dtString) {
-    var m = moment(dtString, DATETIME_FORMATS.full);
+    var m = moment(dtString, DATETIME_FORMATS.full, STRICT).isValid() ?
+        moment(dtString, DATETIME_FORMATS.full, STRICT) :
+        moment(dtString, DATETIME_FORMATS.fullWithT, STRICT);
     return "(DATE '" + m.format(DATETIME_FORMATS.date) +
         "' + TIME '" + m.format(DATETIME_FORMATS.time) + "')";
 }
