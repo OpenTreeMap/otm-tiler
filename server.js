@@ -73,7 +73,8 @@ var windshaftConfig = {
             user: process.env.OTM_DB_USER || 'otm',
             password: process.env.OTM_DB_PASSWORD || 'otm',
             host: process.env.OTM_DB_HOST || 'localhost',
-            port: process.env.OTM_DB_PORT || 5432
+            port: process.env.OTM_DB_PORT || 5432,
+            dbname: dbname
         }
     }, // See grainstore npm for other options
 
