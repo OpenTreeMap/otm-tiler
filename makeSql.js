@@ -40,7 +40,7 @@ var utils = require('./filterObjectUtils');
 // Assumes that instanceid is an integer, ready to be plugged
 // directly into SQL
 function makeSqlForMapFeatures(filterString, displayString, restrictFeatureString, instanceid,
-                               zoom, isUtfGridRequest, isPolygonRequest, instanceConfig) {
+                               zoom, isUtfGridRequest, isPolygonRequest, instanceConfig, showImportedTrees) {
     var geom_spec = config.sqlForMapFeatures.fields.geom,
         geom_field = isPolygonRequest ? geom_spec.polygon : geom_spec.point,
         parsedFilterObject = filterString ? JSON.parse(filterString) : {},
@@ -85,7 +85,9 @@ function makeSqlForMapFeatures(filterString, displayString, restrictFeatureStrin
     } else if (isPolygonRequest) {
         otherFields = config.sqlForMapFeatures.fields.polygon;
     } else {
-        otherFields = config.sqlForMapFeatures.fields.base;
+        // we only sometimes want different colors for imported trees
+        var importerField = showImportedTrees ? 'importer_treeimportrow.id' : 'null';
+        otherFields = _.template(config.sqlForMapFeatures.fields.base)({'importerField': importerField});
     }
 
     geom_field = util.format("%s AS %s",

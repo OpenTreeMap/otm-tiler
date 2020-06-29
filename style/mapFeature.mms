@@ -7,6 +7,9 @@
 @empty_plot_fill_color: #E1C6FF;
 @empty_plot_stroke_color: #D4B5F9;
 
+@imported_tree_fill_color: #85B4ED;
+@imported_tree_stroke_color: #6E9AE0;
+
 @gsi_fill_color: #388E8E;
 
 @tree_gsi_border_color: #b6ce78;
@@ -17,6 +20,9 @@
     }
     [tree_id=null][feature_type="Plot"] {
         marker-fill: @empty_plot_fill_color;
+    }
+    [tree_id!=null][feature_type="Plot"][importer_id!=null] {
+        marker-fill: @imported_tree_fill_color;
     }
 
     [feature_type!="Plot"] {
@@ -33,6 +39,9 @@
     }
     [tree_id!=null][feature_type="Plot"][zoom >= 15] {
         marker-line-color: @tree_gsi_border_color;
+    }
+    [tree_id!=null][feature_type="Plot"][zoom >= 15][importer_id!=null] {
+        marker-line-color: @imported_tree_stroke_color;
     }
     [feature_type!="Plot"][zoom >= 15] {
         marker-line-color: @tree_gsi_border_color;

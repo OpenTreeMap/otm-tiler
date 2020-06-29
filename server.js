@@ -96,19 +96,25 @@ var windshaftConfig = {
             table = req.params.table;
             zoom = req.params.z;
             isPolygonRequest = (table === 'stormwater_polygonalmapfeature');
-            if (table === 'treemap_mapfeature' || isPolygonRequest) {
+            if (table === 'treemap_mapfeature' || isPolygonRequest || table === 'importer_treerowimport') {
                 filterString = req.query[config.filterQueryArgumentName];
                 displayString = req.query[config.displayQueryArgumentName];
                 restrictFeatureString = req.query[config.restrictFeatureQueryArgumentName];
                 isUtfGridRequest = (req.params.format === 'grid.json');
-                req.params.sql = makeSql.makeSqlForMapFeatures(filterString,
-                                                               displayString,
-                                                               restrictFeatureString,
-                                                               instanceid,
-                                                               zoom,
-                                                               isUtfGridRequest,
-                                                               isPolygonRequest,
-                                                               req.instanceConfig);
+
+                var showImportedTrees = table === 'importer_treerowimport';
+
+                req.params.sql = makeSql.makeSqlForMapFeatures(
+                    filterString,
+                    displayString,
+                    restrictFeatureString,
+                    instanceid,
+                    zoom,
+                    isUtfGridRequest,
+                    isPolygonRequest,
+                    req.instanceConfig,
+                    showImportedTrees
+                );
                 if (isPolygonRequest) {
                     req.params.style = styles.polygonalMapFeature;
                 } else if (isUtfGridRequest) {

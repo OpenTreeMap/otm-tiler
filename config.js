@@ -29,7 +29,7 @@ module.exports = {
                 "point": "the_geom_webmercator",
                 "polygon": "stormwater_polygonalmapfeature.polygon"
             },
-            "base": "feature_type, treemap_tree.id AS tree_id",
+            "base": "feature_type, treemap_tree.id AS tree_id, <%= importerField %> as importer_id",
             "polygon": "feature_type",
             "utfGrid": "feature_type, treemap_mapfeature.id AS id"
         },
@@ -74,6 +74,10 @@ module.exports = {
                 "depends": ["mapFeature"],
                 "sql": "LEFT OUTER JOIN treemap_mapfeaturephoto ON treemap_mapfeature.id = treemap_mapfeaturephoto.map_feature_id"
             },
+            "treeRowImport": {
+                "depends": ["mapFeature", "tree"],
+                "sql": "JOIN importer_treeimportrow on importer_treeimportrow.plot_id = treemap_tree.plot_id"
+            },
             "udf": {
                 // Despite mapFeature not being referenced in the "sql" property it will
                 // be used in the filter for udf and so it is required
@@ -105,7 +109,8 @@ module.exports = {
         "bioswale": "stormwater_bioswale",
         "species": "treemap_species",
         "mapFeaturePhoto": "treemap_mapfeaturephoto",
-        "udf": "treemap_userdefinedcollectionvalue"
+        "udf": "treemap_userdefinedcollectionvalue",
+        "treeRowImport": "importer_treeimportrow"
     },
     "udfcTemplates": {
         "tree": "treemap_userdefinedcollectionvalue.field_definition_id=<%= fieldDefId %> AND treemap_userdefinedcollectionvalue.model_id=treemap_tree.id",
