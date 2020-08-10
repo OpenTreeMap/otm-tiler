@@ -23,6 +23,7 @@ var ws;
 
 var styles = {
     boundary: fs.readFileSync('style/boundary.mms', {encoding: 'utf-8'}),
+    boundaryCategory: fs.readFileSync('style/boundaryCategory.mms', {encoding: 'utf-8'}),
     canopy: fs.readFileSync('style/canopy.mms', {encoding: 'utf-8'}),
     mapFeature: fs.readFileSync('style/mapFeature.mms', {encoding: 'utf-8'}),
     uncoloredMapFeature: fs.readFileSync('style/uncoloredMapFeature.mms', {encoding: 'utf-8'}),
@@ -123,6 +124,10 @@ var windshaftConfig = {
                 } else {
                     req.params.style = styles.mapFeature;
                 }
+            } else if (table === 'treemap_boundary' && 'category' in req.query) {
+                category = req.query.category;
+                req.params.sql = makeSql.makeSqlForBoundariesLayers(category);
+                req.params.style = styles.boundaryCategory;
             } else if (table === 'treemap_boundary' && instanceid) {
                 req.params.sql = makeSql.makeSqlForBoundaries(instanceid);
                 req.params.style = styles.boundary;

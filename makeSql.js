@@ -124,6 +124,12 @@ function makeSqlForBoundaries(instanceid) {
     });
 }
 
+function makeSqlForBoundariesLayers(category) {
+    return _.template(config.boundaryLayerGrainstoreSql)({
+        category: category
+    });
+}
+
 function makeSqlForCanopyBoundaries(instanceid, canopy_min, canopy_max, category) {
     return _.template(config.canopyBoundarySql)({
         instanceid: instanceid,
@@ -136,5 +142,6 @@ function makeSqlForCanopyBoundaries(instanceid, canopy_min, canopy_max, category
 exports = module.exports = {
     makeSqlForMapFeatures: makeSqlForMapFeatures,
     makeSqlForCanopyBoundaries: makeSqlForCanopyBoundaries,
-    makeSqlForBoundaries: makeSqlForBoundaries
+    makeSqlForBoundaries: makeSqlForBoundaries,
+    makeSqlForBoundariesLayers: makeSqlForBoundariesLayers
 };

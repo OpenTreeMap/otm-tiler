@@ -92,6 +92,7 @@ module.exports = {
     },
     "treeDisplayFilters": ["EmptyPlot", "Tree"],
     "boundaryGrainstoreSql": "SELECT the_geom_webmercator FROM treemap_boundary JOIN treemap_instance_boundaries ON treemap_instance_boundaries.boundary_id = treemap_boundary.id WHERE treemap_instance_boundaries.instance_id=<%= instanceid %> AND treemap_boundary.searchable=true",
+    "boundaryLayerGrainstoreSql": "SELECT the_geom_webmercator, category, name FROM treemap_boundary WHERE treemap_boundary.category='<%= category %>' AND treemap_boundary.searchable=true",
     "getBoundarySql" : "SELECT the_geom_webmercator FROM treemap_boundary WHERE id=<%= boundaryId %>",
     "canopyBoundarySql": canopyBoundarySql,
     "showAtZoomSql": "(treemap_mapfeature.hide_at_zoom IS NULL OR treemap_mapfeature.hide_at_zoom < <%= zoom %>)",
