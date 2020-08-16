@@ -14,9 +14,19 @@
 		line-color:#ddd;
 		line-opacity: 0.7;
       }
+	  [category="Ward"] {
+		line-width: 5;
+		line-color:#ddd;
+		line-opacity: 0.7;
+      }
   }
 
   ::fill {
+	line-width: 0.5;
+	line-color: #444;
+	line-dasharray: 10, 8;
+    polygon-fill: #55A9F2;
+  	polygon-opacity: 0.2;
 
 	  [category="Parcels"] {
 		line-width: 0.5;
@@ -59,6 +69,14 @@
       }
 
 	  [category="Neighborhood"] {
+		line-width: 0.5;
+		line-color: #444;
+		line-dasharray: 10, 8;
+		polygon-fill: #55A9F2;
+		polygon-opacity: 0.2;
+      }
+
+	  [category="Ward"] {
 		line-width: 0.5;
 		line-color: #444;
 		line-dasharray: 10, 8;
