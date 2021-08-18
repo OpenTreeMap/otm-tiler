@@ -22,64 +22,43 @@
   }
 
   ::fill {
-	line-width: 0.5;
-	line-color: #444;
-	line-dasharray: 10, 8;
+	line-width: 0.75;
+	line-color: #000;
+	line-opacity: 0.8;
     polygon-fill: #55A9F2;
   	polygon-opacity: 0.2;
 
 	  [category="Parcels"] {
-		line-width: 0.5;
-		line-color: #444;
-		line-dasharray: 10, 8;
 		polygon-fill: #ED9FA7;
 		polygon-opacity: 0.2;
       }
 
 	  [category="Zones"] {
-		line-width: 0.5;
-		line-color: #444;
-		line-dasharray: 10, 8;
 		polygon-fill: #ED9FA7;
 		polygon-opacity: 0.2;
       }
 
 	  [category="SID"] {
-		line-width: 0.5;
-		line-color: #444;
-		line-dasharray: 10, 8;
 		polygon-fill: #ED9FA7;
 		polygon-opacity: 0.2;
       }
 	  
 	  [category="Park"] {
-		line-width: 0.5;
-		line-color: #444;
-		line-dasharray: 10, 8;
 		polygon-fill: #ED9FA7;
 		polygon-opacity: 0.2;
       }
 
 	  [category="Main Neighborhood"] {
-		line-width: 0.5;
-		line-color: #444;
-		line-dasharray: 10, 8;
 		polygon-fill: #55A9F2;
 		polygon-opacity: 0.2;
       }
 
 	  [category="Neighborhood"] {
-		line-width: 0.5;
-		line-color: #444;
-		line-dasharray: 10, 8;
-		polygon-fill: #55A9F2;
+		polygon-fill: #557CF2;
 		polygon-opacity: 0.2;
       }
 
 	  [category="Ward"] {
-		line-width: 0.5;
-		line-color: #444;
-		line-dasharray: 10, 8;
 		polygon-fill: #55A9F2;
 		polygon-opacity: 0.2;
       }
@@ -93,7 +72,7 @@
     text-halo-fill: rgba(255, 255, 255, 0.5);
     text-halo-radius: 1;
     text-placement: interior;
-    text-avoid-edges: true;
+    text-avoid-edges: false;
 
     [zoom < 14] { text-name: ''; }
     [category="Parcels"] { text-name: ''; }
