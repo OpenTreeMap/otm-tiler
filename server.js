@@ -105,6 +105,7 @@ var windshaftConfig = {
                 isUtfGridRequest = (req.params.format === 'grid.json');
 
                 var showImportedTrees = table === 'importer_treerowimport';
+                var showTreeCondition = req.query[config.showTreeCondition] === 'true';
 
                 req.params.sql = makeSql.makeSqlForMapFeatures(
                     filterString,
@@ -115,7 +116,8 @@ var windshaftConfig = {
                     isUtfGridRequest,
                     isPolygonRequest,
                     req.instanceConfig,
-                    showImportedTrees
+                    showImportedTrees,
+                    showTreeCondition
                 );
                 if (isPolygonRequest) {
                     req.params.style = styles.polygonalMapFeature;

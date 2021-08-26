@@ -14,7 +14,7 @@ RUN apt-get update && apt-get install -y \
     libpango1.0-dev \
     curl
 
-RUN curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash - && apt-get install -y nodejs
+RUN curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash - && apt-get install -y --force-yes nodejs
 
 RUN npm install -g yarn
 

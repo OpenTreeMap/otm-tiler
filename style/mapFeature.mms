@@ -10,6 +10,12 @@
 @imported_tree_fill_color: #85B4ED;
 @imported_tree_stroke_color: #6E9AE0;
 
+@tree_unhealthy_fill_color: #8B1002;
+@tree_dead_fill_color: #303031;
+
+@tree_unhealthy_stroke_color: #B5554A;
+@tree_dead_stroke_color: #646469;
+
 @gsi_fill_color: #388E8E;
 
 @tree_gsi_border_color: #b6ce78;
@@ -23,6 +29,12 @@
     }
     [tree_id!=null][feature_type="Plot"][importer_id!=null] {
         marker-fill: @imported_tree_fill_color;
+    }
+    [tree_id!=null][feature_type="Plot"][condition="Dead"] {
+        marker-fill: @tree_dead_fill_color;
+    }
+    [tree_id!=null][feature_type="Plot"][condition="Unhealthy"] {
+        marker-fill: @tree_unhealthy_fill_color;
     }
 
     [feature_type!="Plot"] {
@@ -42,6 +54,12 @@
     }
     [tree_id!=null][feature_type="Plot"][zoom >= 15][importer_id!=null] {
         marker-line-color: @imported_tree_stroke_color;
+    }
+    [tree_id!=null][feature_type="Plot"][zoom >= 15][condition="Dead"] {
+        marker-line-color: @tree_dead_stroke_color;
+    }
+    [tree_id!=null][feature_type="Plot"][zoom >= 15][condition="Unhealthy"] {
+        marker-line-color: @tree_unhealthy_stroke_color;
     }
     [feature_type!="Plot"][zoom >= 15] {
         marker-line-color: @tree_gsi_border_color;

@@ -19,6 +19,7 @@ var canopyBoundarySql = [
 
 module.exports = {
     "filterQueryArgumentName": "q",
+    "showTreeCondition": "showTreeCondition",
     "displayQueryArgumentName": "show",
     "restrictFeatureQueryArgumentName": "restrict",
     // This is the column name of the hstore column used for scalar udfs
@@ -29,7 +30,7 @@ module.exports = {
                 "point": "the_geom_webmercator",
                 "polygon": "stormwater_polygonalmapfeature.polygon"
             },
-            "base": "feature_type, treemap_tree.id AS tree_id, <%= importerField %> as importer_id",
+            "base": "feature_type, treemap_tree.id AS tree_id, <%= importerField %> as importer_id, <%= conditionField %> as condition",
             "polygon": "feature_type",
             "utfGrid": "feature_type, treemap_mapfeature.id AS id"
         },
