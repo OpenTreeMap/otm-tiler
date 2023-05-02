@@ -20,9 +20,7 @@ jobs:
       - name: Commit an push files
         run: |
           cd src/otm-cluster
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
           git commit -a -m "Trigger tiler build"
-
-      - name: Push changes to otm-cluster
-        uses: ad-m/github-push-action@master
-        with:
-          force_with_lease: true
+          git push
