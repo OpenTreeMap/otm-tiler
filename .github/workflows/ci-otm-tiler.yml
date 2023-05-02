@@ -1,0 +1,30 @@
+name: CI for OTM tiler build
+
+on:
+  push:
+    paths:
+      - /**
+jobs:
+  ci:
+    name: Trigger otm-cluster build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone otm-cluster without sub-modules
+        uses: actions/checkout@master
+        with:
+          name: OpenTreeMap/otm-cluster     <-- clone https://github.com/OpenTreeMap/otm-cluster
+          ref: refs/heads/main
+
+      - name: Generate commit-sha.txt
+        run: echo "${GITHUB_REF##*/}-${GITHUB_SHA:0:7}" >> build/otm-tiler/commit-sha.txt
+
+      - name: Commit files
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git commit -a -m "Trigger tiler build"
+
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          force_with_lease: true
