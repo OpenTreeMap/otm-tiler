@@ -7,19 +7,17 @@ jobs:
     name: Trigger otm-cluster build
     runs-on: ubuntu-latest
     steps:
-      - name: Clone otm-cluster without sub-modules
-        uses: actions/checkout@v2
-        with:
-          repository: OpenTreeMap/otm-cluster
-          ref: main
+      - name: Clone otm-cluster
+        run: |
+          mkdir -p ./src 
+          cd ./src
+          git clone https://${{ secrets.ACCESS_TOKEN }}@github.com/OpenTreeMap/otm-cluster.git
 
       - name: Generate commit-sha.txt
         run: echo "${GITHUB_REF##*/}-${GITHUB_SHA:0:7}" >> build/otm-tiler/commit-sha.txt
 
       - name: Commit files
         run: |
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
           git commit -a -m "Trigger tiler build"
 
       - name: Push changes to otm-cluster
