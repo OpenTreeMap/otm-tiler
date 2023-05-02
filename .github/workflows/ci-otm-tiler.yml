@@ -11,7 +11,7 @@ jobs:
         uses: actions/checkout@master
         with:
           name: OpenTreeMap/otm-cluster     <-- clone https://github.com/OpenTreeMap/otm-cluster
-          ref: refs/heads/main
+          ref: main
 
       - name: Generate commit-sha.txt
         run: echo "${GITHUB_REF##*/}-${GITHUB_SHA:0:7}" >> build/otm-tiler/commit-sha.txt
