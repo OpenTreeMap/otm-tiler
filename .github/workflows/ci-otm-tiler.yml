@@ -1,10 +1,10 @@
-name: CI for OTM tiler build
+name: CI to trigger otm-cluster tiler image build
 
 on: push
 
 jobs:
   ci:
-    name: Trigger otm-cluster build
+    name: Trigger otm-cluster tiler image build
     runs-on: ubuntu-latest
     steps:
       - name: Clone otm-cluster
