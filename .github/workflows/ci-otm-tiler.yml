@@ -14,7 +14,9 @@ jobs:
           git clone https://${{ secrets.ACCESS_TOKEN }}@github.com/OpenTreeMap/otm-cluster.git
 
       - name: Generate commit-sha.txt
-        run: echo "${GITHUB_REF##*/}-${GITHUB_SHA:0:7}" >> build/otm-tiler/commit-sha.txt
+        run: |
+          ls -la
+          echo "${GITHUB_REF##*/}-${GITHUB_SHA:0:7}" >> build/otm-tiler/commit-sha.txt
 
       - name: Commit files
         run: |
