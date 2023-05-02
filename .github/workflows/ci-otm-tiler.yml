@@ -19,6 +19,6 @@ jobs:
 
       - name: Commit an push files
         run: |
-          cd src
+          cd src/otm-cluster
           git commit -a -m "Trigger tiler build"
           git push
