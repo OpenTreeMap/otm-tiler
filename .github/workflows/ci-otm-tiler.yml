@@ -1,9 +1,7 @@
 name: CI for OTM tiler build
 
-on:
-  push:
-    paths:
-      - /**
+on: push
+
 jobs:
   ci:
     name: Trigger otm-cluster build
