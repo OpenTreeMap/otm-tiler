@@ -10,7 +10,7 @@ jobs:
       - name: Clone otm-cluster without sub-modules
         uses: actions/checkout@v2
         with:
-          repository: OpenTreeMap/otm-cluster     <-- clone https://github.com/OpenTreeMap/otm-cluster
+          repository: OpenTreeMap/otm-cluster
           ref: main
 
       - name: Generate commit-sha.txt
