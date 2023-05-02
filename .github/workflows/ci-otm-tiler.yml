@@ -8,9 +8,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Clone otm-cluster without sub-modules
-        uses: actions/checkout@master
+        uses: actions/checkout@v2
         with:
-          name: OpenTreeMap/otm-cluster     <-- clone https://github.com/OpenTreeMap/otm-cluster
+          repository: OpenTreeMap/otm-cluster     <-- clone https://github.com/OpenTreeMap/otm-cluster
           ref: main
 
       - name: Generate commit-sha.txt
