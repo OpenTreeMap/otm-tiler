@@ -21,4 +21,8 @@ jobs:
         run: |
           cd src/otm-cluster
           git commit -a -m "Trigger tiler build"
-          git push
+
+      - name: Push changes to otm-cluster
+        uses: ad-m/github-push-action@master
+        with:
+          force_with_lease: true
