@@ -16,13 +16,10 @@ jobs:
       - name: Generate commit-sha.txt
         run: |
           ls -la
-          echo "${GITHUB_REF##*/}-${GITHUB_SHA:0:7}" >> build/otm-tiler/commit-sha.txt
+          echo "${GITHUB_REF##*/}-${GITHUB_SHA:0:7}" >> src/build/otm-tiler/commit-sha.txt
 
-      - name: Commit files
+      - name: Commit an push files
         run: |
+          cd src
           git commit -a -m "Trigger tiler build"
-
-      - name: Push changes to otm-cluster
-        uses: ad-m/github-push-action@master
-        with:
-          force_with_lease: true
+          git push
