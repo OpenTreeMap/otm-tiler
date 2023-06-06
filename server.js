@@ -23,6 +23,7 @@ var ws;
 
 var styles = {
     boundary: fs.readFileSync('style/boundary.mms', {encoding: 'utf-8'}),
+    boundaryCategory: fs.readFileSync('style/boundaryCategory.mms', {encoding: 'utf-8'}),
     canopy: fs.readFileSync('style/canopy.mms', {encoding: 'utf-8'}),
     mapFeature: fs.readFileSync('style/mapFeature.mms', {encoding: 'utf-8'}),
     uncoloredMapFeature: fs.readFileSync('style/uncoloredMapFeature.mms', {encoding: 'utf-8'}),
@@ -97,19 +98,27 @@ var windshaftConfig = {
             table = req.params.table;
             zoom = req.params.z;
             isPolygonRequest = (table === 'stormwater_polygonalmapfeature');
-            if (table === 'treemap_mapfeature' || isPolygonRequest) {
+            if (table === 'treemap_mapfeature' || isPolygonRequest || table === 'importer_treerowimport') {
                 filterString = req.query[config.filterQueryArgumentName];
                 displayString = req.query[config.displayQueryArgumentName];
                 restrictFeatureString = req.query[config.restrictFeatureQueryArgumentName];
                 isUtfGridRequest = (req.params.format === 'grid.json');
-                req.params.sql = makeSql.makeSqlForMapFeatures(filterString,
-                                                               displayString,
-                                                               restrictFeatureString,
-                                                               instanceid,
-                                                               zoom,
-                                                               isUtfGridRequest,
-                                                               isPolygonRequest,
-                                                               req.instanceConfig);
+
+                var showImportedTrees = table === 'importer_treerowimport';
+                var showTreeCondition = req.query[config.showTreeCondition] === 'true';
+
+                req.params.sql = makeSql.makeSqlForMapFeatures(
+                    filterString,
+                    displayString,
+                    restrictFeatureString,
+                    instanceid,
+                    zoom,
+                    isUtfGridRequest,
+                    isPolygonRequest,
+                    req.instanceConfig,
+                    showImportedTrees,
+                    showTreeCondition
+                );
                 if (isPolygonRequest) {
                     req.params.style = styles.polygonalMapFeature;
                 } else if (isUtfGridRequest) {
@@ -117,6 +126,10 @@ var windshaftConfig = {
                 } else {
                     req.params.style = styles.mapFeature;
                 }
+            } else if (table === 'treemap_boundary' && 'category' in req.query) {
+                category = req.query.category;
+                req.params.sql = makeSql.makeSqlForBoundariesLayers(category);
+                req.params.style = styles.boundaryCategory;
             } else if (table === 'treemap_boundary' && instanceid) {
                 req.params.sql = makeSql.makeSqlForBoundaries(instanceid);
                 req.params.style = styles.boundary;

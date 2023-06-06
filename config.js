@@ -19,6 +19,7 @@ var canopyBoundarySql = [
 
 module.exports = {
     "filterQueryArgumentName": "q",
+    "showTreeCondition": "showTreeCondition",
     "displayQueryArgumentName": "show",
     "restrictFeatureQueryArgumentName": "restrict",
     // This is the column name of the hstore column used for scalar udfs
@@ -29,7 +30,7 @@ module.exports = {
                 "point": "the_geom_webmercator",
                 "polygon": "stormwater_polygonalmapfeature.polygon"
             },
-            "base": "feature_type, treemap_tree.id AS tree_id",
+            "base": "feature_type, treemap_tree.id AS tree_id, <%= importerField %> as importer_id, <%= conditionField %> as condition",
             "polygon": "feature_type",
             "utfGrid": "feature_type, treemap_mapfeature.id AS id"
         },
@@ -74,6 +75,10 @@ module.exports = {
                 "depends": ["mapFeature"],
                 "sql": "LEFT OUTER JOIN treemap_mapfeaturephoto ON treemap_mapfeature.id = treemap_mapfeaturephoto.map_feature_id"
             },
+            "treeRowImport": {
+                "depends": ["mapFeature", "tree"],
+                "sql": "JOIN importer_treeimportrow on importer_treeimportrow.plot_id = treemap_tree.plot_id"
+            },
             "udf": {
                 // Despite mapFeature not being referenced in the "sql" property it will
                 // be used in the filter for udf and so it is required
@@ -88,6 +93,7 @@ module.exports = {
     },
     "treeDisplayFilters": ["EmptyPlot", "Tree"],
     "boundaryGrainstoreSql": "SELECT the_geom_webmercator FROM treemap_boundary JOIN treemap_instance_boundaries ON treemap_instance_boundaries.boundary_id = treemap_boundary.id WHERE treemap_instance_boundaries.instance_id=<%= instanceid %> AND treemap_boundary.searchable=true",
+    "boundaryLayerGrainstoreSql": "SELECT the_geom_webmercator, category, name FROM treemap_boundary WHERE treemap_boundary.category='<%= category %>' AND treemap_boundary.searchable=true",
     "getBoundarySql" : "SELECT the_geom_webmercator FROM treemap_boundary WHERE id=<%= boundaryId %>",
     "canopyBoundarySql": canopyBoundarySql,
     "showAtZoomSql": "(treemap_mapfeature.hide_at_zoom IS NULL OR treemap_mapfeature.hide_at_zoom < <%= zoom %>)",
@@ -105,7 +111,8 @@ module.exports = {
         "bioswale": "stormwater_bioswale",
         "species": "treemap_species",
         "mapFeaturePhoto": "treemap_mapfeaturephoto",
-        "udf": "treemap_userdefinedcollectionvalue"
+        "udf": "treemap_userdefinedcollectionvalue",
+        "treeRowImport": "importer_treeimportrow"
     },
     "udfcTemplates": {
         "tree": "treemap_userdefinedcollectionvalue.field_definition_id=<%= fieldDefId %> AND treemap_userdefinedcollectionvalue.model_id=treemap_tree.id",

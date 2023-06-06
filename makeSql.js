@@ -40,7 +40,8 @@ var utils = require('./filterObjectUtils');
 // Assumes that instanceid is an integer, ready to be plugged
 // directly into SQL
 function makeSqlForMapFeatures(filterString, displayString, restrictFeatureString, instanceid,
-                               zoom, isUtfGridRequest, isPolygonRequest, instanceConfig) {
+                               zoom, isUtfGridRequest, isPolygonRequest, instanceConfig,
+                               showImportedTrees, showTreeCondition) {
     var geom_spec = config.sqlForMapFeatures.fields.geom,
         geom_field = isPolygonRequest ? geom_spec.polygon : geom_spec.point,
         parsedFilterObject = filterString ? JSON.parse(filterString) : {},
@@ -85,7 +86,13 @@ function makeSqlForMapFeatures(filterString, displayString, restrictFeatureStrin
     } else if (isPolygonRequest) {
         otherFields = config.sqlForMapFeatures.fields.polygon;
     } else {
-        otherFields = config.sqlForMapFeatures.fields.base;
+        // we only sometimes want different colors for imported trees
+        var importerField = showImportedTrees ? 'importer_treeimportrow.id' : 'null';
+        var conditionField = showTreeCondition ? 'treemap_tree.udfs -> \'Condition\'' : 'null';
+        otherFields = _.template(config.sqlForMapFeatures.fields.base)({
+            'importerField': importerField,
+            'conditionField': conditionField
+        });
     }
 
     geom_field = util.format("%s AS %s",
@@ -122,6 +129,12 @@ function makeSqlForBoundaries(instanceid) {
     });
 }
 
+function makeSqlForBoundariesLayers(category) {
+    return _.template(config.boundaryLayerGrainstoreSql)({
+        category: category
+    });
+}
+
 function makeSqlForCanopyBoundaries(instanceid, canopy_min, canopy_max, category) {
     return _.template(config.canopyBoundarySql)({
         instanceid: instanceid,
@@ -134,5 +147,6 @@ function makeSqlForCanopyBoundaries(instanceid, canopy_min, canopy_max, category
 exports = module.exports = {
     makeSqlForMapFeatures: makeSqlForMapFeatures,
     makeSqlForCanopyBoundaries: makeSqlForCanopyBoundaries,
-    makeSqlForBoundaries: makeSqlForBoundaries
+    makeSqlForBoundaries: makeSqlForBoundaries,
+    makeSqlForBoundariesLayers: makeSqlForBoundariesLayers
 };
